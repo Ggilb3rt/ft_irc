@@ -18,6 +18,8 @@ He can :
 - TOPIC (4.2.4)
 (cf RFC1459 1.3.1)
 
+The granting of operator privilegs need some requirements (cf RFC1459 8.12.2)
+
 ### Messages
 - 3 mains parts : the prefix (optional), the command and the command params (up to 15). They are separated by unless one space (ASCII 0x20). (cf RFC1459 2.3)
 - IRC messages are always lines of characters (512 max) with a CR-LF (Carriage Return - Line Feed) pair. (cf RFC1459 2.3) Not all implementations use CR-LF (cf RFC1459 8.)

@@ -1,6 +1,44 @@
 # ft_irc
 My own irc server
 
+## Socket
+A socket create a connection between two programms.
+socket = ip address + port nb
+ex : 127.0.0.1:80
+
+Qt of port = (2^16)-1, so 0-65535 [source]https://fr.wikipedia.org/wiki/Port_(logiciel)
+All blocs of data find the servers with his ip address, then the server sends each blocs to the good process with the port number.
+
+```c
+// This code is for client, not for server and he don't listen the response ==> this is useless
+
+#define MAX_SIZE 512
+
+int                 socketfd;
+struct sockaddr     serveradd;
+char                buff[MAX_SIZE];
+size_t              bufflen;
+
+bzero(buff, MAXSIZE);
+// Prepare and connect to socket
+socketfd = socket(AF_INET, SOCK_STREAM, 0);  // AF_INET == use ipv4, SOCK_STREAM == can write and read, 0 == TCP
+if (socketfd < 0)
+  err_stop();
+serveradd.sin_family = AF_INET;
+serveradd.sin_port = htons(SERVER_PORT);
+
+if (connect(socketfd, &serveradd, sizeof(serveradd)) < 0)
+  err_connect();
+
+//Prepare and send msg
+buff = "SALUT !!\r\n" // I know this will not works
+bufflen = strlen(buff);
+
+if (send(socketfd, &buff, bufflen, MSG_OOB) != bufflen) // MSG_OOB == out of band data, don't know what it is
+  err_sending();
+
+```
+
 ## Client
 ### Irssi
 [doc] https://irssi.org/documentation/
@@ -66,7 +104,7 @@ this user is also given channel operator status. (RFC2811 2.4.2)
 
 ### Messages
 - 3 mains parts : the prefix (optional), the command and the command params (up to 15). They are separated by unless one space (ASCII 0x20). (cf RFC1459 2.3)
-- IRC messages are always lines of characters (512 max) with a CR-LF (Carriage Return - Line Feed) pair. (cf RFC1459 2.3) Not all implementations use CR-LF (cf RFC1459 8.)
+- IRC messages are always lines of characters (512 max) with a CR-LF (Carriage Return - Line Feed) (\r\n) pair. (cf RFC1459 2.3) Not all implementations use CR-LF (cf RFC1459 8.)
 - see pseudo messages in RFC1459 2.3.1
 
 Needed commands (cf RFC1459 4.x) :

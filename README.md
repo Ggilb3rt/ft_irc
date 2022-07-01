@@ -2,12 +2,16 @@
 My own irc server
 
 ## Socket
-A socket create a connection between two programms.
+A socket is a way to speak to other programs using Unix file descriptors.
+It creates a connection between two programms.
+There is many type of internet sockets but we will used "Stream sockets" because it's a two way connected communication.
+
 socket = ip address + port nb
 ex : 127.0.0.1:80
 
 Qt of port = (2^16)-1, so 0-65535 [source]https://fr.wikipedia.org/wiki/Port_(logiciel)
 All blocs of data find the servers with his ip address, then the server sends each blocs to the good process with the port number.
+
 
 ```c
 // This code is for client, not for server and he don't listen the response ==> this is useless
@@ -161,6 +165,10 @@ cf RFC1459 section 6, we just have to copie paste all in a file
 > equivalence of two nicknames." (cf RFC1459 2.2)
 
 ## Sources
+[client] https://irssi.org/New-users/
+[socket_prog] https://beej.us/guide/bgnet/html
+
+[before_RFC] http://chi.cs.uchicago.edu/chirc/intro.html
 [RFC1459:Base] https://datatracker.ietf.org/doc/html/rfc1459
 [RFC2810:Architecture] https://datatracker.ietf.org/doc/html/rfc2810
 [RFC2811:ChanneManagement] https://datatracker.ietf.org/doc/html/rfc2811

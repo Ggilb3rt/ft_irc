@@ -8,7 +8,7 @@ void		init_env(t_env *e)
   int		i;
   struct rlimit	rlp;
 
-  X(-1, getrlimit(RLIMIT_NOFILE, &rlp), "getrlimit");
+  X(-1, getrlimit(RLIMIT_NOFILE, &rlp), "getrlimit"); // find the limit of available fd
   e->maxfd = rlp.rlim_cur;
   e->fds = (t_fd*)Xv(NULL, malloc(sizeof(*e->fds) * e->maxfd), "malloc");
   i = 0;

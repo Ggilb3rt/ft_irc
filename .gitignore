@@ -34,3 +34,5 @@
 .DS_store
 .vscode/
 ./bircd/bircd
+client
+ft_irc

@@ -167,6 +167,7 @@ cf RFC1459 section 6, we just have to copie paste all in a file
 ## Sources
 [client] https://irssi.org/New-users/
 [socket_prog] https://beej.us/guide/bgnet/html
+[socket_prog_fr] http://tvaira.free.fr/bts-sn/reseaux/cours/cours-sockets.pdf
 
 [before_RFC] http://chi.cs.uchicago.edu/chirc/intro.html
 [RFC1459:Base] https://datatracker.ietf.org/doc/html/rfc1459

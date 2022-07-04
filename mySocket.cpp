@@ -80,6 +80,7 @@ void	mySocket::startListen()
 	while (new_fd != 6) { // here must be infinit loop
 		addr_size = sizeof(their_addr);
 		new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
+		// create user with new_fd
 
 		std::cout << "New client #" << new_fd << " from "
 				<< inet_ntoa(their_addr.sin_addr) << ":"

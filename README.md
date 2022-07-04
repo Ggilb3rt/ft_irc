@@ -58,7 +58,7 @@ Install in 42
 brew install irssi
 ```
 #### Connect Irssi to our server
-In irssi
+In irssi[^client]
 ```bash
 /network add ft_irc
 /server add -network ft_irc 127.0.0.1 6697
@@ -74,57 +74,65 @@ In irssi
 - services
 
 ### Server
-__Name maximum length 63 characters__ (RFC2812 1.1)
+__Name maximum length 63 characters__[^RFC2812_1.1]
 
 ### Channels
 > "A channel is a named group of one or more users which will all
 > receive messages addressed to that channel.  A channel is
 > characterized by its name, properties and current members."
 
-__Name maximum length 50 char__ beginning with '&', '#', '+', or '!', without spaces ' ', a control G (ASCII 7) or a comma ','
-Channel names are case insensitive. (RFC2812 1.3)
+__Name maximum length 50 char__ beginning with '&', '#', '+', or '!', without spaces ' ', a control G (ASCII 7) or a comma ',' 
+Channel names are case insensitive.[^RFC2812_1.3]
 
-Standard channels ('&', '#', '+') are implicitly created when first user joins it and die when the last user leaves it. (RFC2811 3.1)
+Standard channels ('&', '#', '+') are implicitly created when first user joins it and die when the last user leaves it.[^RFC2811_3.1]
 Safe channels ('!') are not implicitly created. The user must request the creation using JOIN with channel id replace by '!'. The name of this channel is the concatenation of 5 characters + x characters (user chooses). The user become "channel creator". Theses channels may continue to exist after the last user left.
 
-Cf Creator to see special habilities of them
+Cf Creator to see special habilities of them 
 Cf Operators to see special habilities of them
 
 #### Channel Modes
-For users :
+For users : 
   -O, -o, -V
 
-For channels :
-  -a, -i, -m, -n, -q, -p, -s, -r, -t, -k, -l, -b, -e, -I (see details in RFC2811 4.)
+For channels : 
+  -a, -i, -m, -n, -q, -p, -s, -r, -t, -k, -l, -b, -e, -I (see details in [RFC2811 4.](https://www.rfcreader.com/#rfc2811_line281))
 
 All these modes can be manipulated by "channel operators" by using MODE command
 
 ### User
-Each user is distinguished from other by a unique nickname, __max length 9 characters__ (always real ?) (RFC2812 1.2.1)
+Each user is distinguished from other by a unique nickname, __max length 9 characters__ (always real ?)[^RFC2812_1.2.1]
 
 #### Operators
 They are clients with specials habilities (it's looks like administrors)
 
 Channel operator (chop or chanop) is the "owner" of that channel. The '@' is next to his nickname
-He can :
+He can[^RFC1459_1.3.1] :
 - KICK (RFC1459 4.2.8)
 - MODE (RFC1459 4.2.3)
 - INVITE (RFC1459 4.2.7) (mode +i (RFC2811 2.4))
 - TOPIC (RFC1459 4.2.4)
 Not needed :
 - SQUIT (RFC2812 3.1.8) because no server-server communication
-(cf RFC1459 1.3.1)
 
-The granting of operator privilegs need some requirements (cf RFC1459 8.12.2)
+Check __Messages__ section for more details
+
+The granting of operator privilegs need some requirements[^RFC1459_8.12.2]
 
 #### Creator
 A user who create a channel with the character '!' as prefix is the "channel creator" (-O). Upon creation of the channel,
-this user is also given channel operator status. (RFC2811 2.4.2)
+this user is also given channel operator status.[^RFC2811_2.4.2]
 
 ### Messages
-- 3 mains parts : the prefix (optional), the command and the command params (up to 15). They are separated by unless one space (ASCII 0x20). (cf RFC1459 2.3)
-- IRC messages are always lines of characters __(512 max)__ with a CR-LF (Carriage Return - Line Feed) __(\r\n)__ pair. (cf RFC1459 2.3) Not all implementations use CR-LF (cf RFC1459 8.)
-- see pseudo messages in RFC1459 2.3.1
+- 3 mains parts :
+  - the prefix (optional),
+  - the command
+  - the command params (up to 15)
+
+They are separated by unless one space (ASCII 0x20).[^RFC1459_2.3]
+
+- IRC messages are always lines of characters __(512 max)__ with a CR-LF (Carriage Return - Line Feed) __(\r\n)__ pair.[^RFC1459_2.3] 
+Not all implementations use CR-LF[^RFC1459_8.]
+- see pseudo messages in [here](https://www.rfcreader.com/#rfc1459_line350)
 
 Needed commands (cf RFC1459 4.x) :
 We have to debate about what is needed and what is not following the subject.
@@ -171,20 +179,23 @@ We have to debate about what is needed and what is not following the subject.
 - plus all operators specials habilities
 
 ### Error replies
-cf RFC1459 section 6, we just have to copie paste all in a file
+[RFC1459 section 6](https://www.rfcreader.com/#rfc1459_line1993), we just have to copie paste all in a file
 
 ### Funny things
 > "Because of IRC's scandanavian origin, the characters {}| are
 > considered to be the lower case equivalents of the characters []\,
 > respectively. This is a critical issue when determining the
-> equivalence of two nicknames." (cf RFC1459 2.2)
+> equivalence of two nicknames."[^RFC1459_2.2]
 
 ## Sources
-[client](https://irssi.org/New-users/)
-[socket_prog](https://beej.us/guide/bgnet/html)
+
 [socket_prog_fr](http://tvaira.free.fr/bts-sn/reseaux/cours/cours-sockets.pdf)
 
+[socket_prog](https://beej.us/guide/bgnet/html)
+
 [before_RFC](http://chi.cs.uchicago.edu/chirc/intro.html)
+
+
 [RFC1459:Base](https://datatracker.ietf.org/doc/html/rfc1459)
 [RFC2810:Architecture](https://datatracker.ietf.org/doc/html/rfc2810)
 [RFC2811:ChanneManagement](https://datatracker.ietf.org/doc/html/rfc2811)
@@ -194,3 +205,14 @@ cf RFC1459 section 6, we just have to copie paste all in a file
 
 
 [^1]: https://fr.wikipedia.org/wiki/Port_(logiciel)
+[^client]: https://irssi.org/New-users/
+[^RFC2812_1.1]: https://www.rfcreader.com/#rfc2812_line126
+[^RFC2812_1.3]: https://www.rfcreader.com/#rfc2812_line176
+[^RFC2811_3.1]: https://www.rfcreader.com/#rfc2811_line219
+[^RFC2812_1.2.1]: https://www.rfcreader.com/#rfc2812_line138
+[^RFC1459_1.3.1]: https://www.rfcreader.com/#rfc1459_line263
+[^RFC1459_8.12.2]: https://www.rfcreader.com/#rfc1459_line2922
+[^RFC2811_2.4.2]: https://www.rfcreader.com/#rfc2811_line199
+[^RFC1459_2.3]: https://www.rfcreader.com/#rfc1459_line311
+[^RFC1459_8.]: https://www.rfcreader.com/#rfc1459_line2654
+[^RFC1459_2.2]: https://www.rfcreader.com/#rfc1459_line294

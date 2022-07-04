@@ -1,5 +1,5 @@
 
-SRCS =	main.cpp
+SRCS =	main.cpp mySocket.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 
@@ -25,7 +25,7 @@ fclean:		clean
 re:		fclean all
 
 test: all
-	./${NAME} localhost
-	@echo "\n\n"
-	#./${NAME} google.com
-	
+	./${NAME} 6697
+
+val_test: all
+	valgrind --leak-check=full --track-origins=yes ./${NAME} 6697

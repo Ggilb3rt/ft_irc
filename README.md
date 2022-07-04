@@ -74,7 +74,7 @@ In irssi[^client]
 - services
 
 ### Server
-__Name maximum length 63 characters__[^RFC2812_1.1]
+__Name maximum length 63 characters__[^RFC2812_1_1]
 
 ### Channels
 > "A channel is a named group of one or more users which will all
@@ -82,9 +82,9 @@ __Name maximum length 63 characters__[^RFC2812_1.1]
 > characterized by its name, properties and current members."
 
 __Name maximum length 50 char__ beginning with '&', '#', '+', or '!', without spaces ' ', a control G (ASCII 7) or a comma ',' 
-Channel names are case insensitive.[^RFC2812_1.3]
+Channel names are case insensitive.[^RFC2812_1_3]
 
-Standard channels ('&', '#', '+') are implicitly created when first user joins it and die when the last user leaves it.[^RFC2811_3.1]
+Standard channels ('&', '#', '+') are implicitly created when first user joins it and die when the last user leaves it.[^RFC2811_3_1]
 Safe channels ('!') are not implicitly created. The user must request the creation using JOIN with channel id replace by '!'. The name of this channel is the concatenation of 5 characters + x characters (user chooses). The user become "channel creator". Theses channels may continue to exist after the last user left.
 
 Cf Creator to see special habilities of them 
@@ -95,18 +95,18 @@ For users :
   -O, -o, -V
 
 For channels : 
-  -a, -i, -m, -n, -q, -p, -s, -r, -t, -k, -l, -b, -e, -I (see details in [RFC2811 4.](https://www.rfcreader.com/#rfc2811_line281))
+  -a, -i, -m, -n, -q, -p, -s, -r, -t, -k, -l, -b, -e, -I (see details in [RFC2811 4](https://www.rfcreader.com/#rfc2811_line281))
 
 All these modes can be manipulated by "channel operators" by using MODE command
 
 ### User
-Each user is distinguished from other by a unique nickname, __max length 9 characters__ (always real ?)[^RFC2812_1.2.1]
+Each user is distinguished from other by a unique nickname, __max length 9 characters__ (always real ?)[^RFC2812_1_2_1]
 
 #### Operators
 They are clients with specials habilities (it's looks like administrors)
 
 Channel operator (chop or chanop) is the "owner" of that channel. The '@' is next to his nickname
-He can[^RFC1459_1.3.1] :
+He can[^RFC1459_1_3_1] :
 - KICK (RFC1459 4.2.8)
 - MODE (RFC1459 4.2.3)
 - INVITE (RFC1459 4.2.7) (mode +i (RFC2811 2.4))
@@ -116,11 +116,11 @@ Not needed :
 
 Check __Messages__ section for more details
 
-The granting of operator privilegs need some requirements[^RFC1459_8.12.2]
+The granting of operator privilegs need some requirements[^RFC1459_8_12_2]
 
 #### Creator
 A user who create a channel with the character '!' as prefix is the "channel creator" (-O). Upon creation of the channel,
-this user is also given channel operator status.[^RFC2811_2.4.2]
+this user is also given channel operator status.[^RFC2811_2_4_2]
 
 ### Messages
 - 3 mains parts :
@@ -128,10 +128,10 @@ this user is also given channel operator status.[^RFC2811_2.4.2]
   - the command
   - the command params (up to 15)
 
-They are separated by unless one space (ASCII 0x20).[^RFC1459_2.3]
+They are separated by unless one space (ASCII 0x20).[^RFC1459_2_3]
 
-- IRC messages are always lines of characters __(512 max)__ with a CR-LF (Carriage Return - Line Feed) __(\r\n)__ pair.[^RFC1459_2.3] 
-Not all implementations use CR-LF[^RFC1459_8.]
+- IRC messages are always lines of characters __(512 max)__ with a CR-LF (Carriage Return - Line Feed) __(\r\n)__ pair.[^RFC1459_2_3] 
+Not all implementations use CR-LF[^RFC1459_8]
 - see pseudo messages in [here](https://www.rfcreader.com/#rfc1459_line350)
 
 Needed commands (cf RFC1459 4.x) :
@@ -185,7 +185,7 @@ We have to debate about what is needed and what is not following the subject.
 > "Because of IRC's scandanavian origin, the characters {}| are
 > considered to be the lower case equivalents of the characters []\,
 > respectively. This is a critical issue when determining the
-> equivalence of two nicknames."[^RFC1459_2.2]
+> equivalence of two nicknames."[^RFC1459_2_2]
 
 ## Sources
 
@@ -206,13 +206,13 @@ We have to debate about what is needed and what is not following the subject.
 
 [^1]: https://fr.wikipedia.org/wiki/Port_(logiciel)
 [^client]: https://irssi.org/New-users/
-[^RFC2812_1.1]: https://www.rfcreader.com/#rfc2812_line126
-[^RFC2812_1.3]: https://www.rfcreader.com/#rfc2812_line176
-[^RFC2811_3.1]: https://www.rfcreader.com/#rfc2811_line219
-[^RFC2812_1.2.1]: https://www.rfcreader.com/#rfc2812_line138
-[^RFC1459_1.3.1]: https://www.rfcreader.com/#rfc1459_line263
-[^RFC1459_8.12.2]: https://www.rfcreader.com/#rfc1459_line2922
-[^RFC2811_2.4.2]: https://www.rfcreader.com/#rfc2811_line199
-[^RFC1459_2.3]: https://www.rfcreader.com/#rfc1459_line311
-[^RFC1459_8.]: https://www.rfcreader.com/#rfc1459_line2654
-[^RFC1459_2.2]: https://www.rfcreader.com/#rfc1459_line294
+[^RFC2812_1_1]: https://www.rfcreader.com/#rfc2812_line126
+[^RFC2812_1_3]: https://www.rfcreader.com/#rfc2812_line176
+[^RFC2811_3_1]: https://www.rfcreader.com/#rfc2811_line219
+[^RFC2812_1_2_1]: https://www.rfcreader.com/#rfc2812_line138
+[^RFC1459_1_3_1]: https://www.rfcreader.com/#rfc1459_line263
+[^RFC1459_8_12_2]: https://www.rfcreader.com/#rfc1459_line2922
+[^RFC2811_2_4_2]: https://www.rfcreader.com/#rfc2811_line199
+[^RFC1459_2_3]: https://www.rfcreader.com/#rfc1459_line311
+[^RFC1459_8]: https://www.rfcreader.com/#rfc1459_line2654
+[^RFC1459_2_2]: https://www.rfcreader.com/#rfc1459_line294

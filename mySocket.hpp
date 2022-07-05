@@ -12,6 +12,22 @@
 #include <fcntl.h>
 #include <iostream>
 
+class user
+{
+	private:
+		int			_fd;
+		std::string	_name;
+
+	public:
+		user() : _fd(-1), _name("") {}
+		user(int fd, char *name) : _fd(fd), _name(name) {}
+		~user() {}
+
+		std::string	getName() const { return _name; }
+		int			getFd() const { return _fd; }
+		void		setFd(int fd) { this->_fd = fd; }
+		void		setName(char	*name) { this->_name = name; }
+};
 
 class mySocket
 {
@@ -22,13 +38,14 @@ class mySocket
 private:
 	struct addrinfo		_hints, *_servinfo, *_p;
 	char				*_port;
-	int					sockfd, new_fd;
+	int					_master_sockfd, new_fd;
 	struct sockaddr_in	their_addr;
 	socklen_t			addr_size;
 
+	//user				roger;
 
 	void		initAddrInfo();
-	void		createSocketFd();
+	void		createMasterSocket();
 	int			readData();
 
 public:

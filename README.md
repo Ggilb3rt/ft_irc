@@ -22,27 +22,27 @@ All blocs of data find the servers with his ip address, then the server sends ea
 
 #define MAX_SIZE 512
 
-int                 socketfd;
+int                 MasterSocket;
 struct sockaddr     serveradd;
 char                buff[MAX_SIZE];
 size_t              bufflen;
 
 bzero(buff, MAXSIZE);
 // Prepare and connect to socket
-socketfd = socket(AF_INET, SOCK_STREAM, 0);  // AF_INET == use ipv4, SOCK_STREAM == can write and read, 0 == TCP
-if (socketfd < 0)
+MasterSocket = socket(AF_INET, SOCK_STREAM, 0);  // AF_INET == use ipv4, SOCK_STREAM == can write and read, 0 == TCP
+if (MasterSocket < 0)
   err_stop();
 serveradd.sin_family = AF_INET;
 serveradd.sin_port = htons(SERVER_PORT);
 
-if (connect(socketfd, &serveradd, sizeof(serveradd)) < 0)
+if (connect(MasterSocket, &serveradd, sizeof(serveradd)) < 0)
   err_connect();
 
 //Prepare and send msg
 buff = "SALUT !!\r\n" // I know this will not works
 bufflen = strlen(buff);
 
-if (send(socketfd, &buff, bufflen, MSG_OOB) != bufflen) // MSG_OOB == out of band data, don't know what it is
+if (send(MasterSocket, &buff, bufflen, MSG_OOB) != bufflen) // MSG_OOB == out of band data, don't know what it is
   err_sending();
 ```
 
@@ -193,8 +193,10 @@ We have to debate about what is needed and what is not following the subject.
 
 [socket_prog](https://beej.us/guide/bgnet/html)
 
-[before_RFC](http://chi.cs.uchicago.edu/chirc/intro.html)
+[poll()](https://www.ibm.com/docs/en/i/7.1?topic=designs-using-poll-instead-select)
 
+
+[before_RFC](http://chi.cs.uchicago.edu/chirc/intro.html)
 
 [RFC1459:Base](https://datatracker.ietf.org/doc/html/rfc1459)
 [RFC2810:Architecture](https://datatracker.ietf.org/doc/html/rfc2810)

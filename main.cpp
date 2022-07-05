@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
 	base.printAddrInfo();
 	base.startListen();
-	//std::cout << "Fd : " << base.sockfd << std::endl;
+	//std::cout << "Fd : " << base._master_sockfd << std::endl;
 
 	return 0;
 }

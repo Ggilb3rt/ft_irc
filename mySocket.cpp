@@ -1,15 +1,15 @@
 #include "mySocket.hpp"
 
 
-mySocket::mySocket(char *port) : _port(port)
+mySocket::mySocket(char *port) : _port(port)//, roger()
 {
 	this->initAddrInfo();
-	this->createSocketFd();
+	this->createMasterSocket();
 }
 
 mySocket::~mySocket()
 {
-	close(sockfd);
+	close(_master_sockfd);
 	freeaddrinfo(_servinfo);
 }
 
@@ -30,64 +30,80 @@ void	mySocket::initAddrInfo()
 	}
 }
 
-void	mySocket::createSocketFd()
+void	mySocket::createMasterSocket()
 {
 	int	bind_ret;
 
-	sockfd = socket(_servinfo->ai_family, _servinfo->ai_socktype, _servinfo->ai_protocol);
-	if (sockfd == -1) {
+	_master_sockfd = socket(_servinfo->ai_family, _servinfo->ai_socktype, _servinfo->ai_protocol);
+	if (_master_sockfd == -1) {
         std::cerr << "ERROR : Socket" << std::endl;
 		throw 2;
     }
-	//fcntl(sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc
-	bind_ret = bind(sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
+	// fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc
+	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
 	if (bind_ret == -1) {
         std::cerr << "ERROR : Bind" << std::endl;
-		throw 3;
+		close(_master_sockfd);
+		freeaddrinfo(_servinfo);
+		exit(errno);
     }
-}
-
-int    mySocket::readData()
-{
-		int		maxlen = 512;   // Semi pif, je crois que c'est la taille max dans le protocol IRC pas sur de devoir le mettre ici
-        char	buf[maxlen];	// ne devrait pas etre en local, aura besoin de traitement
-		size_t	recv_ret = 0;
-
-		recv_ret = recv(new_fd, buf, maxlen-1, 0);
-		if (recv_ret == -1)
-			std::cerr << "error : " << errno << std::endl;
-		else if (recv_ret == 0)
-			std::cout << "remote host close the connection" << std::endl;
-		else {
-			for (int i = recv_ret; i < maxlen ; i++)
-				buf[i] = '\0';
-			std::cout << "My buffer[" << recv_ret << "] |" << buf << std::endl;
-		}
-        
-		std::string res = "Hey Maaarc !";
-		send(new_fd, res.c_str(), res.length(), 0);
-
-		return recv_ret;
-
 }
 
 void	mySocket::startListen()
 {
-	std::cout << "listening .. " << std::endl;
-	listen(sockfd, BACKLOG); // again need to check != 0
+	int	needQuit = 1;
 
-	new_fd = 0;
-	while (new_fd != 6) { // here must be infinit loop
+	std::cout << "listening .. " << std::endl;
+	listen(_master_sockfd, BACKLOG); // again need to check != 0
+
+	while (1) { // here must be infinit loop
 		addr_size = sizeof(their_addr);
-		new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
-		// create user with new_fd
+		new_fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
 
 		std::cout << "New client #" << new_fd << " from "
 				<< inet_ntoa(their_addr.sin_addr) << ":"
 				<< ntohs(their_addr.sin_port) << std::endl;
 
-        this->readData();
+        needQuit = this->readData();
+		// create user with new_fd
+		//std::cout << "User : " << roger.getName() << " fd : " << roger.getFd() << std::endl; 
+		// close(new_fd);
 	}
+}
+
+int    mySocket::readData()
+{
+		int		maxlen = 512;   // Semi pif, je crois que c'est la taille max dans le protocol IRC pas sur de devoir le mettre ici
+        char	buff[maxlen];	// ne devrait pas etre en local, aura besoin de traitement
+		int		recv_ret = 1;
+		std::string	msg;
+
+		// recv_ret = recv(new_fd, buff, maxlen-1, 0);
+		// if (recv_ret == -1)
+		// 	std::cerr << "error : " << errno << std::endl;
+		// else if (recv_ret == 0)
+		// 	std::cout << "remote host close the connection" << std::endl;
+		// else {
+		// 	for (int i = recv_ret; i < maxlen ; i++)
+		// 		buff[i] = '\0';
+		// 	std::cout << "My buffer[" << recv_ret << "] |" << buff << std::endl;
+		// }
+
+		while (recv_ret > 0) {
+			recv_ret = recv(new_fd, buff, sizeof(buff), 0);
+			buff[recv_ret] = '\0';
+			std::cout << buff << "|buff size : " << recv_ret << std::endl;
+			msg += buff;
+		}
+
+		std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
+		// must be in a sendData function
+		std::string res = "Hey Maaaarc !";
+		send(new_fd, res.c_str(), res.length(), 0);
+
+		// roger.setFd(new_fd);
+		// roger.setName(buf);
+		return recv_ret;
 }
 
 void	mySocket::printAddrInfo()

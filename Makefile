@@ -6,7 +6,7 @@ OBJS = ${SRCS:.cpp=.o}
 NAME = ft_irc
 
 CFLAGS = -I. -g3 -Wall -Werror -std=c++98
-LDFLAGS = -g
+LDFLAGS =
 
 CC = c++
 RM = rm -f

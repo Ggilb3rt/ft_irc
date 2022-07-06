@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 {
 
 	if (argc != 2) {
-		std::cerr << "usage: showip hostname" << std::endl;
+		std::cerr << "usage: ./ft_irc port password" << std::endl;
 		return 1;
 	}
 
@@ -25,7 +25,6 @@ int main(int argc, char **argv)
 
 	base.printAddrInfo();
 	base.startListen();
-	//std::cout << "Fd : " << base._master_sockfd << std::endl;
 
 	return 0;
 }

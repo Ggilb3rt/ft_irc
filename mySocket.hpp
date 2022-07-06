@@ -10,6 +10,9 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
+#include <vector>
+#include <map>
 #include <iostream>
 
 class user
@@ -34,6 +37,7 @@ class mySocket
 
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
+#define END_MSG "\r\n"
 
 private:
 	struct addrinfo		_hints, *_servinfo, *_p;
@@ -44,6 +48,7 @@ private:
 
 	//user				roger;
 
+	void		init();
 	void		initAddrInfo();
 	void		createMasterSocket();
 	int			readData();

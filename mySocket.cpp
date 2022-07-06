@@ -3,8 +3,7 @@
 
 mySocket::mySocket(char *port) : _port(port)//, roger()
 {
-	this->initAddrInfo();
-	this->createMasterSocket();
+	this->init();
 }
 
 mySocket::~mySocket()
@@ -13,6 +12,13 @@ mySocket::~mySocket()
 	freeaddrinfo(_servinfo);
 }
 
+void	mySocket::init()
+{
+	this->initAddrInfo();
+	this->createMasterSocket();
+
+
+}
 
 void	mySocket::initAddrInfo()
 {
@@ -39,7 +45,7 @@ void	mySocket::createMasterSocket()
         std::cerr << "ERROR : Socket" << std::endl;
 		throw 2;
     }
-	// fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc
+	//fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
 	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
 	if (bind_ret == -1) {
         std::cerr << "ERROR : Bind" << std::endl;
@@ -47,24 +53,54 @@ void	mySocket::createMasterSocket()
 		freeaddrinfo(_servinfo);
 		exit(errno);
     }
+	std::cout << "listening .. " << std::endl;
+	listen(_master_sockfd, BACKLOG); // again need to check != 0
 }
 
 void	mySocket::startListen()
 {
 	int	needQuit = 1;
+	int	ret_poll = 0;
+	struct	pollfd	pfds[2];
 
-	std::cout << "listening .. " << std::endl;
-	listen(_master_sockfd, BACKLOG); // again need to check != 0
+	pfds[0].fd = _master_sockfd;
+	pfds[0].events = POLLIN;
 
 	while (1) { // here must be infinit loop
-		addr_size = sizeof(their_addr);
-		new_fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
+		ret_poll = poll(pfds, 2, 0);
 
-		std::cout << "New client #" << new_fd << " from "
-				<< inet_ntoa(their_addr.sin_addr) << ":"
-				<< ntohs(their_addr.sin_port) << std::endl;
+		if (ret_poll == -1) {
+			std::cerr << errno << std::endl;
+			exit(-1);
+		}
+		else if (ret_poll == 0) { // si le client crash ou timeout quel est le ret
+		// 	std::cerr << "Time out" << std::endl;
+		}
+		else {
+			if (pfds[0].revents & POLLIN) {
+		std::cout << "Master\n";
+				addr_size = sizeof(their_addr);
+				new_fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
+				pfds[1].fd = new_fd;
+				pfds[1].events = POLLIN;
+			}
+			else if (pfds[1].revents & POLLIN){
+		std::cout << "new\n";
 
-        needQuit = this->readData();
+				needQuit = this->readData();
+			}
+		}
+		
+
+		// addr_size = sizeof(their_addr);
+		// new_fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
+
+		// std::cout << "New client #" << new_fd << " from "
+		// 		<< inet_ntoa(their_addr.sin_addr) << ":"
+		// 		<< ntohs(their_addr.sin_port) << std::endl;
+
+        // needQuit = this->readData();
+
 		// create user with new_fd
 		//std::cout << "User : " << roger.getName() << " fd : " << roger.getFd() << std::endl; 
 		// close(new_fd);
@@ -92,15 +128,19 @@ int    mySocket::readData()
 		while (recv_ret > 0) {
 			recv_ret = recv(new_fd, buff, sizeof(buff), 0);
 			buff[recv_ret] = '\0';
-			std::cout << buff << "|buff size : " << recv_ret << std::endl;
 			msg += buff;
+			if (msg.find("\r\n") != std::string::npos) {
+				std::cout << buff << "|buff size : " << recv_ret << std::endl;
+				break ;
+			}
 		}
-
 		std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
-		// must be in a sendData function
-		std::string res = "Hey Maaaarc !";
-		send(new_fd, res.c_str(), res.length(), 0);
 
+		// must be in a sendData function
+		std::string res = "hey Marc !";
+		res += END_MSG;
+		send(new_fd, res.c_str(), res.length(), 0);
+		std::cout << "Send reponse " << res << std::endl;
 		// roger.setFd(new_fd);
 		// roger.setName(buf);
 		return recv_ret;

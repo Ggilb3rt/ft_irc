@@ -15,22 +15,40 @@
 #include <map>
 #include <iostream>
 
+
+
 class user
 {
+
+	#define channel std::string
+	#define role	bool
+
 	private:
-		int			_fd;
+		int			_id;
+		std::string	_nick;
 		std::string	_name;
+		std::map<channel, role>	_channels;
+
+		user() : _nick(""), _name("") {}
+		static int	id_counter;
 
 	public:
-		user() : _fd(-1), _name("") {}
-		user(int fd, char *name) : _fd(fd), _name(name) {}
+		user(char *nick, char *name) :
+			_id(id_counter++),
+			_nick(nick),
+			_name(name),
+			_channels() {}
 		~user() {}
 
+		int			getId() const {return _id;}
+		std::string	getNick() const { return _nick; }
+		void		setNick(char	*nick) { /*check if new nick exist*/this->_nick = nick; }
 		std::string	getName() const { return _name; }
-		int			getFd() const { return _fd; }
-		void		setFd(int fd) { this->_fd = fd; }
 		void		setName(char	*name) { this->_name = name; }
 };
+
+
+int user::id_counter = 0;
 
 class mySocket
 {

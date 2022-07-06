@@ -12,6 +12,8 @@
 
 #include "mySocket.hpp"
 
+
+
 int main(int argc, char **argv)
 {
 
@@ -21,7 +23,6 @@ int main(int argc, char **argv)
 	}
 
 	mySocket	base(argv[1]);
-
 
 	base.printAddrInfo();
 	base.startListen();

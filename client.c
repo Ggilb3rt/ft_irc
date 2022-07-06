@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+#include <fcntl.h>
 #include <arpa/inet.h>
 
 #define PORT "6697" // the port client will be connecting to 
@@ -30,6 +31,7 @@ void *get_in_addr(struct sockaddr *sa)
 
 int main(int argc, char *argv[])
 {
+    printf("Bonjouerpouet\r\nlol internet\n");
     int _master_sockfd, numbytes;  
     char buf[MAXDATASIZE];
     struct addrinfo hints, *servinfo, *p;
@@ -57,6 +59,7 @@ int main(int argc, char *argv[])
             perror("client: socket");
             continue;
         }
+        // fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
 
         if (connect(_master_sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(_master_sockfd);
@@ -72,6 +75,12 @@ int main(int argc, char *argv[])
         return 2;
     }
 
+    send(_master_sockfd, "Yo !\n", 5, 0);
+    sleep(1);
+    printf("awake\n");
+    send(_master_sockfd, "Yo2 !\n", 6, 0);
+    send(_master_sockfd, "|Yo3 !\rP\n|", 10, 0);
+    send(_master_sockfd, "|Yo4 !\rP\n|", 10, 0);
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
     printf("client: connecting to %s\n", s);
@@ -87,7 +96,10 @@ int main(int argc, char *argv[])
 
     printf("client: received '%s'\n",buf);
 
+    while (1){}
     close(_master_sockfd);
 
     return 0;
 }
+
+

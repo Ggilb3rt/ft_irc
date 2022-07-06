@@ -45,7 +45,7 @@ void	mySocket::createMasterSocket()
         std::cerr << "ERROR : Socket" << std::endl;
 		throw 2;
     }
-	//fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
+	fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
 	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
 	if (bind_ret == -1) {
         std::cerr << "ERROR : Bind" << std::endl;
@@ -69,14 +69,14 @@ void	mySocket::startListen()
 	while (1) { // here must be infinit loop
 		ret_poll = poll(pfds, 2, 0);
 
-		if (ret_poll == -1) {
-			std::cerr << errno << std::endl;
-			exit(-1);
-		}
-		else if (ret_poll == 0) { // si le client crash ou timeout quel est le ret
+		// if (ret_poll == -1) {
+		// 	std::cerr << errno << std::endl;
+		// 	exit(-1);
+		// }
+		// else if (ret_poll == 0) { // si le client crash ou timeout quel est le ret
 		// 	std::cerr << "Time out" << std::endl;
-		}
-		else {
+		// }
+		// else {
 			if (pfds[0].revents & POLLIN) {
 		std::cout << "Master\n";
 				addr_size = sizeof(their_addr);
@@ -89,7 +89,7 @@ void	mySocket::startListen()
 
 				needQuit = this->readData();
 			}
-		}
+		// }
 		
 
 		// addr_size = sizeof(their_addr);
@@ -114,6 +114,8 @@ int    mySocket::readData()
 		int		recv_ret = 1;
 		std::string	msg;
 
+		// send(new_fd, "403\r\n", 5, 0);
+
 		// recv_ret = recv(new_fd, buff, maxlen-1, 0);
 		// if (recv_ret == -1)
 		// 	std::cerr << "error : " << errno << std::endl;
@@ -129,7 +131,8 @@ int    mySocket::readData()
 			recv_ret = recv(new_fd, buff, sizeof(buff), 0);
 			buff[recv_ret] = '\0';
 			msg += buff;
-			if (msg.find("\r\n") != std::string::npos) {
+			std::cout << "\n\n---------BUFFER == " << buff << " ---------\n\n";
+			if (msg.find("\n") != std::string::npos) {
 				std::cout << buff << "|buff size : " << recv_ret << std::endl;
 				break ;
 			}

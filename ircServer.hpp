@@ -1,5 +1,5 @@
-#ifndef MY_SOCKET_HPP
-    #define MY_SOCKET_HPP
+#ifndef IRC_SERVER_HPP
+    #define IRC_SERVER_HPP
 
 #include <string.h>
 #include <sys/types.h>
@@ -10,11 +10,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
-
 #include <iostream>
 #include <vector>
 #include <map>
-
+#include "user_class.hpp"
 #include <queue>
 
 typedef struct	s_lex {
@@ -23,48 +22,15 @@ typedef struct	s_lex {
 
 }				t_lex;
 
-class user
-{
-
-	#define channel std::string
-	#define role	bool
-
-	private:
-		int			_id;
-		std::string	_nick;
-		std::string	_name;
-		std::map<channel, role>	_channels;
-
-		// user() : _nick(""), _name("") {}
-
-	public:
-		user(int fd) :
-			_id(fd) {}
-		user(int fd, char *nick, char *name) :
-			_id(fd),
-			_nick(nick),
-			_name(name),
-			_channels() {}
-		~user() {}
-
-		int			getId() const {return _id;}
-		std::string	getNick() const { return _nick; }
-		void		setNick(char	*nick) { /*check if new nick exist*/this->_nick = nick; }
-		std::string	getName() const { return _name; }
-		void		setName(char	*name) { this->_name = name; }
-};
-
-// int user::id_counter = 0;
-
-
-class mySocket
+class ircServer
 {
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
 #define END_MSG "\r\n"
 #define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL)
 
-typedef		std::map<int, user>	user_list;
+typedef		std::map<int, user>				users_map;
+typedef		std::vector<struct pollfd>		clients_vector;
 
 private:
 	struct addrinfo				_hints, *_servinfo, *_p;
@@ -72,8 +38,8 @@ private:
 	int							_master_sockfd, new_fd;
 	struct sockaddr_in			their_addr;
 	socklen_t					addr_size;
-	std::map<int, user>			_users;
-	std::vector<struct pollfd>	_pfds;
+	users_map					_users;
+	clients_vector				_pfds;
 
 
 	void		init();
@@ -86,8 +52,8 @@ private:
 
 public:
 
-	mySocket(char *_port);
-	~mySocket();
+	ircServer(char *_port);
+	~ircServer();
 
 	void	startListen();
 	void	printAddrInfo();

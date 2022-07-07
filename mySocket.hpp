@@ -67,19 +67,22 @@ class mySocket
 typedef		std::map<int, user>	user_list;
 
 private:
-	struct addrinfo		_hints, *_servinfo, *_p;
-	char				*_port;
-	int					_master_sockfd, new_fd;
-	struct sockaddr_in	their_addr;
-	socklen_t			addr_size;
-	std::map<int, user>	_users;
+	struct addrinfo				_hints, *_servinfo, *_p;
+	char						*_port;
+	int							_master_sockfd, new_fd;
+	struct sockaddr_in			their_addr;
+	socklen_t					addr_size;
+	std::map<int, user>			_users;
+	std::vector<struct pollfd>	_pfds;
+
 
 	void		init();
 	void		initAddrInfo();
 	void		createMasterSocket();
-	int			readData(struct pollfd);
+	int			readData(std::vector<struct pollfd>::iterator);
 	void		parse(std::string msg);
-	int			handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it, std::vector<struct pollfd>& pfdsref);
+	int			handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it);
+	void		removeClient(std::vector<struct pollfd>::iterator it);
 
 public:
 

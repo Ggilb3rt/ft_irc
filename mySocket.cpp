@@ -1,5 +1,32 @@
 #include "mySocket.hpp"
 
+/*
+	TODO:
+	- Finish error management :
+		-accept (-1 handled, 0 seems inoperant)
+		-recv : EAGAIN error check on linux
+		-send : must create send()function
+		-listen: TODO
+	- Parsing : 
+		- check README to get syntax requirements
+		- implement lexer
+		- ! multi command in single fd
+	- Commands :
+		- implement commands in README
+	- Miscellaneous :
+		- Code cleanup
+			-------------------
+		!! Worry about user suppression
+		-> multiple instance of the same user can coexist in
+			- channels
+			- map in socket object
+		-> multiple instance of the same channel can coexist in 
+			- users
+			- socket object
+			-------------------
+		POSSIBLE SOLUTION
+			create channels with user.fd and access clients with fd
+*/
 
 mySocket::mySocket(char *port) : _port(port)//, roger()
 {
@@ -16,8 +43,6 @@ void	mySocket::init()
 {
 	this->initAddrInfo();
 	this->createMasterSocket();
-
-
 }
 
 void	mySocket::initAddrInfo()
@@ -67,16 +92,15 @@ void	mySocket::startListen()
 	master.fd = _master_sockfd;
 	master.events = POLLIN;
 
-	std::vector<struct pollfd>	pfds;
 
-	std::vector<struct pollfd>::iterator it = pfds.begin();
-	std::vector<struct pollfd>::iterator end = pfds.end();
+	std::vector<struct pollfd>::iterator it = _pfds.begin();
+	std::vector<struct pollfd>::iterator end = _pfds.end();
 
 
-	pfds.push_back(master);
+	_pfds.push_back(master);
 
 	while (1) { // here must be infinit loop
-		ret_poll = poll(pfds.data(), pfds.size(), 0);
+		ret_poll = poll(_pfds.data(), _pfds.size(), 0);
 
 		if (ret_poll == -1) {
 			// TODO:: Crash Test infinite FD
@@ -84,36 +108,37 @@ void	mySocket::startListen()
 			isStuck++;
 			if (isStuck > 5)
 				exit(1);
-			continue ;
 		}
-		// else if (ret_poll == 0) { // si le client crash ou timeout quel est le ret
-		// 	std::cerr << "Time out" << std::endl;
-		// }
-		// else {
-			struct pollfd	newClient;
+		else {
+			if (_pfds[0].revents & POLLIN ) {
+				struct pollfd	newClient;//!!!!
 
-			if (pfds[0].revents & POLLIN ) {
-				std::cout << "Master\n";
 				addr_size = sizeof(their_addr);
-				newClient.fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
-				newClient.events = MASK;
-				pfds.push_back(newClient);
-				_users.insert(std::pair<int, user>(newClient.fd, user(newClient.fd)));
-				end = pfds.end();
-				// UNCOMMENT TO PRINT MAP ON USERS
-				// for (user_list::iterator it = _users.begin(); it != _users.end(); it++) {
-				// 	std::cout << "id == " << it->second.getId() << std::endl;
-				// }
+				newClient.fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check 
+				if (newClient.fd == -1) {
+					std::cerr << errno << std::endl;
+				}
+				else {
+					// accept will create a new socket to talk with client
+					newClient.events = MASK;
+					_pfds.push_back(newClient);
+					_users.insert(std::pair<int, user>(newClient.fd, user(newClient.fd)));
+					end = _pfds.end();
+					// UNCOMMENT TO PRINT MAP ON USERS
+					// for (user_list::iterator it = _users.begin(); it != _users.end(); it++) {
+					// 	std::cout << "id == " << it->second.getId() << std::endl;
+					// }
+				}
 			}
 			else {
-				it = pfds.begin();
+				it = _pfds.begin();
 				while (ret_poll > 0 && it != end) {
-					ret_poll = handleChange(ret_poll, it, pfds);
+					ret_poll = handleChange(ret_poll, it);
 					it++;
 				}
 				// Answer to client
 			}
-		// }
+		}
 		
 
 		// addr_size = sizeof(their_addr);
@@ -131,59 +156,59 @@ void	mySocket::startListen()
 	}
 }
 
-int		mySocket::handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it, std::vector<struct pollfd>& pfdsref) {
-	if (it->revents & POLLERR) {
+void	mySocket::removeClient(std::vector<struct pollfd>::iterator it) {
 		close(it->fd);
 		_users.erase(it->fd);
-		pfdsref.erase(it);
+		_pfds.erase(it);
+}
+
+int		mySocket::handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it) {
+	if (it->revents & POLLERR) {
+		removeClient(it);
 		std::cerr << "error: An error has occured" << std::endl;
 	}
 	else if (it->revents & POLLHUP) {
-		close(it->fd);
-		_users.erase(it->fd);
-		pfdsref.erase(it);
+		removeClient(it);
 	}
 	else if (it->revents & POLLNVAL) {
-		close(it->fd);
-		_users.erase(it->fd);
-		pfdsref.erase(it);
+		removeClient(it);
 		std::cerr << "error: Invalid fd member" << std::endl;
 	}
 	else if (it->revents & POLLIN) {
-		this->readData(*it);
+		this->readData(it);
 		ret_poll--;
 	}
 	return (ret_poll);
 }
 
-int		mySocket::readData(struct pollfd client)
+int		mySocket::readData(std::vector<struct pollfd>::iterator client)
 {
 		int		maxlen = 512;   // Semi pif, je crois que c'est la taille max dans le protocol IRC pas sur de devoir le mettre ici
         char	buff[maxlen];	// ne devrait pas etre en local, aura besoin de traitement
 		int		recv_ret = 1;
 		std::string	msg;
 
-		// send(new_fd, "403\r\n", 5, 0);
-
-		// recv_ret = recv(new_fd, buff, maxlen-1, 0);
-		// if (recv_ret == -1)
-		// 	std::cerr << "error : " << errno << std::endl;
-		// else if (recv_ret == 0)
-		// 	std::cout << "remote host close the connection" << std::endl;
-		// else {
-		// 	for (int i = recv_ret; i < maxlen ; i++)
-		// 		buff[i] = '\0';
-		// 	std::cout << "My buffer[" << recv_ret << "] |" << buff << std::endl;
-		// }
-
 		while (recv_ret > 0) {
-			recv_ret = recv(client.fd, buff, sizeof(buff), 0);
-			buff[recv_ret] = '\0';
-			msg += buff;
-			std::cout << "\n\n---------BUFFER == " << buff << " ---------\n\n";
-			if (msg.find("\r\n") != std::string::npos) {
-				std::cout << buff << "|buff size : " << recv_ret << std::endl;
-				break ;
+			recv_ret = recv(client->fd, buff, sizeof(buff), 0);
+			if (recv_ret == 0) {
+				removeClient(client);
+				std::cout << "client disconnected\n";
+			}
+			//UNCOMMENT ON LINUX
+			// else if (recv_ret == -1) {
+			// 
+			// 	// send msg to warn client he must leave
+			// 	removeClient(client);
+			// 	std::cout << strerror(errno) << std::endl; 
+			// }
+			else if (recv_ret > 0) {
+				buff[recv_ret] = '\0';
+				msg += buff;
+				std::cout << "\n\n---------BUFFER == " << buff << " ---------\n\n";
+				if (msg.find("\r\n") != std::string::npos) {
+					std::cout << buff << "|buff size : " << recv_ret << std::endl;
+					break ;
+				}
 			}
 		}
 		std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
@@ -193,7 +218,7 @@ int		mySocket::readData(struct pollfd client)
 		// must be in a sendData function
 		std::string res = "hey you send me :\n" + msg + "!";
 		res += END_MSG;
-		send(client.fd, res.c_str(), res.length(), 0);
+		send(client->fd, res.c_str(), res.length(), 0);
 		std::cout << "Send reponse " << res << std::endl;
 		// roger.setFd(new_fd);
 		// roger.setName(buf);

@@ -43,7 +43,8 @@ void	mySocket::createMasterSocket()
 	_master_sockfd = socket(_servinfo->ai_family, _servinfo->ai_socktype, _servinfo->ai_protocol);
 	if (_master_sockfd == -1) {
         std::cerr << "ERROR : Socket" << std::endl;
-		throw 2;
+		freeaddrinfo(_servinfo);
+		exit(errno);
     }
 	fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
 	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
@@ -59,35 +60,58 @@ void	mySocket::createMasterSocket()
 
 void	mySocket::startListen()
 {
-	int	needQuit = 1;
 	int	ret_poll = 0;
-	struct	pollfd	pfds[2];
+	int	isStuck = 0;
+	struct pollfd	master;
+	
+	master.fd = _master_sockfd;
+	master.events = POLLIN;
 
-	pfds[0].fd = _master_sockfd;
-	pfds[0].events = POLLIN;
+	std::vector<struct pollfd>	pfds;
+
+	std::vector<struct pollfd>::iterator it = pfds.begin();
+	std::vector<struct pollfd>::iterator end = pfds.end();
+
+
+	pfds.push_back(master);
 
 	while (1) { // here must be infinit loop
-		ret_poll = poll(pfds, 2, 0);
+		ret_poll = poll(pfds.data(), pfds.size(), 0);
 
-		// if (ret_poll == -1) {
-		// 	std::cerr << errno << std::endl;
-		// 	exit(-1);
-		// }
+		if (ret_poll == -1) {
+			// TODO:: Crash Test infinite FD
+			std::cerr << errno << std::endl;
+			isStuck++;
+			if (isStuck > 5)
+				exit(1);
+			continue ;
+		}
 		// else if (ret_poll == 0) { // si le client crash ou timeout quel est le ret
 		// 	std::cerr << "Time out" << std::endl;
 		// }
 		// else {
-			if (pfds[0].revents & POLLIN) {
-		std::cout << "Master\n";
-				addr_size = sizeof(their_addr);
-				new_fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
-				pfds[1].fd = new_fd;
-				pfds[1].events = POLLIN;
-			}
-			else if (pfds[1].revents & POLLIN){
-		std::cout << "new\n";
+			struct pollfd	newClient;
 
-				needQuit = this->readData();
+			if (pfds[0].revents & POLLIN ) {
+				std::cout << "Master\n";
+				addr_size = sizeof(their_addr);
+				newClient.fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
+				newClient.events = MASK;
+				pfds.push_back(newClient);
+				_users.insert(std::pair<int, user>(newClient.fd, user(newClient.fd)));
+				end = pfds.end();
+				// UNCOMMENT TO PRINT MAP ON USERS
+				// for (user_list::iterator it = _users.begin(); it != _users.end(); it++) {
+				// 	std::cout << "id == " << it->second.getId() << std::endl;
+				// }
+			}
+			else {
+				it = pfds.begin();
+				while (ret_poll > 0 && it != end) {
+					ret_poll = handleChange(ret_poll, it, pfds);
+					it++;
+				}
+				// Answer to client
 			}
 		// }
 		
@@ -107,7 +131,32 @@ void	mySocket::startListen()
 	}
 }
 
-int    mySocket::readData()
+int		mySocket::handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it, std::vector<struct pollfd>& pfdsref) {
+	if (it->revents & POLLERR) {
+		close(it->fd);
+		_users.erase(it->fd);
+		pfdsref.erase(it);
+		std::cerr << "error: An error has occured" << std::endl;
+	}
+	else if (it->revents & POLLHUP) {
+		close(it->fd);
+		_users.erase(it->fd);
+		pfdsref.erase(it);
+	}
+	else if (it->revents & POLLNVAL) {
+		close(it->fd);
+		_users.erase(it->fd);
+		pfdsref.erase(it);
+		std::cerr << "error: Invalid fd member" << std::endl;
+	}
+	else if (it->revents & POLLIN) {
+		this->readData(*it);
+		ret_poll--;
+	}
+	return (ret_poll);
+}
+
+int		mySocket::readData(struct pollfd client)
 {
 		int		maxlen = 512;   // Semi pif, je crois que c'est la taille max dans le protocol IRC pas sur de devoir le mettre ici
         char	buff[maxlen];	// ne devrait pas etre en local, aura besoin de traitement
@@ -128,7 +177,7 @@ int    mySocket::readData()
 		// }
 
 		while (recv_ret > 0) {
-			recv_ret = recv(new_fd, buff, sizeof(buff), 0);
+			recv_ret = recv(client.fd, buff, sizeof(buff), 0);
 			buff[recv_ret] = '\0';
 			msg += buff;
 			std::cout << "\n\n---------BUFFER == " << buff << " ---------\n\n";
@@ -138,25 +187,25 @@ int    mySocket::readData()
 			}
 		}
 		std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
-		this->parse(msg);
+		// this->parse(msg);
 
-
+		// msg sent or cmd done
 		// must be in a sendData function
 		std::string res = "hey you send me :\n" + msg + "!";
 		res += END_MSG;
-		send(new_fd, res.c_str(), res.length(), 0);
+		send(client.fd, res.c_str(), res.length(), 0);
 		std::cout << "Send reponse " << res << std::endl;
 		// roger.setFd(new_fd);
 		// roger.setName(buf);
 		return recv_ret;
 }
 
-void	mySocket::parse(std::string msg)
-{
-	// <CMD> [{<PARAM> <SPACE>}]
+// void	mySocket::parse(std::string msg)
+// {
+// 	// <CMD> [{<PARAM> <SPACE>}]
 
-	std::queue<t_lex>	tokens();
-}
+// 	std::queue<t_lex>	tokens();
+// }
 
 void	mySocket::printAddrInfo()
 {

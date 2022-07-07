@@ -12,8 +12,6 @@
 
 #include "mySocket.hpp"
 
-int user::id_counter = 0;
-
 
 int main(int argc, char **argv)
 {
@@ -23,7 +21,6 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	user		poeut((char *)"roger", (char *)"roger");
 	mySocket	base(argv[1]);
 
 	base.printAddrInfo();

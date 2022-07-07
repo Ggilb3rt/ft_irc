@@ -35,12 +35,13 @@ class user
 		std::string	_name;
 		std::map<channel, role>	_channels;
 
-		user() : _nick(""), _name("") {}
-		static int	id_counter;
+		// user() : _nick(""), _name("") {}
 
 	public:
-		user(char *nick, char *name) :
-			_id(id_counter++),
+		user(int fd) :
+			_id(fd) {}
+		user(int fd, char *nick, char *name) :
+			_id(fd),
 			_nick(nick),
 			_name(name),
 			_channels() {}
@@ -58,10 +59,12 @@ class user
 
 class mySocket
 {
-
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
 #define END_MSG "\r\n"
+#define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL)
+
+typedef		std::map<int, user>	user_list;
 
 private:
 	struct addrinfo		_hints, *_servinfo, *_p;
@@ -69,12 +72,14 @@ private:
 	int					_master_sockfd, new_fd;
 	struct sockaddr_in	their_addr;
 	socklen_t			addr_size;
+	std::map<int, user>	_users;
 
 	void		init();
 	void		initAddrInfo();
 	void		createMasterSocket();
-	int			readData();
+	int			readData(struct pollfd);
 	void		parse(std::string msg);
+	int			handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it, std::vector<struct pollfd>& pfdsref);
 
 public:
 

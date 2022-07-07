@@ -17,35 +17,6 @@ Qt of port = (2^16)-1, so 0-65535[^1]
 All blocs of data find the servers with his ip address, then the server sends each blocs to the good process with the port number.
 
 
-```c
-// This code is for client, not for server and he don't listen the response ==> this is useless
-
-#define MAX_SIZE 512
-
-int                 MasterSocket;
-struct sockaddr     serveradd;
-char                buff[MAX_SIZE];
-size_t              bufflen;
-
-bzero(buff, MAXSIZE);
-// Prepare and connect to socket
-MasterSocket = socket(AF_INET, SOCK_STREAM, 0);  // AF_INET == use ipv4, SOCK_STREAM == can write and read, 0 == TCP
-if (MasterSocket < 0)
-  err_stop();
-serveradd.sin_family = AF_INET;
-serveradd.sin_port = htons(SERVER_PORT);
-
-if (connect(MasterSocket, &serveradd, sizeof(serveradd)) < 0)
-  err_connect();
-
-//Prepare and send msg
-buff = "SALUT !!\r\n" // I know this will not works
-bufflen = strlen(buff);
-
-if (send(MasterSocket, &buff, bufflen, MSG_OOB) != bufflen) // MSG_OOB == out of band data, don't know what it is
-  err_sending();
-```
-
 ## Client
 ### Irssi
 [doc](https://irssi.org/documentation/)
@@ -127,6 +98,7 @@ this user is also given channel operator status.[^RFC2811_2_4_2]
   - the prefix (optional),
   - the command
   - the command params (up to 15)
+  - (end with "\r\n")
 
 They are separated by unless one space (ASCII 0x20).[^RFC1459_2_3]
 
@@ -163,7 +135,7 @@ We have to debate about what is needed and what is not following the subject.
   - ADMIN
   - INFO
 - Sending messages (4.4)
-  - PRIVMSG (mode +n, +m, +v (RFC2811 2.4))
+  - PRIVMSG (mode +n, +m, +v (RFC2811 2.4)) (! irssi use command "/MSG user message" syntax)
   - NOTICE
 - User (4.5)
   - WHO
@@ -186,6 +158,35 @@ We have to debate about what is needed and what is not following the subject.
 > considered to be the lower case equivalents of the characters []\,
 > respectively. This is a critical issue when determining the
 > equivalence of two nicknames."[^RFC1459_2_2]
+
+
+## How BNF (Backus-Naur Form) works
+It's a metalanguage to define the syntaxe of a language.[^BNF_wiki]
+Exemple with if statement in c :
+> <if_struct> ::= if "(" <condition> ")" "{" <instructions> "}"
+
+BNF define in irc protocol :[^RFC1459_2_3]
+> <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
+> <prefix>   ::= <servername> | <nick> [ '!' <user> ] [ '@' <host> ]
+> <command>  ::= <letter> { <letter> } | <number> <number> <number>
+> <SPACE>    ::= ' ' { ' ' }
+> <params>   ::= <SPACE> [ ':' <trailing> | <middle> <params> ]
+> <middle>   ::= <Any *non-empty* sequence of octets not including SPACE
+               or NUL or CR or LF, the first of which may not be ':'>
+> <trailing> ::= <Any, possibly *empty*, sequence of octets not including
+                 NUL or CR or LF>
+> <crlf>     ::= CR LF
+
+
+Some help with symbols :
+- ::=       ==> *left* is define by *right*
+- < >       ==> nonterminal (variable)
+- '' or ""  ==> something inside is litteral char
+- |         ==> or
+- ( )       ==> isolate what's inside
+- [ ]       ==> element is optional
+- { }       ==> element can be repeat
+
 
 ## Sources
 
@@ -218,3 +219,4 @@ We have to debate about what is needed and what is not following the subject.
 [^RFC1459_2_3]: https://www.rfcreader.com/#rfc1459_line311
 [^RFC1459_8]: https://www.rfcreader.com/#rfc1459_line2654
 [^RFC1459_2_2]: https://www.rfcreader.com/#rfc1459_line294
+[^BNF_wiki]: https://fr.wikipedia.org/wiki/Forme_de_Backus-Naur

@@ -132,21 +132,30 @@ int    mySocket::readData()
 			buff[recv_ret] = '\0';
 			msg += buff;
 			std::cout << "\n\n---------BUFFER == " << buff << " ---------\n\n";
-			if (msg.find("\n") != std::string::npos) {
+			if (msg.find("\r\n") != std::string::npos) {
 				std::cout << buff << "|buff size : " << recv_ret << std::endl;
 				break ;
 			}
 		}
 		std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
+		this->parse(msg);
+
 
 		// must be in a sendData function
-		std::string res = "hey Marc !";
+		std::string res = "hey you send me :\n" + msg + "!";
 		res += END_MSG;
 		send(new_fd, res.c_str(), res.length(), 0);
 		std::cout << "Send reponse " << res << std::endl;
 		// roger.setFd(new_fd);
 		// roger.setName(buf);
 		return recv_ret;
+}
+
+void	mySocket::parse(std::string msg)
+{
+	// <CMD> [{<PARAM> <SPACE>}]
+
+	std::queue<t_lex>	tokens();
 }
 
 void	mySocket::printAddrInfo()

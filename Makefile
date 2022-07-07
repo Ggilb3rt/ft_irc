@@ -11,6 +11,9 @@ LDFLAGS =
 CC = c++
 RM = rm -f
 
+PORT = 6697
+HOST = 127.0.0.1
+
 ${NAME}:	${OBJS}
 		${CC} -o ${NAME} ${OBJS} ${LDFLAGS}
 
@@ -25,7 +28,10 @@ fclean:		clean
 re:		fclean all
 
 test: all
-	./${NAME} 6697
+	./${NAME} ${PORT}
 
 val_test: all
 	valgrind --leak-check=full --track-origins=yes ./${NAME} 6697
+
+ns_test:
+	./nc_test.sh

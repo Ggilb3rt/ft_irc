@@ -1,7 +1,6 @@
 #ifndef MY_SOCKET_HPP
     #define MY_SOCKET_HPP
 
-#include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -11,11 +10,18 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
+
+#include <iostream>
 #include <vector>
 #include <map>
-#include <iostream>
 
+#include <queue>
 
+typedef struct	s_lex {
+	int			type;
+	std::string	lexeme;
+
+}				t_lex;
 
 class user
 {
@@ -47,8 +53,8 @@ class user
 		void		setName(char	*name) { this->_name = name; }
 };
 
+// int user::id_counter = 0;
 
-int user::id_counter = 0;
 
 class mySocket
 {
@@ -64,12 +70,11 @@ private:
 	struct sockaddr_in	their_addr;
 	socklen_t			addr_size;
 
-	//user				roger;
-
 	void		init();
 	void		initAddrInfo();
 	void		createMasterSocket();
 	int			readData();
+	void		parse(std::string msg);
 
 public:
 

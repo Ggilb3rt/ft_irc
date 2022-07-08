@@ -107,7 +107,7 @@ Not all implementations use CR-LF[^RFC1459_8]
 - see pseudo messages in [here](https://www.rfcreader.com/#rfc1459_line350)
 
 Needed commands (cf RFC1459 4.x) :
-We have to debate about what is needed and what is not following the subject.
+__We have to debate about what is needed and what is not following the subject.__
 - Connection (4.1)
   - (PASS ??)
   - NICK

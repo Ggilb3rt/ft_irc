@@ -38,3 +38,4 @@ client
 ft_irc
 tuto
 tuto.c
+./test/fd_killer

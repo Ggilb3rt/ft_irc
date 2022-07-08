@@ -6,14 +6,18 @@
 		-accept (-1 handled, 0 seems inoperant)
 		-recv : EAGAIN error check on linux
 		-send : must create send()function
-		-listen: TODO
+		-listen: (ok)
+		!- error ?? : when buffer uncomplete the program blocks ;
+		!				sending message from another client put it in waiting list
+		!===> solution : one buffer by client
 	- Parsing : 
-		- check README to get syntax requirements
+		- check README to get syntax requirements, need to chooses them
 		- implement lexer
 		- ! multi command in single fd
 	- Commands :
 		- implement commands in README
 	- Miscellaneous :
+		?- Remove ip v6 ?
 		- Code cleanup
 			-------------------
 		!! Worry about user suppression
@@ -28,7 +32,7 @@
 			create channels with user.fd and access clients with fd
 */
 
-mySocket::mySocket(char *port) : _port(port)//, roger()
+mySocket::mySocket(char *port) : _port(port)
 {
 	this->init();
 }
@@ -48,14 +52,14 @@ void	mySocket::init()
 void	mySocket::initAddrInfo()
 {
 	int		_addrinfo_status;
-	// INIT STRUCT
+
 	memset(&_hints, 0, sizeof _hints);
 	_hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
 	_hints.ai_socktype = SOCK_STREAM;
-	_hints.ai_flags = AI_PASSIVE; // give my local ip
+	_hints.ai_flags = AI_PASSIVE; // maybe useless
 
 	_addrinfo_status = getaddrinfo(ADDRESS_NAME, _port, &_hints, &_servinfo);
-	if (_addrinfo_status != 0) { // here we need to use the second argument (the port)
+	if (_addrinfo_status != 0) {
 		std::cerr << "getaddrinfo error " << _addrinfo_status << " : "  << errno << std::endl;
 		exit(errno);
 	}
@@ -64,23 +68,28 @@ void	mySocket::initAddrInfo()
 void	mySocket::createMasterSocket()
 {
 	int	bind_ret;
+	int	listen_ret;
 
 	_master_sockfd = socket(_servinfo->ai_family, _servinfo->ai_socktype, _servinfo->ai_protocol);
 	if (_master_sockfd == -1) {
-        std::cerr << "ERROR : Socket" << std::endl;
+		std::cerr << "ERROR : Socket" << std::endl;
 		freeaddrinfo(_servinfo);
 		exit(errno);
     }
-	fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
+	// fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors // only on mac, fuck it ?
 	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
 	if (bind_ret == -1) {
-        std::cerr << "ERROR : Bind" << std::endl;
-		close(_master_sockfd);
+		std::cerr << "ERROR : Bind" << std::endl;
 		freeaddrinfo(_servinfo);
 		exit(errno);
     }
 	std::cout << "listening .. " << std::endl;
-	listen(_master_sockfd, BACKLOG); // again need to check != 0
+	listen_ret = listen(_master_sockfd, BACKLOG);
+	if (listen_ret == -1) {
+		std::cerr << "ERROR : listen" << std::endl;
+		freeaddrinfo(_servinfo);
+		exit(errno);
+	}
 }
 
 void	mySocket::startListen()
@@ -205,7 +214,7 @@ int		mySocket::readData(std::vector<struct pollfd>::iterator client)
 				buff[recv_ret] = '\0';
 				msg += buff;
 				std::cout << "\n\n---------BUFFER == " << buff << " ---------\n\n";
-				if (msg.find("\r\n") != std::string::npos) {
+				if (msg.find("\n") != std::string::npos) {
 					std::cout << buff << "|buff size : " << recv_ret << std::endl;
 					break ;
 				}
@@ -256,7 +265,7 @@ void	mySocket::printAddrInfo()
 		}
 
 		// convert the IP to a string and print it:
-		inet_ntop(_p->ai_family, addr, _ipstr, sizeof _ipstr);
+		inet_ntop(_p->ai_family, addr, _ipstr, sizeof _ipstr); //! not allowed
 		std::cout << "\t" << ipver << " : " << _ipstr << std::endl;
 	}
 }

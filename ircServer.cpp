@@ -6,7 +6,6 @@
 		-accept (-1 handled, 0 seems inoperant)
 		-recv : EAGAIN error check on linux
 		-send : must create send()function
-		-listen: (ok)
 		!- error ?? : when buffer uncomplete the program blocks ;
 		!				sending message from another client put it in waiting list
 		!===> solution : one buffer by client	
@@ -30,9 +29,15 @@
 			-------------------
 		POSSIBLE SOLUTION
 			create channels with user.fd and access clients with fd
+
+
+	TODO: DONE
+	- Finish error management :
+		-listen: (ok)
+
 */
 
-ircServer::ircServer(char *port) : _port(port)//, roger()
+ircServer::ircServer(char *port) : _port(port)
 {
 	this->init();
 }

@@ -11,9 +11,9 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <iostream>
+#include "user_class.hpp"
 #include <vector>
 #include <map>
-#include "user_class.hpp"
 #include <queue>
 
 typedef struct	s_lex {
@@ -26,8 +26,11 @@ class ircServer
 {
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
-#define END_MSG "\r\n"
 #define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL)
+
+// IRC PROTOCOLE RULES
+#define END_MSG "\r\n"
+#define MSG_MAX_SIZE 512
 
 typedef		std::map<int, user>				users_map;
 typedef		std::vector<struct pollfd>		clients_vector;

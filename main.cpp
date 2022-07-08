@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-#include "mySocket.hpp"
+#include "ircServer.hpp"
 
 
 int main(int argc, char **argv)
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	mySocket	base(argv[1]);
+	ircServer	base(argv[1]);
 
 	base.printAddrInfo();
 	base.startListen();

@@ -1,5 +1,5 @@
 
-SRCS =	main.cpp mySocket.cpp
+SRCS =	main.cpp ircServer.cpp setup.cpp read.cpp listen.cpp helpers.cpp commands.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 

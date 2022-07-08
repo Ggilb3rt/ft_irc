@@ -56,10 +56,10 @@ private:
 	void		parse(std::string msg);
 
 	// execute
-	void    	ircServer::handleNick(users_map::iterator it, std::string newNick);
+	void    	handleNick(users_map::iterator it, std::string newNick);
 
 	// helpers
-	void    	ircServer::sendToClient(int fd, char *msg);
+	void    	sendToClient(int fd, char *msg);
 
 public:
 

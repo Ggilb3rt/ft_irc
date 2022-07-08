@@ -75,14 +75,14 @@ void	ircServer::startListen()
 
 int		ircServer::handleChange(int	ret_poll, clients_vector::iterator it) {
 	if (it->revents & POLLERR) {
-		removeClient(it);
+		removeClient(it, 1);
 		std::cerr << "error: An error has occured" << std::endl;
 	}
 	else if (it->revents & POLLHUP) {
-		removeClient(it);
+		removeClient(it, 2);
 	}
 	else if (it->revents & POLLNVAL) {
-		removeClient(it);
+		removeClient(it, 3);
 		std::cerr << "error: Invalid fd member" << std::endl;
 	}
 	else if (it->revents & POLLIN) {

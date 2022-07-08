@@ -10,8 +10,9 @@ void    ircServer::sendToClient(int fd, const char *msg)
     }
 }
 
-void	ircServer::removeClient(std::vector<struct pollfd>::iterator it)
+void	ircServer::removeClient(std::vector<struct pollfd>::iterator it, int code)
 {
+	std::cout << "need to remove " << it->fd << " from " << code << std::endl;
 		close(it->fd);
 		_users.erase(it->fd);
 		_pfds.erase(it);

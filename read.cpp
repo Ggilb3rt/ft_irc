@@ -4,10 +4,9 @@
 int		ircServer::readData(clients_vector::iterator client)
 {
 		int		    maxlen = MSG_MAX_SIZE;
-        char	    buff[maxlen];	// ne devrait pas etre en local, aura besoin de traitement
+        char	    buff[maxlen];
 		int		    recv_ret = 1;
-		// std::string	msg;
-		// users_map::iterator	user_x = _users.find(client->fd);
+		users_map::iterator	user_x = _users.find(client->fd);
 
 
 		recv_ret = recv(client->fd, buff, maxlen-1, 0);
@@ -18,8 +17,10 @@ int		ircServer::readData(clients_vector::iterator client)
 		else {
 			for (int i = recv_ret; i < maxlen ; i++)
 				buff[i] = '\0';
-			// user_x->second._msg += buff;
-			std::cout << "My buffer[" << recv_ret << "] |" << buff << std::endl;
+			user_x->second._msg += buff;
+			std::cout << "My buffer[" << recv_ret << "] in ["
+					<< user_x->second.getId() << "] |"
+					<< buff << std::endl;
 		}
 
 		// while (recv_ret > 0) {
@@ -48,14 +49,17 @@ int		ircServer::readData(clients_vector::iterator client)
 		//std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
 		// this->parse(msg);
 
- 		// if (user_x->second._msg.find("\n") != std::string::npos) { //! find must search END_MSG
+ 		// if (msg.find("\n") != std::string::npos) { //! find must search END_MSG
+ 		if (user_x->second._msg.find("\n") != std::string::npos) { //! find must search END_MSG
 
 		// msg sent or cmd done
 		// must be in a sendData function
-			std::string res = "hey you send me :\n" + _users[client->fd]._msg + "!";
+			// std::string res = "hey you send me :\n" + msg + "!";
+			std::string res = "hey you send me :\n" + user_x->second._msg + "!";
 			res += END_MSG;
+			user_x->second._msg = "";
 			send(client->fd, res.c_str(), res.length(), 0);
 			std::cout << "Send reponse " << res << std::endl;
-		// }
+		}
 		return recv_ret;
 }

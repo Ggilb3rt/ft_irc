@@ -52,7 +52,7 @@ private:
 
 	// listen
 	int			handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it);
-	void		removeClient(std::vector<struct pollfd>::iterator it);
+	void		removeClient(std::vector<struct pollfd>::iterator it, int code);
 
 	// read and parse
 	int			readData(std::vector<struct pollfd>::iterator);

@@ -42,13 +42,24 @@ private:
 	clients_vector				_pfds;
 
 
+	// init
 	void		init();
 	void		initAddrInfo();
 	void		createMasterSocket();
-	int			readData(std::vector<struct pollfd>::iterator);
-	void		parse(std::string msg);
+
+	// listen
 	int			handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it);
 	void		removeClient(std::vector<struct pollfd>::iterator it);
+
+	// read and parse
+	int			readData(std::vector<struct pollfd>::iterator);
+	void		parse(std::string msg);
+
+	// execute
+	void    	ircServer::handleNick(users_map::iterator it, std::string newNick);
+
+	// helpers
+	void    	ircServer::sendToClient(int fd, char *msg);
 
 public:
 

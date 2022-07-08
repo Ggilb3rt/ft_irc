@@ -42,7 +42,7 @@ void	ircServer::startListen()
 					_users.insert(std::pair<int, user>(newClient.fd, user(newClient.fd)));
 					end = _pfds.end();
 					// UNCOMMENT TO PRINT MAP ON USERS
-					// for (users_map::iterator it = _users.begin(); it != _users.end(); it++) {
+					// for (user_list::iterator it = _users.begin(); it != _users.end(); it++) {
 					// 	std::cout << "id == " << it->second.getId() << std::endl;
 					// }
 				}

@@ -30,9 +30,9 @@ class user
 
 		int			getId() const {return _id;}
 		std::string	getNick() const { return _nick; }
-		void		setNick(char	*nick) { /*check if new nick exist*/this->_nick = nick; }
+		void		setNick(std::string nick) { /*check if new nick exist*/this->_nick = nick; }
 		std::string	getName() const { return _name; }
-		void		setName(char	*name) { this->_name = name; }
+		void		setName(std::string name) { this->_name = name; }
 };
 
 #endif

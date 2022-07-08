@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     // loop through all the results and connect to the first we can
     std::string ret;
     for(p = servinfo; p != NULL; p = p->ai_next) {
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1020; i++) {
             ret = std::to_string(i) + " Yo\n";
             if ((_master_sockfd = socket(p->ai_family, p->ai_socktype,
                     p->ai_protocol)) == -1) {

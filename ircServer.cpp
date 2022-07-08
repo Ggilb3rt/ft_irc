@@ -6,9 +6,7 @@
 		-accept (-1 handled, 0 seems inoperant)
 		-recv : EAGAIN error check on linux
 		-send : must create send()function
-		!- error ?? : when buffer uncomplete the program blocks ;
-		!				sending message from another client put it in waiting list
-		!===> solution : one buffer by client	
+		-segfault : ø
 	- Parsing : 
 		- check README to get syntax requirements
 		- implement lexer
@@ -34,6 +32,14 @@
 	TODO: DONE
 	- Finish error management :
 		-listen: (ok)
+		- error: when buffer uncomplete the program blocks ;
+				sending message from another client put it in waiting list
+			===> solution : one buffer by client
+	-segfault : 
+			- scenario :
+				- clientX connects, then clientY connects
+					clientY disconnects before clientX then clientX disconnects
+					(true in branch main)
 
 */
 

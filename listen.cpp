@@ -53,6 +53,7 @@ void	ircServer::startListen()
 					ret_poll = handleChange(ret_poll, it);
 					it++;
 				}
+				end = _pfds.end();
 				// Answer to client
 			}
 		}
@@ -73,16 +74,17 @@ void	ircServer::startListen()
 	}
 }
 
-int		ircServer::handleChange(int	ret_poll, clients_vector::iterator it) {
+int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {
 	if (it->revents & POLLERR) {
-		removeClient(it, 1);
+		removeClient(it);
 		std::cerr << "error: An error has occured" << std::endl;
 	}
 	else if (it->revents & POLLHUP) {
-		removeClient(it, 2);
+		std::cerr << "Client " << it->fd << " disconnected" << std::endl;
+		removeClient(it);
 	}
 	else if (it->revents & POLLNVAL) {
-		removeClient(it, 3);
+		removeClient(it);
 		std::cerr << "error: Invalid fd member" << std::endl;
 	}
 	else if (it->revents & POLLIN) {

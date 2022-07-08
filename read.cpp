@@ -49,13 +49,9 @@ int		ircServer::readData(clients_vector::iterator client)
 		//std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
 		// this->parse(msg);
 
- 		// if (msg.find("\n") != std::string::npos) { //! find must search END_MSG
  		if (user_x->second._msg.find("\n") != std::string::npos) { //! find must search END_MSG
-
-		// msg sent or cmd done
-		// must be in a sendData function
-			// std::string res = "hey you send me :\n" + msg + "!";
-			std::string res = "hey you send me :\n" + user_x->second._msg + "!";
+			// must be in a sendData function
+			std::string res = "----hey you send me :\n" + user_x->second._msg + "----!----";
 			res += END_MSG;
 			user_x->second._msg = "";
 			send(client->fd, res.c_str(), res.length(), 0);

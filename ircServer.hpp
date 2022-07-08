@@ -51,18 +51,19 @@ private:
 	void		createMasterSocket();
 
 	// listen
-	int			handleChange(int	ret_poll, std::vector<struct pollfd>::iterator it);
-	void		removeClient(std::vector<struct pollfd>::iterator it, int code);
+	int			handleChange(int	ret_poll, std::vector<struct pollfd>::iterator &it);
+	void		removeClient(std::vector<struct pollfd>::iterator &it);
 
 	// read and parse
 	int			readData(std::vector<struct pollfd>::iterator);
 	void		parse(std::string msg);
 
 	// execute
-	void    	handleNick(users_map::iterator it, std::string newNick);
+	void		handleNick(users_map::iterator it, std::string newNick);
 
 	// helpers
-	void    	sendToClient(int fd, const char *msg);
+	void		sendToClient(int fd, const char *msg);
+	void		printUsers();
 
 public:
 

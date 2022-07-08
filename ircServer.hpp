@@ -59,7 +59,7 @@ private:
 	void    	handleNick(users_map::iterator it, std::string newNick);
 
 	// helpers
-	void    	sendToClient(int fd, char *msg);
+	void    	sendToClient(int fd, std::string msg);
 
 public:
 

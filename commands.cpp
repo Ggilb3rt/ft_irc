@@ -10,17 +10,20 @@ void    ircServer::handleNick(users_map::iterator pair, std::string newNick) {
 
     while (beg != end) {
         if (beg->second.getNick() == newNick) {
-            sendToClient(pair->first, "Nickname already exists !");
+            res =  "Nickname already exists !";
+            sendToClient(pair->first, res);
             newNick += "_";
         }
         beg++;
     }
     // if above 9 ask for another nickname ? or disconnect ?
     if (newNick.length() > 9) {
-        sendToClient(pair->first, "Nickname must be less than 10 characters !");
+        res = "Nickname must be less than 10 characters !";
+        sendToClient(pair->first, res);
     }
     else {
+        res = "Nickname changed to :" + newNick;
         pair->second.setNick(newNick);
-        sendToClient(pair->first, "Nickname must be less than 10 characters !");
+        sendToClient(pair->first, res);
     }
 }

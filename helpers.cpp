@@ -1,14 +1,13 @@
 #include "ircServer.hpp"
 
-void    ircServer::sendToClient(int fd, char *msg)
+void    ircServer::sendToClient(int fd, std::string res)
 {
-    std::string res = msg;
     res += END_MSG;
     if (send(fd, res.c_str(), res.length(), 0) == -1) {
         std::cerr << strerror(errno) << std::endl;
         // maybe disconnect client?
     }
-}
+}   
 
 void	ircServer::removeClient(std::vector<struct pollfd>::iterator it)
 {

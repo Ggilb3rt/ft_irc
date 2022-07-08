@@ -20,11 +20,7 @@ void	ircServer::startListen()
 		ret_poll = poll(_pfds.data(), _pfds.size(), 0);
 
 		if (ret_poll == -1) {
-			// TODO:: Crash Test infinite FD
-			std::cerr << errno << std::endl;
-			isStuck++;
-			if (isStuck > 5)
-				exit(1);
+			// TODO:: kill server
 		}
 		else {
 			if (_pfds[0].revents & POLLIN ) {

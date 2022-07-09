@@ -12,6 +12,7 @@ void    ircServer::handleNick(users_map::iterator pair, std::string newNick) {
         if (beg->second.getNick() == newNick) {
             sendToClient(pair->first, "Nickname already exists !");
             newNick += "_";
+            break ;
         }
         beg++;
     }
@@ -21,6 +22,6 @@ void    ircServer::handleNick(users_map::iterator pair, std::string newNick) {
     }
     else {
         pair->second.setNick(newNick);
-        sendToClient(pair->first, "Nickname must be less than 10 characters !");
+        sendToClient(pair->first, "Nickname changed :)");
     }
 }

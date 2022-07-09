@@ -27,6 +27,7 @@ class ircServer
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
 #define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL)
+#define	MAXLEN_MSG 510
 
 // IRC PROTOCOLE RULES
 #define END_MSG "\r\n"
@@ -59,7 +60,9 @@ private:
 	void		parse(std::string msg);
 
 	// execute
-	void		handleNick(users_map::iterator it, std::string newNick);
+	void	    parse(clients_vector::iterator it, std::string query);
+	void    	handleCommands(clients_vector::iterator it, std::string query);
+	void    	handleNick(users_map::iterator it, std::string newNick);
 
 	// helpers
 	void		sendToClient(int fd, const char *msg);

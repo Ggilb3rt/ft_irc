@@ -19,13 +19,18 @@ class user
 		// user() : _nick(""), _name("") {}
 
 	public:
+		std::string	_msg;
+
 		user(int fd) :
-			_id(fd) {}
+			_id(fd)
+		{}
 		user(int fd, char *nick, char *name) :
 			_id(fd),
 			_nick(nick),
 			_name(name),
-			_channels() {}
+			_channels(),
+			_msg()
+		{}
 		~user() {}
 
 		int			getId() const {return _id;}

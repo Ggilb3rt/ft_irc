@@ -1,45 +1,61 @@
 #include "ircServer.hpp"
+#include "user_class.hpp"
 
 int		ircServer::readData(clients_vector::iterator client)
 {
-		int		    maxlen = 512;   // Semi pif, je crois que c'est la taille max dans le protocol IRC pas sur de devoir le mettre ici
-        char	    buff[maxlen];	// ne devrait pas etre en local, aura besoin de traitement
+		int		    maxlen = MSG_MAX_SIZE;
+        char	    buff[maxlen];
 		int		    recv_ret = 1;
-		std::string	msg;
+		users_map::iterator	user_x = _users.find(client->fd);
 
-		while (recv_ret > 0) {
-			recv_ret = recv(client->fd, buff, sizeof(buff), 0);
-			if (recv_ret == 0) {
-				removeClient(client);
-				std::cout << "client disconnected\n";
-			}
-			//UNCOMMENT ON LINUX
-			// else if (recv_ret == -1) {
-			// 
-			// 	// send msg to warn client he must leave
-			// 	removeClient(client);
-			// 	std::cout << strerror(errno) << std::endl; 
-			// }
-			else if (recv_ret > 0) {
-				buff[recv_ret] = '\0';
-				msg += buff;
-				std::cout << "\n\n---------BUFFER == " << buff << " ---------\n\n";
-				if (msg.find("\n") != std::string::npos) { //! find must search END_MSG
-					std::cout << buff << "|buff size : " << recv_ret << std::endl;
-					break ;
-				}
-			}
+
+		recv_ret = recv(client->fd, buff, maxlen-1, 0);
+		if (recv_ret == -1)
+			std::cerr << "ERROR recv : " << errno << std::endl;
+		else if (recv_ret == 0)
+			std::cout << "remote host close the connection" << std::endl;
+		else {
+			for (int i = recv_ret; i < maxlen ; i++)
+				buff[i] = '\0';
+			user_x->second._msg += buff;
+			std::cout << "My buffer[" << recv_ret << "] in ["
+					<< user_x->second.getId() << "] |"
+					<< buff << std::endl;
 		}
-		std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
+
+		// while (recv_ret > 0) {
+		// 	recv_ret = recv(client->fd, buff, sizeof(buff), 0);
+		// 	if (recv_ret == 0) {
+		// 		removeClient(client);
+		// 		std::cout << "client disconnected\n";
+		// 	}
+		// 	//UNCOMMENT ON LINUX
+		// 	// else if (recv_ret == -1) {
+		// 	// 
+		// 	// 	// send msg to warn client he must leave
+		// 	// 	removeClient(client);
+		// 	// 	std::cout << strerror(errno) << std::endl; 
+		// 	// }
+		// 	else if (recv_ret > 0) {
+		// 		buff[recv_ret] = '\0';
+		// 		msg += buff;
+		// 		std::cout << "\n\n---------BUFFER == " << buff << " ---------\n\n";
+		// 		if (msg.find("\n") != std::string::npos) { //! find must search END_MSG
+		// 			std::cout << buff << "|buff size : " << recv_ret << std::endl;
+		// 			break ;
+		// 		}
+		// 	}
+		// }
+		//std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
 		// this->parse(msg);
 
-		// msg sent or cmd done
-		// must be in a sendData function
-		std::string res = "hey you send me :\n" + msg + "!";
-		res += END_MSG;
-		send(client->fd, res.c_str(), res.length(), 0);
-		std::cout << "Send reponse " << res << std::endl;
-		// roger.setFd(new_fd);
-		// roger.setName(buf);
+ 		if (user_x->second._msg.find("\n") != std::string::npos) { //! find must search END_MSG
+			// must be in a sendData function
+			std::string res = "----hey you send me :\n" + user_x->second._msg + "----!----";
+			res += END_MSG;
+			user_x->second._msg = "";
+			send(client->fd, res.c_str(), res.length(), 0);
+			std::cout << "Send reponse " << res << std::endl;
+		}
 		return recv_ret;
 }

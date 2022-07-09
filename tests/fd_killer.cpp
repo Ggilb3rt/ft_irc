@@ -37,7 +37,7 @@
 
 
 /*
-** client.c -- a stream socket client demo
+** Get all available fd - 1
 */
 
 #include <stdio.h>

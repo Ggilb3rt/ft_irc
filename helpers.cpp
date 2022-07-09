@@ -10,11 +10,18 @@ void    ircServer::sendToClient(int fd, const char *msg)
     }
 }
 
-void	ircServer::removeClient(std::vector<struct pollfd>::iterator it)
+void	ircServer::removeClient(std::vector<struct pollfd>::iterator &it)
 {
-		close(it->fd);
-		_users.erase(it->fd);
-		_pfds.erase(it);
+	close(it->fd);
+	_users.erase(it->fd);
+	_pfds.erase(it);
+}
+
+// just for debug
+void	ircServer::printUsers() {
+	for (users_map::iterator i = _users.begin(); i != _users.end(); i++) {
+		std::cout << i->first << " : " << i->second.getId() << std::endl;
+	}
 }
 
 void	ircServer::printAddrInfo()

@@ -20,11 +20,7 @@ void	ircServer::startListen()
 		ret_poll = poll(_pfds.data(), _pfds.size(), 0);
 
 		if (ret_poll == -1) {
-			// TODO:: Crash Test infinite FD
-			std::cerr << errno << std::endl;
-			isStuck++;
-			if (isStuck > 5)
-				exit(1);
+			std::cerr << "ERROR : poll " << errno << " isStuck " << isStuck << std::endl;
 		}
 		else {
 			if (_pfds[0].revents & POLLIN ) {
@@ -33,10 +29,14 @@ void	ircServer::startListen()
 				addr_size = sizeof(their_addr);
 				newClient.fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); 
 				if (newClient.fd == -1) {
-					std::cerr << errno << std::endl;
+					// TODO:: Crash Test infinite FD 
+						// it works, the program exit() but I don't like it
+					std::cerr << "ERROR : accept " << errno << std::endl;
+					isStuck++;
+					if (isStuck > 5)
+						exit(1);
 				}
 				else {
-					// accept will create a new socket to talk with client
 					newClient.events = MASK;
 					_pfds.push_back(newClient);
 					_users.insert(std::pair<int, user>(newClient.fd, user(newClient.fd)));
@@ -53,6 +53,7 @@ void	ircServer::startListen()
 					ret_poll = handleChange(ret_poll, it);
 					it++;
 				}
+				end = _pfds.end();
 				// Answer to client
 			}
 		}
@@ -73,12 +74,13 @@ void	ircServer::startListen()
 	}
 }
 
-int		ircServer::handleChange(int	ret_poll, clients_vector::iterator it) {
+int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {
 	if (it->revents & POLLERR) {
 		removeClient(it);
 		std::cerr << "error: An error has occured" << std::endl;
 	}
 	else if (it->revents & POLLHUP) {
+		std::cerr << "Client " << it->fd << " disconnected" << std::endl;
 		removeClient(it);
 	}
 	else if (it->revents & POLLNVAL) {

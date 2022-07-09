@@ -28,6 +28,7 @@ class ircServer
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
 #define END_MSG "\r\n"
 #define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL)
+#define	MAXLEN_MSG 510
 
 typedef		std::map<int, user>				users_map;
 typedef		std::vector<struct pollfd>		clients_vector;
@@ -56,6 +57,8 @@ private:
 	void		parse(std::string msg);
 
 	// execute
+	void	    parse(clients_vector::iterator it, std::string query);
+	void    	handleCommands(clients_vector::iterator it, std::string query);
 	void    	handleNick(users_map::iterator it, std::string newNick);
 
 	// helpers

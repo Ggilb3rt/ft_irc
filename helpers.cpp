@@ -1,6 +1,6 @@
 #include "ircServer.hpp"
 
-void    ircServer::sendToClient(int fd, const char *msg)
+void	ircServer::sendToClient(int fd, const char *msg)
 {
     std::string res = msg;
     res += END_MSG;
@@ -26,7 +26,8 @@ void	ircServer::printUsers() {
 
 void	ircServer::printAddrInfo()
 {
-   	char    _ipstr[INET6_ADDRSTRLEN];
+	char			_ipstr[INET6_ADDRSTRLEN];
+	struct addrinfo	*_p;
 
 	std::cout << std::endl << "IP addresses for " << ADDRESS_NAME << " : " << std::endl << std::endl;
 	for(_p = _servinfo;_p != NULL; _p = _p->ai_next) {

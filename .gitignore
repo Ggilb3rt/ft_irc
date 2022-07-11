@@ -37,4 +37,4 @@
 ./bircd/bircd
 client
 ft_irc
-./test/fd_killer
+./tests/fd_killer

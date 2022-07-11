@@ -12,6 +12,7 @@
 #include <poll.h>
 #include <iostream>
 #include "user_class.hpp"
+#include "channelClass.hpp"
 #include <vector>
 #include <map>
 #include <queue>
@@ -35,15 +36,19 @@ class ircServer
 
 typedef		std::map<int, user>				users_map;
 typedef		std::vector<struct pollfd>		clients_vector;
+typedef		std::map<std::string, channel>	channel_map;
+
+friend		class channel;
 
 private:
-	struct addrinfo				_hints, *_servinfo, *_p;
+	struct addrinfo				_hints, *_servinfo;
 	char						*_port;
-	int							_master_sockfd, new_fd;
+	int							_master_sockfd;
 	struct sockaddr_in			their_addr;
 	socklen_t					addr_size;
 	users_map					_users;
 	clients_vector				_pfds;
+	channel_map					_channel;
 
 
 	// init
@@ -60,9 +65,9 @@ private:
 	void		parse(std::string msg);
 
 	// execute
-	void	    parse(clients_vector::iterator it, std::string query);
-	void    	handleCommands(clients_vector::iterator it, std::string query);
-	void    	handleNick(users_map::iterator it, std::string newNick);
+	void		parse(clients_vector::iterator it, std::string query);
+	void		handleCommands(clients_vector::iterator it, std::string query);
+	void		handleNick(users_map::iterator it, std::string newNick);
 
 	// helpers
 	void		sendToClient(int fd, const char *msg);

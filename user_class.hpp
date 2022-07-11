@@ -7,14 +7,14 @@
 class user
 {
 
-	#define channel std::string
-	#define role	bool
+	#define channel_name	std::string
+	#define role			bool
 
 	private:
-		int			            _id;
-		std::string	            _nick;
-		std::string	            _name;
-		std::map<channel, role>	_channels;
+		int						_id;
+		std::string				_nick;
+		std::string				_name;
+		std::map<channel_name, role>	_channels;
 
 		// user() : _nick(""), _name("") {}
 

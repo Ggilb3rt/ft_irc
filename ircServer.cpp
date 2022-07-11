@@ -3,7 +3,7 @@
 /*
 	TODO:
 	- Finish error management :
-		-accept (-1 handled, 0 seems inoperant)
+		-accept (-1 handled, 0 seems inoperant) but don't want to exit() when -1, just print err and go againt
 		-recv : EAGAIN error check on linux
 		-send : must create send()function
 		-segfault : ø

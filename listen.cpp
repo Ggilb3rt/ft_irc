@@ -20,7 +20,7 @@ void	ircServer::startListen()
 		ret_poll = poll(_pfds.data(), _pfds.size(), 0);
 
 		if (ret_poll == -1) {
-			std::cerr << "ERROR : poll " << errno << " isStuck " << isStuck << std::endl;
+			std::cerr << "ERROR : poll " << errno << std::endl;
 		}
 		else {
 			if (_pfds[0].revents & POLLIN ) {
@@ -58,7 +58,7 @@ void	ircServer::startListen()
 			}
 		}
 		
-
+		// int	new_fd; // original in ircServer class
 		// addr_size = sizeof(their_addr);
 		// new_fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); // again check // accept will create a new socket to talk with client
 

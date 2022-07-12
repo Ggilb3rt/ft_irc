@@ -1,5 +1,8 @@
 
-SRCS =	main.cpp ircServer.cpp setup.cpp read.cpp listen.cpp helpers.cpp commands.cpp
+SRCS =	main.cpp \
+		ircServer.cpp setup.cpp read.cpp listen.cpp \
+		channelClass.cpp \
+		helpers.cpp commands.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 

@@ -12,13 +12,12 @@ class ircServer;
 
 class channel
 {
-#define user int
+#define user_id int
 
 private:
-	std::string			_name;
-	std::string			_description;
-	std::vector<user>	_users;
-	// friend				ircServer;
+	std::string				_name;
+	std::string				_description;
+	std::vector<user_id>	_users;
 
 	channel() {}
 
@@ -30,15 +29,11 @@ public:
 	std::string	getName() const {return _name;}
 	std::string	getDescription() const {return _description;}
 	void		setDescription(std::string description);
-	void		addUser(user user_fd);
-	void		removeUser(user user_fd);
+	void		addUser(user_id user_fd);
+	void		removeUser(user_id user_fd);
 
 	// USAGE
-	void		sendToAll(const char *msg) {
-		size_t	nb_users = _users.size();
-		for (size_t i = 0; i < nb_users; i++)
-			ircServer::sendToClient(i, msg);
-	}
+	void		sendToAll(ircServer& server, const char *msg);
 
 };
 

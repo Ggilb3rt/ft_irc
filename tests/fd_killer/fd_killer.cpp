@@ -57,6 +57,8 @@
 #define PORT "6697" // the port client will be connecting to 
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
+#define MAX_FD 1023
+
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -70,8 +72,8 @@ void *get_in_addr(struct sockaddr *sa)
 
 int main(int argc, char *argv[])
 {
-    printf("Bonjouerpouet\r\nlol internet\n");
-    int _master_sockfd, numbytes;  
+    int  max_fd = MAX_FD;
+    int _master_sockfd[max_fd], numbytes;  
     char buf[MAXDATASIZE];
     struct addrinfo hints, *servinfo, *p;
     int rv;
@@ -95,26 +97,27 @@ int main(int argc, char *argv[])
     // loop through all the results and connect to the first we can
     std::string ret;
     for(p = servinfo; p != NULL; p = p->ai_next) {
-        for (int i = 0; i < 1020; i++) {
-            ret = std::to_string(i) + " Yo\n";
-            if ((_master_sockfd = socket(p->ai_family, p->ai_socktype,
+        for (int i = 3; i < max_fd; i++) {
+            ret = std::to_string(i) + " Yo\r\n";
+            if ((_master_sockfd[i] = socket(p->ai_family, p->ai_socktype,
                     p->ai_protocol)) == -1) {
                 perror("client: socket");
                 continue;
             }
-            std::cout << "master socket " << _master_sockfd << std::endl;
+            std::cout << "master socket " << _master_sockfd[i] << std::endl;
             // fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
-            co_ret = connect(_master_sockfd, p->ai_addr, p->ai_addrlen);
+            co_ret = connect(_master_sockfd[i], p->ai_addr, p->ai_addrlen);
             if (co_ret == -1) {
-                close(_master_sockfd);
+                close(_master_sockfd[i]);
                 perror("client: connect");
                 continue;
             }
             std::cout << "connect " << co_ret << std::endl;
-            send(_master_sockfd, ret.c_str(), ret.length(), 0);
+            send(_master_sockfd[i], ret.c_str(), ret.length(), 0);
         }
         break;
     }
+    std::cout << "out of connections\n";
 
     if (p == NULL) {
         fprintf(stderr, "client: failed to connect\n");
@@ -133,17 +136,22 @@ int main(int argc, char *argv[])
 
     freeaddrinfo(servinfo); // all done with this structure
 
-    if ((numbytes = recv(_master_sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
-        perror("recv");
-        exit(1);
+    for (int i = 3; i < max_fd; i++) {
+        if ((numbytes = recv(_master_sockfd[i], buf, MAXDATASIZE-1, 0)) == -1) {
+            perror("recv");
+            exit(1);
+        }
+        while (numbytes < MAXDATASIZE)
+            buf[numbytes++] = '\0';
+        printf("client: received '%s'\n",buf);
     }
 
-    buf[numbytes] = '\0';
+    for (int i = 3; i < max_fd; i++) {
+        close(_master_sockfd[i]);
+        std::cout << "close" << i << " ";
+    }
 
-    printf("client: received '%s'\n",buf);
-
-    while (1){}
-    close(_master_sockfd);
+    // while (1){}
 
     return 0;
 }

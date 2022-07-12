@@ -4,6 +4,7 @@ void	ircServer::startListen()
 {
 	int	ret_poll = 0;
 	int	isStuck = 0;
+	int quit = 0;
 	struct pollfd	master;
 	
 	master.fd = _master_sockfd;
@@ -16,7 +17,7 @@ void	ircServer::startListen()
 
 	_pfds.push_back(master);
 
-	while (1) { // here must be infinit loop
+	while (!quit) { // here must be infinit loop
 		ret_poll = poll(_pfds.data(), _pfds.size(), 0);
 
 		if (ret_poll == -1) {
@@ -27,14 +28,18 @@ void	ircServer::startListen()
 				struct pollfd	newClient;//!!!!
 
 				addr_size = sizeof(their_addr);
+				std::cout << "poll size " << _pfds.size() << std::endl;
 				newClient.fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); 
 				if (newClient.fd == -1) {
 					// TODO:: Crash Test infinite FD 
 						// it works, the program exit() but I don't like it
 					std::cerr << "ERROR : accept " << errno << std::endl;
+					// if (isStuck)
+					// 	continue;
+					// std::cout << close(1023) << std::endl;
 					isStuck++;
 					if (isStuck > 5)
-						exit(1);
+						quit = 1;
 				}
 				else {
 					newClient.events = MASK;
@@ -48,6 +53,7 @@ void	ircServer::startListen()
 				}
 			}
 			else {
+				// std::cout << "nothing appends : " << (_pfds[0].revents & POLLIN) << std::endl;
 				it = _pfds.begin();
 				while (ret_poll > 0 && it != end) {
 					ret_poll = handleChange(ret_poll, it);
@@ -81,6 +87,10 @@ int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {
 	}
 	else if (it->revents & POLLHUP) {
 		std::cerr << "Client " << it->fd << " disconnected" << std::endl;
+		removeClient(it);
+	}
+	else if (it->revents & POLLRDHUP) {
+		std::cerr << "Client " << it->fd << " closed connection" << std::endl;
 		removeClient(it);
 	}
 	else if (it->revents & POLLNVAL) {

@@ -10,7 +10,8 @@ void	ircServer::initAddrInfo()
 {
 	int		_addrinfo_status;
 	// INIT STRUCT
-	memset(&_hints, 0, sizeof _hints);
+	memset(&_hints, 0, sizeof(_hints));
+	memset(&_servinfo, 0, sizeof(_servinfo));
 	_hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
 	_hints.ai_socktype = SOCK_STREAM;
 	_hints.ai_flags = AI_PASSIVE; // maybe useles
@@ -22,6 +23,7 @@ void	ircServer::initAddrInfo()
 	}
 }
 
+//! conditional jump here, don't find it
 void	ircServer::createMasterSocket()
 {
 	int	bind_ret;
@@ -33,7 +35,7 @@ void	ircServer::createMasterSocket()
 		freeaddrinfo(_servinfo);
 		exit(errno);
     }
-	fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
+	// fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
 	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
 	if (bind_ret == -1) {
         std::cerr << "ERROR : Bind" << std::endl;

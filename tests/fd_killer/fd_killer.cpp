@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
                 perror("client: connect");
                 continue;
             }
-            std::cout << "connect " << co_ret << std::endl;
+            // std::cout << "connect " << co_ret << std::endl;
             send(_master_sockfd[i], ret.c_str(), ret.length(), 0);
         }
         break;
@@ -146,12 +146,17 @@ int main(int argc, char *argv[])
         printf("client: received '%s'\n",buf);
     }
 
-    for (int i = 3; i < max_fd; i++) {
+    char next;
+    std::cout << "(choose a char to continue ...)" << std::endl;
+    std::cin >> next;
+    // close(_master_sockfd[99]);
+    for (int i = 3; i < max_fd - 1; i++) {
         close(_master_sockfd[i]);
-        std::cout << "close" << i << " ";
+        // std::cout << "close" << i << " ";
     }
 
-    // while (1){}
+    std::cout << "(choose a char to quit ...)" << std::endl;
+    std::cin >> next;
 
     return 0;
 }

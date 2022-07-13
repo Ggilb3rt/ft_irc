@@ -13,11 +13,13 @@ class ircServer;
 class channel
 {
 #define user_id int
+#define role	bool
 
 private:
 	std::string				_name;
 	std::string				_description;
 	std::vector<user_id>	_users;
+	std::map<user_id, role>	_users_map;
 
 	channel() {}
 
@@ -33,7 +35,12 @@ public:
 	void		removeUser(user_id user_fd);
 
 	// USAGE
-	void		sendToAll(ircServer& server, const char *msg);
+	void		sendToAll(ircServer& server, const char *msg) const;
+	//void		sendToOne(const char *msg) const;	
+
+
+	// DEBUG
+	void		printUsers() const;
 
 };
 

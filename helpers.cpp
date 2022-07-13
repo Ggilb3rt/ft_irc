@@ -10,11 +10,16 @@ void	ircServer::sendToClient(int fd, const char *msg)
     }
 }
 
-void	ircServer::removeClient(std::vector<struct pollfd>::iterator &it)
+void	ircServer::removeClient(clients_vector::iterator &it)
 {
 	close(it->fd);
+	// must send signal to each of his channels to remove him from list
 	_users.erase(it->fd);
-	_pfds.erase(it);
+	it = _pfds.erase(it);
+}
+
+void	ircServer::removeChannel(channel_map::iterator &it) {
+	// must send signal to each of his users to remove him from list
 }
 
 // just for debug

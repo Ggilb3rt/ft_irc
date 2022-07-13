@@ -20,9 +20,21 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+
 	ircServer	base(argv[1]);
 
 	base.printAddrInfo();
+
+	channel		lol("Pouet");
+	lol.addUser(1);
+	lol.addUser(9);
+	lol.addUser(5);
+	std::cout << "Channel :\n"
+				<< lol.getName() << std::endl
+				<< lol.getDescription() << std::endl;
+	lol.printUsers();
+	lol.sendToAll(base, "lol");
+
 	base.startListen();
 
 

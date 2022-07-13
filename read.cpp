@@ -18,7 +18,7 @@ int		ircServer::readData(clients_vector::iterator client)
 			for (int i = recv_ret; i < maxlen ; i++)
 				buff[i] = '\0';
 			user_x->second._msg += buff;
-			std::cout << "My buffer[" << recv_ret << "] in ["
+			std::cout << "My buffer[" << recv_ret << "] in fd["
 					<< user_x->second.getId() << "] |"
 					<< buff << std::endl;
 		}

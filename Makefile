@@ -8,7 +8,7 @@ OBJS = ${SRCS:.cpp=.o}
 
 NAME = ft_irc
 
-CFLAGS = -I. -g3 -Wall -Werror -std=c++98
+CFLAGS = -Wall -Werror -Wextra  -I. -g -std=c++98
 LDFLAGS =
 
 CC = c++
@@ -34,7 +34,11 @@ test: all
 	./${NAME} ${PORT}
 
 val_test: all
-	valgrind --leak-check=full --track-origins=yes ./${NAME} 6697
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${NAME} 6697
 
-ns_test:
-	./nc_test.sh
+gdb: all
+	gdb --args ./${NAME} ${PORT}
+
+fd_killer:
+	./fd_killer/fd_killer.sh
+

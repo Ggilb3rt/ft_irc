@@ -23,7 +23,6 @@ void	ircServer::initAddrInfo()
 	}
 }
 
-//! conditional jump here, don't find it
 void	ircServer::createMasterSocket()
 {
 	int	bind_ret;
@@ -43,7 +42,7 @@ void	ircServer::createMasterSocket()
 		exit(errno);
     }
 	std::cout << "listening .. " << std::endl;
-	listen(_master_sockfd, BACKLOG);
+	listen_ret = listen(_master_sockfd, BACKLOG);
 	if (listen_ret == -1) {
 		std::cerr << "ERROR : listen" << std::endl;
 		freeaddrinfo(_servinfo);

@@ -14,7 +14,7 @@ class user
 		int						_id;
 		std::string				_nick;
 		std::string				_name;
-		std::map<channel_name, role>	_channels;
+		std::map<channel_name, role>	_channels; // to remove
 
 		// user() : _nick(""), _name("") {}
 

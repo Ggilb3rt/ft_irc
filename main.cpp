@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
 	base.printAddrInfo();
 
-	channel		lol("Pouet");
+	channel		lol("Pouet", 8);
 	lol.addUser(1);
 	lol.addUser(9);
 	lol.addUser(5);

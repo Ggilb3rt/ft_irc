@@ -18,13 +18,15 @@ class channel
 private:
 	std::string				_name;
 	std::string				_description;
-	std::vector<user_id>	_users;
-	std::map<user_id, role>	_users_map;
+	std::map<user_id, role>	_users; // nope
 
 	channel() {}
 
 public:
-	channel(std::string name) : _name(name), _description("Super channel " + name) {}
+	channel(std::string name, user_id creator) : _name(name), _description("Super channel " + name)
+	{
+		_users.insert(std::pair<user_id, role>(creator, true));
+	}
 	~channel() {}
 
 	// MODIFIERS

@@ -93,14 +93,14 @@ int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {
 		removeClient(it);
 		std::cerr << "error: An error has occured" << std::endl;
 	}
-	// else if (it->revents & POLLHUP) {
-	// 	std::cerr << "Client " << it->fd << " disconnected" << std::endl;
-	// 	removeClient(it);
-	// }
-	else if (it->revents & POLLRDHUP) {
-		std::cerr << "Client " << it->fd << " closed connection" << std::endl;
+	else if (it->revents & POLLHUP) {	// MAC
+		std::cerr << "Client " << it->fd << " disconnected" << std::endl;
 		removeClient(it);
 	}
+	// else if (it->revents & POLLRDHUP) { // LINUX
+	// 	std::cerr << "Client " << it->fd << " closed connection" << std::endl;
+	// 	removeClient(it);
+	// }
 	else if (it->revents & POLLNVAL) {
 		removeClient(it);
 		std::cerr << "error: Invalid fd member" << std::endl;

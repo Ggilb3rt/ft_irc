@@ -3,9 +3,11 @@
 /*
 	TODO:
 	- Finish error management :
-		-accept (-1 handled, 0 seems inoperant) but don't want to exit() when -1, just print err and go againt
+		-accept (-1 handled, 0 seems inoperant) but don't want to exit() when -1,
+				just print err and go againt, use an arbitrary limit ?
 		-send : must create send()function
-		-segfault : none
+		-segfault :
+			- start fd_killer and ctrl+c before it ends
 	- Parsing : 
 		- check README to get syntax requirements
 		- implement lexer

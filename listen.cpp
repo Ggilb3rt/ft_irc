@@ -26,7 +26,18 @@ void	ircServer::startListen()
 			std::cerr << "ERROR : poll " << errno << std::endl;
 		}
 		else {
-			if (_pfds[0].revents & POLLIN ) {
+			//! plutot sale mais (en partie) fonctionnel
+			if (_pfds.size() > 2) { // limite arbitraire
+				it = _pfds.begin();
+				while (ret_poll > 0 && it != end) {
+					// std::cout << "iterator when change " << &(*it) << " | " << it->fd << std::endl;
+					ret_poll = handleChange(ret_poll, it);
+					// std::cout << "iterator after change " << &(*it) << " | " << it->fd << std::endl << std::endl;
+					it++;
+				}
+				end = _pfds.end();
+			}
+			else if (_pfds[0].revents & POLLIN ) {
 				struct pollfd	newClient;//!!!!
 
 				addr_size = sizeof(their_addr);
@@ -52,8 +63,10 @@ void	ircServer::startListen()
 					// UNCOMMENT TO PRINT MAP ON USERS
 					// for (user_list::iterator it = _users.begin(); it != _users.end(); it++) {
 					// 	std::cout << "id == " << it->second.getId() << std::endl;
-					// }
 				}
+			// std::cout << "size " << _pfds.size() << std::endl;
+			// }
+			// std::cout << "out\n";
 			}
 			else {
 				// std::cout << "nothing appends : " << (_pfds[0].revents & POLLIN) << std::endl;

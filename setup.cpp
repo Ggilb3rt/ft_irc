@@ -12,7 +12,7 @@ void	ircServer::initAddrInfo()
 	// INIT STRUCT
 	memset(&_hints, 0, sizeof(_hints));
 	memset(&_servinfo, 0, sizeof(_servinfo));
-	_hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
+	_hints.ai_family = AF_INET; // AF_INET or AF_INET6 to force version
 	_hints.ai_socktype = SOCK_STREAM;
 	_hints.ai_flags = AI_PASSIVE; // maybe useles
 

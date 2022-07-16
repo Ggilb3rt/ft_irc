@@ -25,3 +25,45 @@ void    ircServer::handleNick(users_map::iterator pair, std::string newNick) {
         sendToClient(pair->first, "Nickname changed :)");
     }
 }
+
+const char	*ircServer::topic(user_id id, std::string current_chan, const char *msg)
+{
+	/*
+		TOPIC REPLIES
+			- ERR_NEEDMOREPARAMS
+			- ERR_NOTONCHANNEL
+			- RPL_NOTOPIC
+			- RPL_TOPIC
+			- ERR_CHANOPRIVSNEEDED
+	*/
+	rplManager				*rpl_manager = rplManager::getInstance();
+	std::string				response;
+	int						ret;
+	channel_map::iterator	it;
+
+	it = _channel.find(current_chan);
+	if (it == _channel.end()) {
+		std::cerr << "Channel does not exist" << std::endl;
+		return (NULL); //! reponse non indiquée dans RFC
+	}
+	if (msg == NULL) {
+		response = rpl_manager->createResponse(
+							RPL_TOPIC,
+							current_chan,
+							it->second.getDescription().c_str());
+		return (response.c_str());
+	}
+	ret = it->second.setDescription(id, msg);
+	if (ret == RPL_TOPIC) {
+			response = rpl_manager->createResponse(
+							RPL_TOPIC,
+							current_chan,
+							it->second.getDescription().c_str());
+	}
+	else {
+		response = rpl_manager->createResponse(
+							ret,
+							current_chan);
+	}
+	return (response.c_str());
+}

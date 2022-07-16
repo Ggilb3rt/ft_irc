@@ -28,6 +28,7 @@
 			-------------------
 		POSSIBLE SOLUTION
 			create channels with user.fd and access clients with fd
+		- on DALnet, when try to nick existingName the server let me 60 seconds after that he give me nick GuestXXXX
 
 
 	TODO: DONE
@@ -53,6 +54,13 @@
 ircServer::ircServer(char *port) : _port(port)
 {
 	this->init();
+
+	/* TESTS for TOPIC and rplManager*/
+	this->_channel.insert(std::pair<std::string, channel>("lol", channel("lol", 4)));
+	std::cout << "Return from TOPIC (geter) : " << this->topic(4, "lol") << std::endl;
+	std::cout << "Return from TOPIC (seter): " << this->topic(4, "lol", "New topic for lol") << std::endl;
+	std::cout << "Return from TOPIC (not allowed): " << this->topic(6, "lol", "fouille merde") << std::endl;
+
 }
 
 ircServer::~ircServer()

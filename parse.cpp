@@ -2,7 +2,7 @@
 
 void    ircServer::parse(clients_vector::iterator it, std::string query, int channel)
 {
-    if (query.length() > MAXLEN_MSG) {
+    if (query.length() > MSG_MAX_SIZE) {
         sendToClient(it->fd, "Message must be less than 510 characters");
     }
     else if (*(query.begin()) == '/') {

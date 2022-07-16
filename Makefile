@@ -2,7 +2,7 @@
 SRCS =	main.cpp \
 		ircServer.cpp setup.cpp read.cpp listen.cpp \
 		channelClass.cpp \
-		helpers.cpp commands.cpp
+		helpers.cpp commands.cpp rplManager.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 

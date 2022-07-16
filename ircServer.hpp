@@ -11,11 +11,13 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <iostream>
+#include "irc_protocole_rules.hpp"
 #include "user_class.hpp"
 #include "channelClass.hpp"
+#include "rplManager.hpp"
 #include <vector>
 #include <map>
-#include <queue>
+
 
 typedef struct	s_lex {
 	int			type;
@@ -28,15 +30,14 @@ class ircServer
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
 #define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL) // + POLLRDHUP)
-#define	MAXLEN_MSG 510
 
-// IRC PROTOCOLE RULES
-#define END_MSG "\r\n"
-#define MSG_MAX_SIZE 512
 
 typedef		std::map<int, user>				users_map;
 typedef		std::vector<struct pollfd>		clients_vector;
 typedef		std::map<std::string, channel>	channel_map;
+
+#define user_id int
+
 
 friend		class channel;
 
@@ -69,10 +70,16 @@ private:
 	void		handleNick(users_map::iterator it, std::string newNick);
 
 	// helpers
+	void		sendToClient(int fd, const char *msg);
 	void		removeClient(clients_vector::iterator &it);
 	void		removeChannel(channel_map::iterator &it);
-	void		sendToClient(int fd, const char *msg);
+	user_id		getUserByNick(std::string nick);
 	void		printUsers();
+
+
+
+	// cmds //? must return char* with response inside
+	const char	*topic(user_id id, std::string current_chan, const char *msg = NULL);
 
 public:
 

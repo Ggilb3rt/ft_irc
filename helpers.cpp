@@ -18,12 +18,23 @@ void	ircServer::removeClient(clients_vector::iterator &it)
 	it = _pfds.erase(it);
 }
 
-void	ircServer::removeChannel(channel_map::iterator &it) {
+void	ircServer::removeChannel(channel_map::iterator &it)
+{
 	// must send signal to each of his users to remove him from list
+	it = _channel.erase(it);
+}
+
+user_id	ircServer::getUserByNick(std::string nick)
+{
+	// foreach user in users
+	// if user->_nick == nick
+	//		return user->_id;
+	return (-1);
 }
 
 // just for debug
-void	ircServer::printUsers() {
+void	ircServer::printUsers()
+{
 	for (users_map::iterator i = _users.begin(); i != _users.end(); i++) {
 		std::cout << i->first << " : " << i->second.getId() << std::endl;
 	}

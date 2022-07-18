@@ -33,26 +33,28 @@ int main(int argc, char **argv)
 
 	base.printAddrInfo();
 
-	channel		lol("Pouet", 8);
-	lol.addUser(1);
-	lol.addUser(5);
-	lol.addUser(9);
-	lol.addUser(5);
-	lol.setDescription(9, "Channel trop nul");
-	lol.setDescription(8, "Fan club de trompettes aux sons incertains");
-	std::cout << "Channel :\n\t"
-				<< lol.getName() << std::endl
-				<< "\t" << lol.getDescription() << std::endl;
-	lol.printUsers();
-	lol.sendToAll(base, "lol");
-	lol.setUserRole(1, true);
-	lol.setUserRole(8, false);
-	lol.removeUser(9);
-	lol.printUsers();
+	// channel		lol("Pouet", 8);
+	// lol.addUser(1);
+	// lol.addUser(5);
+	// lol.addUser(9);
+	// lol.addUser(5);
+	// lol.setDescription(9, "Channel trop nul");
+	// lol.setDescription(8, "Fan club de trompettes aux sons incertains");
+	// std::cout << "Channel :\n\t"
+	// 			<< lol.getName() << std::endl
+	// 			<< "\t" << lol.getDescription() << std::endl;
+	// lol.printUsers();
+	// lol.sendToAll(base, "lol");
+	// lol.setUserRole(1, true);
+	// lol.setUserRole(8, false);
+	// lol.removeUser(9);
+	// lol.printUsers();
 
 
 
 	// base.startListen();
+
+	delete rpl_manager;
 
 	return 0;
 }

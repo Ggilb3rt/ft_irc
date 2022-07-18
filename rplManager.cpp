@@ -11,21 +11,27 @@ rplManager	*rplManager::getInstance()
 }
 
 rplManager::rplManager()
-		{
-			list.insert(new_pair(1, " :lol internet"));
-			list.insert(new_pair(14, " :petit mais puissant"));
-			list.insert(new_pair(ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG));
-			list.insert(new_pair(ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG));
-			list.insert(new_pair(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG));
-			list.insert(new_pair(RPL_NOTOPIC, RPL_NOTOPIC_MSG));
-			list.insert(new_pair(RPL_TOPIC, RPL_TOPIC_MSG));
-		}
+{
+	list.insert(new_pair(1, " :lol internet"));
+	list.insert(new_pair(14, " :petit mais puissant"));
+	list.insert(new_pair(ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG));
+	list.insert(new_pair(ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG));
+	list.insert(new_pair(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG));
+	list.insert(new_pair(RPL_NOTOPIC, RPL_NOTOPIC_MSG));
+	list.insert(new_pair(RPL_TOPIC, RPL_TOPIC_MSG));
+}
+
+rplManager::~rplManager()
+{
+	std::cout << "Delete replies manager\n";
+}
 
 
-const char	*rplManager::createResponse(int ret, std::string opt_before, std::string opt_after)
+
+std::string	rplManager::createResponse(int ret, std::string opt_before, std::string opt_after)
 {
 	std::stringstream	ss;
-	std::string			res = "";
+	std::string				res = "";
 	rpl_map::iterator	it = list.find(ret);
 
 	ss << ret;
@@ -44,7 +50,7 @@ const char	*rplManager::createResponse(int ret, std::string opt_before, std::str
 		res += opt_after;
 	}
 	res += END_MSG;
-	return (res.c_str());
+	return (res);
 }
 
 void		rplManager::printAll()

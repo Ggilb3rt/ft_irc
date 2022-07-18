@@ -1,7 +1,8 @@
 #ifndef IRC_SERVER_HPP
     #define IRC_SERVER_HPP
 
-#include <string.h>
+#include <cstring>
+#include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -80,7 +81,7 @@ private:
 
 
 	// cmds //? must return char* with response inside
-	const char	*topic(user_id id, std::string current_chan, const char *msg = NULL);
+	std::string	topic(user_id id, std::string current_chan, const char *msg = NULL);
 
 public:
 

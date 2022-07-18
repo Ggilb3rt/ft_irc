@@ -4,6 +4,7 @@
 #include "irc_protocole_rules.hpp"
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <map>
 
 // ERRORS
@@ -33,13 +34,13 @@ class	rplManager
 		rplManager();
 
 	public:
-		rplManager(rplManager &copy) { delete _rplManager; }
-		void operator=(const rplManager &other) { delete _rplManager; }
-		~rplManager() { delete _rplManager; }
+		// rplManager(rplManager &copy) { delete _rplManager; }
+		// void operator=(const rplManager &other) { delete _rplManager; }
+		~rplManager();
 
 		static rplManager	*getInstance();
 
-		const char	*createResponse(int ret, std::string opt_before = "", std::string opt_after = "");
+		std::string	createResponse(int ret, std::string opt_before = "", std::string opt_after = "");
 		void		printAll();
 };
 

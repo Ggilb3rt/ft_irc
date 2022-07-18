@@ -26,7 +26,7 @@ void    ircServer::handleNick(users_map::iterator pair, std::string newNick) {
     }
 }
 
-const char	*ircServer::topic(user_id id, std::string current_chan, const char *msg)
+std::string	ircServer::topic(user_id id, std::string current_chan, const char *msg)
 {
 	/*
 		TOPIC REPLIES
@@ -37,7 +37,7 @@ const char	*ircServer::topic(user_id id, std::string current_chan, const char *m
 			- ERR_CHANOPRIVSNEEDED
 	*/
 	rplManager				*rpl_manager = rplManager::getInstance();
-	std::string				response;
+	// std::string				response;
 	int						ret;
 	channel_map::iterator	it;
 
@@ -47,23 +47,17 @@ const char	*ircServer::topic(user_id id, std::string current_chan, const char *m
 		return (rpl_manager->createResponse(2, current_chan)); //! reponse non indiquée dans RFC
 	}
 	if (msg == NULL) {
-		response = rpl_manager->createResponse(
+		return (rpl_manager->createResponse(
 							RPL_TOPIC,
 							current_chan,
-							it->second.getDescription().c_str());
-		return (response.c_str());
+							it->second.getDescription().c_str()));
 	}
 	ret = it->second.setDescription(id, msg);
 	if (ret == RPL_TOPIC) {
-			response = rpl_manager->createResponse(
+			return (rpl_manager->createResponse(
 							RPL_TOPIC,
 							current_chan,
-							it->second.getDescription().c_str());
+							it->second.getDescription().c_str()));
 	}
-	else {
-		response = rpl_manager->createResponse(
-							ret,
-							current_chan);
-	}
-	return (response.c_str());
+	return (rpl_manager->createResponse(ret, current_chan));
 }

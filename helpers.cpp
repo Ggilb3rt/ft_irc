@@ -23,8 +23,8 @@ void	ircServer::addChannel(std::string name, user_id id)
 	std::pair<channel_map::iterator, bool>	ret;
 
 	ret = _channel.insert(std::pair<std::string, channel>(name, channel(name, id)));
-	// if (ret.second == false)
-		// already exist
+	if (ret.second == false)
+		std::cerr << "ERROR : channel already exist" << std::endl; //! pas de reponse dans la RFC
 }
 
 void	ircServer::removeChannel(channel_map::iterator &it)

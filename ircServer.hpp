@@ -72,6 +72,7 @@ private:
 	// helpers
 	void		sendToClient(int fd, const char *msg);
 	void		removeClient(clients_vector::iterator &it);
+	void		addChannel(std::string name, user_id id);
 	void		removeChannel(channel_map::iterator &it);
 	user_id		getUserByNick(std::string nick);
 	void		printUsers();

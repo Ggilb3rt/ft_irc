@@ -18,9 +18,17 @@ void	ircServer::removeClient(clients_vector::iterator &it)
 	it = _pfds.erase(it);
 }
 
+void	ircServer::addChannel(std::string name, user_id id)
+{
+	std::pair<channel_map::iterator, bool>	ret;
+
+	ret = _channel.insert(std::pair<std::string, channel>(name, channel(name, id)));
+	// if (ret.second == false)
+		// already exist
+}
+
 void	ircServer::removeChannel(channel_map::iterator &it)
 {
-	// must send signal to each of his users to remove him from list
 	it = _channel.erase(it);
 }
 

@@ -44,7 +44,7 @@ const char	*ircServer::topic(user_id id, std::string current_chan, const char *m
 	it = _channel.find(current_chan);
 	if (it == _channel.end()) {
 		std::cerr << "Channel does not exist" << std::endl;
-		return (NULL); //! reponse non indiquée dans RFC
+		return (rpl_manager->createResponse(2, current_chan)); //! reponse non indiquée dans RFC
 	}
 	if (msg == NULL) {
 		response = rpl_manager->createResponse(

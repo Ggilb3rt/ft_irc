@@ -30,17 +30,17 @@ void	ircServer::createMasterSocket()
 
 	_master_sockfd = socket(_servinfo->ai_family, _servinfo->ai_socktype, _servinfo->ai_protocol);
 	if (_master_sockfd == -1) {
-        std::cerr << "ERROR : Socket" << std::endl;
+		std::cerr << "ERROR : Socket" << std::endl;
 		freeaddrinfo(_servinfo);
 		exit(errno);
-    }
-	fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
+	}
+	// fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
 	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
 	if (bind_ret == -1) {
-        std::cerr << "ERROR : Bind" << std::endl;
+		std::cerr << "ERROR : Bind" << std::endl;
 		freeaddrinfo(_servinfo);
 		exit(errno);
-    }
+	}
 	std::cout << "listening .. " << std::endl;
 	listen_ret = listen(_master_sockfd, BACKLOG);
 	if (listen_ret == -1) {

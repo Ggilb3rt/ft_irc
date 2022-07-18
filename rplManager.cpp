@@ -26,6 +26,7 @@ const char	*rplManager::createResponse(int ret, std::string opt_before, std::str
 {
 	std::stringstream	ss;
 	std::string			res = "";
+	rpl_map::iterator	it = list.find(ret);
 
 	ss << ret;
 	for (int i = ret; i < 100; i *= 10) {
@@ -36,7 +37,8 @@ const char	*rplManager::createResponse(int ret, std::string opt_before, std::str
 		res += " ";
 		res += opt_before;
 	}
-	res += list.find(ret)->second;
+	if (it != list.end())
+		res += it->second;
 	if (opt_after.size() > 0) {
 		res += " ";
 		res += opt_after;

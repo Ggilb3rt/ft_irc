@@ -19,8 +19,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	rplManager	*rpl_manager = rplManager::getInstance();
 	ircServer	base(argv[1]);
+	rplManager	*rpl_manager = rplManager::getInstance();
 
 	/* Replie manager TESTS */
 	std::cout << "rpl_manager addr " << rpl_manager << std::endl;

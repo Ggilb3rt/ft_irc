@@ -82,7 +82,7 @@ private:
 	void			addClient(int fd);
 	void			addClient(int fd, std::string nick, std::string name);
 	void			removeClient(clients_vector::iterator &it);
-	std::pair<std::map<std::string, channel>::iterator, bool>			addChannel(std::string name, user_id id);
+	channel_pair	addChannel(std::string name, user_id id);
 	void			removeChannel(channel_map::iterator &it);
 	user_id			getUserByNick(std::string nick);
 	void			printUsers();

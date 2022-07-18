@@ -38,6 +38,11 @@
 		- error: when buffer uncomplete the program blocks ;
 				sending message from another client put it in waiting list
 			==> solution : one buffer by client
+	- Channels :
+		- when client disconnect : 
+			- remove channel if it was the last in
+			- change operator if there is no more operator
+				==> it works, the first user in the map is set has operator
 	-segfault : 
 			- scenario :
 				- clientX connects, then clientY connects
@@ -78,8 +83,9 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	std::cout << "----------------Creating Users----------------\n";
 	std::string	names[5] = {"Roger", "Marcel", "Corine", "Corine", "Boby"};
 	std::string	nicks[5] = {"Rabbit", "Patoulatchi", "Corine", "Roger", "Toby"};
-	for (int i = 15; i < 20; i++)
+	for (int i = 15; i < 20; i++) {
 		this->addClient(i, nicks[i-15], names[i-15]);
+	}
 	this->addClient(17);
 	this->addClient(20, "Rabbit", "anotherName");
 	this->addClient(21, "Rabbit", "anotherName");
@@ -92,11 +98,12 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	this->join(_users.find(16)->second.getId(), "GardienDeLaPaix");
 	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");
 	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");
+	this->join(_users.find(19)->second.getId(), "GardienDeLaPaix");
 	this->join(_users.find(18)->second.getId(), "Gardien de la paix");
 	this->join(_users.find(18)->second.getId(), "ChannelDeRoger");
 	this->join(_users.find(18)->second.getId(), "Vive18");
-	this->join(_users.find(19)->second.getId(), "Vive18");
-	this->join(_users.find(20)->second.getId(), "Vive18");
+	for (int i = 15; i < 22; i++)
+		this->join(_users.find(i)->second.getId(), "Vive18");
 	this->printChannels();
 
 	// change descriptions
@@ -104,7 +111,74 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	std::cout << this->topic(_users.find(18)->second.getId(), "Vive18");
 	std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");
 	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger");
+	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger", "ViveMoi");
+	std::cout << this->topic(_users.find(19)->second.getId(), "Pouet", "ViveMoi");
 	std::cout << std::endl;
+	this->printChannels();
+
+	// remove x/2 users
+	std::cout << "----------------QUIT/KICK/disconnecting users----------------\n";
+	//can't remove client with .removeClient() I need _pfds
+	// only remove client from channels
+	channel_map::iterator it = _channel.begin();
+	channel_map::iterator end = _channel.end();
+
+	while (it !=end){
+		it->second.removeUser(17);
+		if (it->second.getSize() == 0)
+			it = _channel.erase(it);
+		else {
+			it->second.replaceLastOperator();
+			it++;
+		}
+	}
+	it = _channel.begin();
+	end = _channel.end();
+	while (it !=end) {
+		it->second.removeUser(8);
+		if (it->second.getSize() == 0)
+			it = _channel.erase(it);
+		else {
+			it->second.replaceLastOperator();
+			it++;
+		}
+	}
+	it = _channel.begin();
+	end = _channel.end();
+	while (it !=end) {
+		it->second.removeUser(15);
+		if (it->second.getSize() == 0)
+			it = _channel.erase(it);
+		else {
+			it->second.replaceLastOperator();
+			it++;
+		}
+	}
+	it = _channel.begin();
+	end = _channel.end();
+	while (it !=end) {
+		it->second.removeUser(18);
+		if (it->second.getSize() == 0)
+			it = _channel.erase(it);
+		else {
+			it->second.replaceLastOperator();
+			it++;
+		}
+	}
+	this->printChannels();
+
+	it = _channel.begin();
+	end = _channel.end();
+	while (it !=end) {
+		it->second.removeUser(16);
+		if (it->second.getSize() == 0)
+			it = _channel.erase(it);
+		else {
+			it->second.replaceLastOperator();
+			it++;
+		}
+	}
+
 	this->printChannels();
 
 	std::cout << "====================================================\n\n";

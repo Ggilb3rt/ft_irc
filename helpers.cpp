@@ -40,14 +40,24 @@ void		ircServer::addClient(int fd, std::string nick, std::string name)
 
 void	ircServer::removeClient(clients_vector::iterator &it)
 {
+	channel_map::iterator	chan_it = _channel.begin();
+	channel_map::iterator	chan_end = _channel.end();
+
+	while (chan_it != chan_end) {
+		chan_it->second.removeUser(it->fd);
+		if (chan_it->second.getSize() == 0)
+			chan_it = _channel.erase(chan_it);
+		else {
+			chan_it->second.replaceLastOperator();
+			chan_it++;
+		}
+	}
 	close(it->fd);
-	// must send signal to each of his channels to remove him from list
 	_users.erase(it->fd);
 	it = _pfds.erase(it);
 }
 
-//! pourquoi je peux pas utiliser le typedef ici ??????!!!!!!!
-std::pair<std::map<std::string, channel>::iterator, bool>	ircServer::addChannel(std::string name, user_id id)
+ircServer::channel_pair	ircServer::addChannel(std::string name, user_id id)
 {
 	channel_pair	ret;
 

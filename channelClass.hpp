@@ -41,9 +41,12 @@ public:
 	bool		addUser(user_id user_fd);
 	void		removeUser(user_id user_fd);
 	void		setUserRole(user_id id, role new_role);
-	
+	size_t		getSize();
+	// users_list::iterator		getUser(user_id id);
+
 
 	// USAGE
+	void		replaceLastOperator();
 	void		sendToAll(ircServer& server, const char *msg) const;
 	//void		sendToOne(const char *msg) const;	
 

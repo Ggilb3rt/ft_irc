@@ -51,7 +51,7 @@
 
 */
 
-ircServer::ircServer(char *port) : _port(port)
+ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 {
 	this->init();
 
@@ -62,6 +62,53 @@ ircServer::ircServer(char *port) : _port(port)
 	std::cout << "Return from TOPIC (seter): " << this->topic(4, "lol", "New topic for lol") << std::endl;
 	std::cout << "Return from TOPIC (not allowed): " << this->topic(6, "lol", "fouille merde") << std::endl;
 
+
+
+	/* SIMULATION test
+			- Create x users ( >= 5 )
+				- try to create user with same nick
+			- each users create or join one or more channels
+			- try to change desciption with operator and basic user
+			- remove x/2 users
+	*/
+	std::cout << "\n\n===========STARTING SIMULATION TEST============\n\n";
+
+	// create users
+	this->printUsers();
+	std::cout << "----------------Creating Users----------------\n";
+	std::string	names[5] = {"Roger", "Marcel", "Corine", "Corine", "Boby"};
+	std::string	nicks[5] = {"Rabbit", "Patoulatchi", "Corine", "Roger", "Toby"};
+	for (int i = 15; i < 20; i++)
+		this->addClient(i, nicks[i-15], names[i-15]);
+	this->addClient(17);
+	this->addClient(20, "Rabbit", "anotherName");
+	this->addClient(21, "Rabbit", "anotherName");
+	this->printUsers();
+
+	// create/join channels
+	this->printChannels();
+	std::cout << "----------------Creating and joining some channels----------------\n";
+	this->join(_users.find(15)->second.getId(), "ChannelDeRoger");
+	this->join(_users.find(16)->second.getId(), "GardienDeLaPaix");
+	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");
+	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");
+	this->join(_users.find(18)->second.getId(), "Gardien de la paix");
+	this->join(_users.find(18)->second.getId(), "ChannelDeRoger");
+	this->join(_users.find(18)->second.getId(), "Vive18");
+	this->join(_users.find(19)->second.getId(), "Vive18");
+	this->join(_users.find(20)->second.getId(), "Vive18");
+	this->printChannels();
+
+	// change descriptions
+	std::cout << "----------------Getting or Updating descriptions----------------\n";
+	std::cout << this->topic(_users.find(18)->second.getId(), "Vive18");
+	std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");
+	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger");
+	std::cout << std::endl;
+	this->printChannels();
+
+	std::cout << "====================================================\n\n";
+	// END SIMULATION test
 }
 
 ircServer::~ircServer()
@@ -69,3 +116,5 @@ ircServer::~ircServer()
 	close(_master_sockfd);
 	freeaddrinfo(_servinfo);
 }
+
+

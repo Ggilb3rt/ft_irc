@@ -1,5 +1,6 @@
 #include "ircServer.hpp"
 
+//! Commands should send(), some then must send multiple replies (like join)
 
 // considering the input is an iterator->[client_fd][user], and an already parsed string nick
 
@@ -60,4 +61,41 @@ std::string	ircServer::topic(user_id id, std::string current_chan, const char *m
 							it->second.getDescription().c_str()));
 	}
 	return (rpl_manager->createResponse(ret, current_chan));
+}
+
+
+std::string	ircServer::join(user_id id, std::string chan, std::string key)
+{
+	// 1.  the user must be invited if the channel is invite-only;
+    // 2.  the user's nick/username/hostname must not match any
+    //     active bans;
+    // 3.  the correct key (password) must be given if it is set.
+
+
+	/*
+		JOIN REPLIES
+           - ERR_NEEDMOREPARAMS              - ERR_BANNEDFROMCHAN
+           - ERR_INVITEONLYCHAN              - ERR_BADCHANNELKEY
+           - ERR_CHANNELISFULL               - ERR_BADCHANMASK
+           - ERR_NOSUCHCHANNEL               - ERR_TOOMANYCHANNELS
+           - RPL_TOPIC
+	*/
+
+
+
+	// if no channel ==> create channel and user become operator
+	// else join channel
+	rplManager				*rpl_manager = rplManager::getInstance();
+	channel_map::iterator	exist;
+	
+
+	exist = _channel.find(chan);
+	if (exist == _channel.end())
+		exist = this->addChannel(chan, id).first;
+	else {
+		if (!(exist->second.addUser(id)))
+			return ("..."); // user already in
+	}
+	return (rpl_manager->createResponse(RPL_TOPIC, chan, exist->second.getDescription()));
+	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
 }

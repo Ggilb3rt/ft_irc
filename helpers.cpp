@@ -10,6 +10,34 @@ void	ircServer::sendToClient(int fd, const char *msg)
     }
 }
 
+
+void	ircServer::addClient(int fd)
+{
+	std::pair<users_map::iterator, bool>	ret;
+
+	ret = _users.insert(std::pair<int, user>(fd, user(fd)));
+	if (ret.second == false)
+		std::cerr << "ERROR : fd " << fd << " is already in use." << std::endl;
+}
+
+void		ircServer::addClient(int fd, std::string nick, std::string name)
+{
+	std::pair<users_map::iterator, bool>	ret;
+
+	if (this->getUserByNick(nick)) {
+		std::stringstream	ss;
+
+		ss << _nick_suffixe++;
+		nick = "Guest" + ss.str();
+		std::cerr << "ERROR : user with same nick, your new nick is " << nick << std::endl;
+	}
+	ret = _users.insert(std::pair<int, user>(fd, user(fd, nick, name)));
+	if (ret.second == false)
+		std::cerr << "ERROR : " << fd << " is already in use." << std::endl;
+	//! must send a replie to client ?
+}
+
+
 void	ircServer::removeClient(clients_vector::iterator &it)
 {
 	close(it->fd);
@@ -18,13 +46,15 @@ void	ircServer::removeClient(clients_vector::iterator &it)
 	it = _pfds.erase(it);
 }
 
-void	ircServer::addChannel(std::string name, user_id id)
+//! pourquoi je peux pas utiliser le typedef ici ??????!!!!!!!
+std::pair<std::map<std::string, channel>::iterator, bool>	ircServer::addChannel(std::string name, user_id id)
 {
-	std::pair<channel_map::iterator, bool>	ret;
+	channel_pair	ret;
 
 	ret = _channel.insert(std::pair<std::string, channel>(name, channel(name, id)));
 	if (ret.second == false)
-		std::cerr << "ERROR : channel already exist" << std::endl; //! pas de reponse dans la RFC
+		std::cerr << "ERROR : channel already exist." << std::endl; //! pas de reponse dans la RFC
+	return (ret);
 }
 
 void	ircServer::removeChannel(channel_map::iterator &it)
@@ -34,18 +64,48 @@ void	ircServer::removeChannel(channel_map::iterator &it)
 
 user_id	ircServer::getUserByNick(std::string nick)
 {
-	// foreach user in users
-	// if user->_nick == nick
-	//		return user->_id;
-	return (-1);
+	users_map::iterator		it = _users.begin();
+	users_map::iterator		end = _users.end();
+
+	while (it != end) {
+		if (it->second.getNick() == nick)
+			return (it->first);
+		it++;
+	}
+	return (0);
 }
 
 // just for debug
-void	ircServer::printUsers()
+void ircServer::printUsers()
 {
-	for (users_map::iterator i = _users.begin(); i != _users.end(); i++) {
-		std::cout << i->first << " : " << i->second.getId() << std::endl;
+	users_map::iterator	it = _users.begin();
+	users_map::iterator	end = _users.end();
+	
+	std::cout << "==All users==\n";
+	while (it != end) {
+		std::cout << it->first << " ==>\n\t-"
+			<< it->second.getId() << "\n\t-"
+			<< it->second.getNick() << "\n\t-"
+			<< it->second.getName() << "\n";
+		it++;
 	}
+	std::cout << std::endl;
+}
+
+void ircServer::printChannels()
+{
+	channel_map::iterator	it = _channel.begin();
+	channel_map::iterator	end = _channel.end();
+	
+	std::cout << "==All channels==\n";
+	while (it != end) {
+		std::cout << it->first << " ==>\n\t-"
+			<< it->second.getName() << "\n\t-"
+			<< it->second.getDescription() << "\n\t-";
+			it->second.printUsers();
+		it++;
+	}
+	std::cout << std::endl;
 }
 
 void	ircServer::printAddrInfo()

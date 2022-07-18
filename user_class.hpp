@@ -24,7 +24,7 @@ class user
 		user(int fd) :
 			_id(fd)
 		{}
-		user(int fd, char *nick, char *name) :
+		user(int fd, std::string nick, std::string name) :
 			_id(fd),
 			_nick(nick),
 			_name(name),

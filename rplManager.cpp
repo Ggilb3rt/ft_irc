@@ -26,8 +26,6 @@ rplManager::~rplManager()
 	std::cout << "Delete replies manager\n";
 }
 
-
-
 std::string	rplManager::createResponse(int ret, std::string opt_before, std::string opt_after)
 {
 	std::stringstream	ss;
@@ -46,7 +44,7 @@ std::string	rplManager::createResponse(int ret, std::string opt_before, std::str
 	if (it != list.end())
 		res += it->second;
 	if (opt_after.size() > 0) {
-		res += " ";
+		// res += " ";
 		res += opt_after;
 	}
 	res += END_MSG;

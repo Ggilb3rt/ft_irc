@@ -38,9 +38,10 @@ public:
 	std::string	getName() const {return _name;}
 	std::string	getDescription() const {return _description;}
 	int			setDescription(user_id id, std::string description);
-	void		addUser(user_id user_fd);
+	bool		addUser(user_id user_fd);
 	void		removeUser(user_id user_fd);
 	void		setUserRole(user_id id, role new_role);
+	
 
 	// USAGE
 	void		sendToAll(ircServer& server, const char *msg) const;

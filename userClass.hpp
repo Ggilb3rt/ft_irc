@@ -7,7 +7,7 @@
 class user
 {
 	private:
-		int						_id;
+		const int				_id;
 		std::string				_nick;
 		std::string				_name;
 

@@ -97,6 +97,40 @@ std::string	ircServer::join(user_id id, std::string chan, std::string key)
 	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
 }
 
+std::string ircServer::part(user_id id, const std::vector<std::string> chans)
+{
+	/*
+		PART REPLIES
+		- ERR_NEEDMOREPARAMS             - ERR_NOSUCHCHANNEL
+        - ERR_NOTONCHANNEL
+	*/
+	rplManager									*rpl_manager = rplManager::getInstance();
+	std::vector<std::string>::const_iterator	chan = chans.begin();
+	std::vector<std::string>::const_iterator	end = chans.end();
+	channel_map::iterator						it_chan;
+
+	if (chans.size() == 0) {
+		//must send ERR_NEEDMOREPARAMS
+		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "PART");
+		return ("Part nope");
+	}
+
+	while (chan != end) {
+		it_chan = _channel.find(*chan);
+		if (it_chan == _channel.end()) {
+			// must send ERR_NOSUSHCHANNEL not print
+			std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, *chan);
+			chan++;
+			continue;
+		}
+		if (it_chan->second.removeUser(id) == 0) {
+			// must send ERR_NOTONCHANNEL not print
+			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, *chan);
+		}
+		chan++;
+	}
+	return ("part");
+}
 
 std::string ircServer::kick(std::string chan, user_id id, std::string comment)
 {

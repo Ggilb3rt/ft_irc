@@ -8,6 +8,8 @@
 #include <map>
 
 // ERRORS
+#define ERR_NOSUCHCHANNEL			403
+#define ERR_NOSUCHCHANNEL_MSG		" :No such channel" // 403 <channel_name>
 #define ERR_NOTONCHANNEL			442
 #define ERR_NOTONCHANNEL_MSG		" :You're not on that channel" // 442 <channel>
 #define ERR_CHANOPRIVSNEEDED		482

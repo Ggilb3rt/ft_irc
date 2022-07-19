@@ -15,6 +15,7 @@ rplManager::rplManager()
 	list.insert(new_pair(1, " :lol internet"));
 	list.insert(new_pair(14, " :petit mais puissant"));
 	list.insert(new_pair(ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG));
+	list.insert(new_pair(ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG));
 	list.insert(new_pair(ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG));
 	list.insert(new_pair(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG));
 	list.insert(new_pair(RPL_NOTOPIC, RPL_NOTOPIC_MSG));

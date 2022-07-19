@@ -18,16 +18,6 @@
 		?- Remove ip v6 ?
 		- Code cleanup
 			-------------------
-		!! Worry about user suppression
-		-> multiple instance of the same user can coexist in
-			- channels
-			- map in socket object
-		-> multiple instance of the same channel can coexist in 
-			- users
-			- socket object
-			-------------------
-		POSSIBLE SOLUTION
-			create channels with user.fd and access clients with fd
 		- on DALnet, when try to nick existingName the server let me 60 seconds after that he give me nick GuestXXXX
 
 
@@ -120,11 +110,13 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	this->printChannels();
 
 	// remove x/2 users
-	std::cout << "----------------QUIT/KICK/disconnecting users----------------\n";
+	std::cout << "----------------QUIT/PART/KICK/disconnecting users----------------\n";
 	//can't remove client with .removeClient() because I need _pfds
 	// only remove client from channels (like in .reomoveClient())
 	channel_map::iterator it = _channel.begin();
 	channel_map::iterator end = _channel.end();
+
+	this->part(20, std::vector<std::string>(1, std::string("ChannelDeRoger")));
 
 	while (it !=end){
 		it->second.removeUser(17);
@@ -182,10 +174,16 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 		}
 	}
 
+	this->part(4, std::vector<std::string>(1, std::string("lol")));
+	this->part(4, std::vector<std::string>(1, std::string("lol")));	// error 442
+	this->part(4, std::vector<std::string>(1, std::string("lolilol"))); // error 403
+	this->part(4, std::vector<std::string>(0, std::string(""))); // error 461
+
 	this->printChannels();
 
 	std::cout << "====================================================\n\n";
 	// END SIMULATION test
+	
 }
 
 ircServer::~ircServer()

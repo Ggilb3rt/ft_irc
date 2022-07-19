@@ -32,7 +32,7 @@ class ircServer
 {
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
-#define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL) // + POLLRDHUP)
+#define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL + POLLRDHUP)
 
 
 typedef		std::map<int, user>						users_map;
@@ -99,6 +99,7 @@ private:
 	// cmds //? must return char* with response inside
 	std::string	topic(user_id id, std::string current_chan, const char *msg = NULL);
 	std::string	join(user_id id, std::string chan, std::string key = ""); // key == password ?
+	std::string	part(user_id, const std::vector<std::string> chans);
 	std::string kick(std::string chan, user_id id, std::string comment = "");
 
 public:

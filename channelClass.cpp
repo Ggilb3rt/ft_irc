@@ -53,9 +53,9 @@ bool	channel::addUser(user_id user_fd)
 	return (true);
 }
 
-void		channel::removeUser(user_id user_fd)
+size_t		channel::removeUser(user_id user_fd)
 {
-	this->_users.erase(user_fd);
+	return (this->_users.erase(user_fd));
 }
 
 void		channel::setUserRole(user_id id, role new_role)

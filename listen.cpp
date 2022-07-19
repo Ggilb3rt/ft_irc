@@ -25,17 +25,15 @@ void	ircServer::startListen()
 		}
 		else {
 			//! plutot sale mais (en partie) fonctionnel
-			// if (_pfds.size() > 2) { // limite arbitraire
-			// 	it = _pfds.begin();
-			// 	while (ret_poll > 0 && it != end) {
-			// 		// std::cout << "iterator when change " << &(*it) << " | " << it->fd << std::endl;
-			// 		ret_poll = handleChange(ret_poll, it);
-			// 		// std::cout << "iterator after change " << &(*it) << " | " << it->fd << std::endl << std::endl;
-			// 		it++;
-			// 	}
-			// 	end = _pfds.end();
-			// } else if
-			if (_pfds[0].revents & POLLIN ) {
+			if (_pfds.size() > 2) { // limite arbitraire
+				it = _pfds.begin();
+				while (ret_poll > 0 && it != end) {
+					ret_poll = handleChange(ret_poll, it);
+					it++;
+				}
+				end = _pfds.end();
+			}
+			else if (_pfds[0].revents & POLLIN ) {
 				struct pollfd	newClient;//!!!!
 
 				addr_size = sizeof(their_addr);
@@ -50,24 +48,20 @@ void	ircServer::startListen()
 				else {
 					newClient.events = MASK;
 					_pfds.push_back(newClient);
-					_users.insert(std::pair<int, user>(newClient.fd, user(newClient.fd)));
+					this->addClient(newClient.fd);
 					it = _pfds.begin();
 					end = _pfds.end();
-					// UNCOMMENT TO PRINT MAP ON USERS
-					// for (user_list::iterator it = _users.begin(); it != _users.end(); it++) {
-					// 	std::cout << "id == " << it->second.getId() << std::endl;
+					// this->printUsers();
 				}
 
 			}
 			else {
-				// std::cout << "nothing appends : " << (_pfds[0].revents & POLLIN) << std::endl;
 				it = _pfds.begin();
 				while (ret_poll > 0 && it != end) {
 					ret_poll = handleChange(ret_poll, it);
 					it++;
 				}
 				end = _pfds.end();
-
 				// Answer to client
 			}
 		}
@@ -77,19 +71,19 @@ void	ircServer::startListen()
 int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {
 	if (it->revents & POLLERR) {
 		removeClient(it);
-		std::cerr << "error: An error has occured" << std::endl;
+		std::cerr << "ERROR: An error has occured" << std::endl;
 	}
-	// else if (it->revents & POLLHUP) {	// MAC
-	// 	std::cerr << "Client " << it->fd << " disconnected" << std::endl;
-	// removeClient(it);
-	// }
+	else if (it->revents & POLLHUP) {	// MAC
+		std::cout << "Client " << it->fd << " disconnected" << std::endl;
+		removeClient(it);
+	}
 	else if (it->revents & POLLRDHUP) { // LINUX
-		std::cerr << "Client " << it->fd << " closed connection" << std::endl;
+		std::cout << "Client " << it->fd << " closed connection" << std::endl;
 		removeClient(it);
 	}
 	else if (it->revents & POLLNVAL) {
 		removeClient(it);
-		std::cerr << "error: Invalid fd member" << std::endl;
+		std::cerr << "ERROR: Invalid fd member" << std::endl;
 	}
 	else if (it->revents & POLLIN) {
 		this->readData(it);

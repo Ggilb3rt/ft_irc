@@ -39,7 +39,7 @@ public:
 	std::string	getDescription() const {return _description;}
 	int			setDescription(user_id id, std::string description);
 	bool		addUser(user_id user_fd);
-	void		removeUser(user_id user_fd);
+	size_t		removeUser(user_id user_fd);
 	void		setUserRole(user_id id, role new_role);
 	size_t		getSize();
 	// users_list::iterator		getUser(user_id id);

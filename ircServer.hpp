@@ -18,7 +18,7 @@
 
 #include "irc_protocole_rules.hpp"
 #include "rplManager.hpp"
-#include "user_class.hpp"
+#include "userClass.hpp"
 #include "channelClass.hpp"
 
 
@@ -77,13 +77,19 @@ private:
 	void			handleCommands(clients_vector::iterator it, std::string query);
 	void			handleNick(users_map::iterator it, std::string newNick);
 
-	// helpers
-	void			sendToClient(int fd, const char *msg);
+
+	// client managements
 	void			addClient(int fd);
 	void			addClient(int fd, std::string nick, std::string name);
 	void			removeClient(clients_vector::iterator &it);
+
+	// channel managements
+	void			channelNameCorrection(std::string &name);
 	channel_pair	addChannel(std::string name, user_id id);
 	void			removeChannel(channel_map::iterator &it);
+
+	// helpers
+	void			sendToClient(int fd, const char *msg);
 	user_id			getUserByNick(std::string nick);
 	void			printUsers();
 	void			printChannels();
@@ -93,9 +99,9 @@ private:
 	// cmds //? must return char* with response inside
 	std::string	topic(user_id id, std::string current_chan, const char *msg = NULL);
 	std::string	join(user_id id, std::string chan, std::string key = ""); // key == password ?
+	std::string kick(std::string chan, user_id id, std::string comment = "");
 
 public:
-
 	ircServer(char *_port);
 	~ircServer();
 

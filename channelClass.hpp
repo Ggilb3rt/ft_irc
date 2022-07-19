@@ -18,14 +18,14 @@ class channel
 typedef		std::map<user_id, role>	users_list;
 
 private:
-	std::string				_name;
+	const std::string		_name;
 	std::string				_description;
 	users_list				_users;
 
 	channel() {}
 
-	bool		isOnChannel(user_id id);
-	bool		isOperator(user_id id);
+	bool		isOnChannel(user_id id) const;
+	bool		isOperator(user_id id) const;
 
 public:
 	channel(std::string name, user_id creator) : _name(name), _description("Super channel " + name)

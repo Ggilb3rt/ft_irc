@@ -82,9 +82,6 @@ std::string	ircServer::join(user_id id, std::string chan, std::string key)
 	*/
 
 
-
-	// if no channel ==> create channel and user become operator
-	// else join channel
 	rplManager				*rpl_manager = rplManager::getInstance();
 	channel_map::iterator	exist;
 	
@@ -98,4 +95,10 @@ std::string	ircServer::join(user_id id, std::string chan, std::string key)
 	}
 	return (rpl_manager->createResponse(RPL_TOPIC, chan, exist->second.getDescription()));
 	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
+}
+
+
+std::string ircServer::kick(std::string chan, user_id id, std::string comment)
+{
+	return ("kick");
 }

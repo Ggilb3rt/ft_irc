@@ -8,16 +8,16 @@
 */
 
 
-bool		channel::isOnChannel(user_id id)
+bool		channel::isOnChannel(user_id id) const
 {
 	if (_users.find(id) == _users.end())
 		return (0);
 	return (1);
 }
 
-bool		channel::isOperator(user_id id)
+bool		channel::isOperator(user_id id) const
 {
-	users_list::iterator	it = _users.find(id);
+	users_list::const_iterator	it = _users.find(id);
 
 	if (it == _users.end())
 		return (0);
@@ -25,6 +25,7 @@ bool		channel::isOperator(user_id id)
 		return (0);
 	return (1);
 }
+
 
 // MODIFIERS
 int		channel::setDescription(user_id id, std::string description)

@@ -1,6 +1,7 @@
 
 SRCS =	main.cpp \
 		ircServer.cpp setup.cpp read.cpp listen.cpp \
+		irc_client_managers.cpp irc_channel_managers.cpp \
 		channelClass.cpp \
 		commands.cpp \
 		helpers.cpp rplManager.cpp

@@ -6,17 +6,11 @@
 
 class user
 {
-
-	// #define channel_name	std::string
-	// #define role			bool
-
 	private:
 		int						_id;
 		std::string				_nick;
 		std::string				_name;
-		// std::map<channel_name, role>	_channels; // to remove
 
-		// user() : _nick(""), _name("") {}
 
 	public:
 		std::string	_msg;
@@ -28,7 +22,6 @@ class user
 			_id(fd),
 			_nick(nick),
 			_name(name),
-			// _channels(),
 			_msg()
 		{}
 		~user() {}

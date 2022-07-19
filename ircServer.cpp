@@ -65,6 +65,8 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	std::cout << "Return from TOPIC (not exist) : " << this->topic(4, "lolo") << std::endl;
 	std::cout << "Return from TOPIC (geter) : " << this->topic(4, "lol") << std::endl;
 	std::cout << "Return from TOPIC (seter): " << this->topic(4, "lol", "New topic for lol") << std::endl;
+	std::cout << "Return from TOPIC (not in): " << this->topic(6, "lol", "fouille merde") << std::endl;
+	this->join(6, "lol");
 	std::cout << "Return from TOPIC (not allowed): " << this->topic(6, "lol", "fouille merde") << std::endl;
 
 
@@ -75,6 +77,7 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 			- each users create or join one or more channels
 			- try to change desciption with operator and basic user
 			- remove x/2 users
+				- try to kick some of them with operator and basic user
 	*/
 	std::cout << "\n\n===========STARTING SIMULATION TEST============\n\n";
 
@@ -106,7 +109,7 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 		this->join(_users.find(i)->second.getId(), "Vive18");
 	this->printChannels();
 
-	// change descriptions
+	// get and set descriptions
 	std::cout << "----------------Getting or Updating descriptions----------------\n";
 	std::cout << this->topic(_users.find(18)->second.getId(), "Vive18");
 	std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");
@@ -118,8 +121,8 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 
 	// remove x/2 users
 	std::cout << "----------------QUIT/KICK/disconnecting users----------------\n";
-	//can't remove client with .removeClient() I need _pfds
-	// only remove client from channels
+	//can't remove client with .removeClient() because I need _pfds
+	// only remove client from channels (like in .reomoveClient())
 	channel_map::iterator it = _channel.begin();
 	channel_map::iterator end = _channel.end();
 

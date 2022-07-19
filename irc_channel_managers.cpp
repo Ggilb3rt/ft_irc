@@ -17,7 +17,6 @@ void	ircServer::channelNameCorrection(std::string &name)
 		name[found] = '_';
 		found = name.find_first_of(forbid, found+1);
 	}
-	std::cout << "CHAN name after correction : " << name << std::endl;
 }
 
 ircServer::channel_pair	ircServer::addChannel(std::string name, user_id id)

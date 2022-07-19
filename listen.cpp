@@ -63,9 +63,7 @@ void	ircServer::startListen()
 				// std::cout << "nothing appends : " << (_pfds[0].revents & POLLIN) << std::endl;
 				it = _pfds.begin();
 				while (ret_poll > 0 && it != end) {
-					// std::cout << "iterator when change " << &(*it) << " | " << it->fd << std::endl;
 					ret_poll = handleChange(ret_poll, it);
-					// std::cout << "iterator after change " << &(*it) << " | " << it->fd << std::endl << std::endl;
 					it++;
 				}
 				end = _pfds.end();

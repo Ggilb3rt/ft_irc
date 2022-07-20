@@ -42,7 +42,7 @@ void	ircServer::removeClient(clients_vector::iterator &it)
 			chan_it++;
 		}
 	}
-	close(it->fd);
 	_users.erase(it->fd);
+	close(it->fd);
 	it = _pfds.erase(it);
 }

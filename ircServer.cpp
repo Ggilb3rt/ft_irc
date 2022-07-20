@@ -8,6 +8,10 @@
 		-send : must create send()function
 		-segfault :
 			- start fd_killer and ctrl+c before it ends
+			- wait reach max fd, connect another client; send data from new client, make fd_killer close
+					--> can't close all fd before open new one
+					xx> again it was an iterator update, the end iterator inside the while(ret_poll>0)
+						--> this solution create segfault with basic usage
 	- Parsing : 
 		- check README to get syntax requirements
 		- implement lexer
@@ -68,7 +72,7 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 			- try to change desciption with operator and basic user
 			- remove x/2 users
 				- try to kick some of them with operator and basic user
-	*/
+	
 	std::cout << "\n\n===========STARTING SIMULATION TEST============\n\n";
 
 	// create users
@@ -183,7 +187,7 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 
 	std::cout << "====================================================\n\n";
 	// END SIMULATION test
-	
+	*/
 }
 
 ircServer::~ircServer()

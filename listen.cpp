@@ -25,12 +25,15 @@ void	ircServer::startListen()
 		}
 		else {
 			//! plutot sale mais (en partie) fonctionnel
-			if (_pfds.size() > 2) { // limite arbitraire
+			if (_pfds.size() > 1020) { // limite arbitraire
+				std::cout << "in limite\n";
 				it = _pfds.begin();
 				while (ret_poll > 0 && it != end) {
 					ret_poll = handleChange(ret_poll, it);
 					it++;
+					// end = _pfds.end();
 				}
+				it = _pfds.begin();
 				end = _pfds.end();
 			}
 			else if (_pfds[0].revents & POLLIN ) {
@@ -43,7 +46,7 @@ void	ircServer::startListen()
 					// TODO:: Crash Test infinite FD 
 						// it works, the program exit() but I don't like it
 					std::cerr << "ERROR : accept " << errno << std::endl;
-					quit = 1;
+					// quit = 1;
 				}
 				else {
 					newClient.events = MASK;
@@ -53,14 +56,15 @@ void	ircServer::startListen()
 					end = _pfds.end();
 					// this->printUsers();
 				}
-
 			}
 			else {
 				it = _pfds.begin();
 				while (ret_poll > 0 && it != end) {
 					ret_poll = handleChange(ret_poll, it);
 					it++;
+					// end = _pfds.end();
 				}
+				it = _pfds.begin();
 				end = _pfds.end();
 				// Answer to client
 			}

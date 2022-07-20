@@ -34,6 +34,8 @@ class ircServer
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
 #define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL + POLLRDHUP)
 
+#define DELETE	1
+
 
 typedef		std::map<int, user>						users_map;
 typedef		std::vector<struct pollfd>				clients_vector;
@@ -82,6 +84,7 @@ private:
 	void			addClient(int fd);
 	void			addClient(int fd, std::string nick, std::string name);
 	void			removeClient(clients_vector::iterator &it);
+	void			removeClient(users_map::iterator &it);
 
 	// channel managements
 	void			channelNameCorrection(std::string &name);

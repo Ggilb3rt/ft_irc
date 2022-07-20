@@ -34,7 +34,16 @@ void	ircServer::createMasterSocket()
 		freeaddrinfo(_servinfo);
 		exit(errno);
 	}
-	// fcntl(_master_sockfd, F_SETFL, O_NONBLOCK);	// disable the capacity to block from accept() recv() etc // need to check errors
+	if (setsockopt(_master_sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)1, sizeof(int)) < -1) {
+		std::cerr << "ERROR : setsockopt" << std::endl;
+		freeaddrinfo(_servinfo);
+		exit(errno);
+	}
+	if (fcntl(_master_sockfd, F_SETFL, O_NONBLOCK) < 0) {
+		std::cerr << "ERROR : fcntl" << std::endl;
+		freeaddrinfo(_servinfo);
+		exit(errno);
+	}
 	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
 	if (bind_ret == -1) {
 		std::cerr << "ERROR : Bind" << std::endl;

@@ -46,3 +46,27 @@ void	ircServer::removeClient(clients_vector::iterator &it)
 	close(it->fd);
 	it = _pfds.erase(it);
 }
+
+void	ircServer::removeClient(users_map::iterator &it)
+{
+	channel_map::iterator	chan_it = _channel.begin();
+	channel_map::iterator	chan_end = _channel.end();
+
+	while (chan_it != chan_end) {
+		chan_it->second.removeUser(it->first);
+		if (chan_it->second.getSize() == 0)
+			chan_it = _channel.erase(chan_it);
+		else {
+			chan_it->second.replaceLastOperator(); // not sure it's needed
+			chan_it++;
+		}
+	}
+	close(it->second.getId());
+	for (clients_vector::iterator vecit = _pfds.begin(); vecit != _pfds.end(); vecit++) {
+		if (vecit->fd == it->first) {
+			vecit = _pfds.erase(vecit);
+			break ;
+		}
+	}
+	_users.erase(it->first);
+}

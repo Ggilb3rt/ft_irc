@@ -25,18 +25,18 @@ void	ircServer::startListen()
 		}
 		else {
 			//! plutot sale mais (en partie) fonctionnel
-			if (_pfds.size() > 1020) { // limite arbitraire
-				std::cout << "in limite\n";
-				it = _pfds.begin();
-				while (ret_poll > 0 && it != end) {
-					ret_poll = handleChange(ret_poll, it);
-					it++;
-					// end = _pfds.end();
-				}
-				it = _pfds.begin();
-				end = _pfds.end();
-			}
-			else if (_pfds[0].revents & POLLIN ) {
+			// if (_pfds.size() > 1020) { // limite arbitraire
+			// 	std::cout << "in limite\n";
+			// 	it = _pfds.begin();
+			// 	while (ret_poll > 0 && it != end) {
+			// 		ret_poll = handleChange(ret_poll, it);
+			// 		it++;
+			// 		// end = _pfds.end();
+			// 	}
+			// 	it = _pfds.begin();
+			// 	end = _pfds.end();
+			// }
+			if (_pfds.size() < 3 && _pfds[0].revents & POLLIN) {
 				struct pollfd	newClient;//!!!!
 
 				addr_size = sizeof(their_addr);
@@ -57,16 +57,34 @@ void	ircServer::startListen()
 					// this->printUsers();
 				}
 			}
+			// else {
+			// 	it = _pfds.begin();
+			// 	while (ret_poll > 0 && it != end) {
+			// 		std::cout << ret_poll << std::endl;
+			// 		ret_poll = handleChange(ret_poll, it);
+			// 		it++;
+			// 		// end = _pfds.end();
+			// 	}
+			// 	it = _pfds.begin();
+			// 	end = _pfds.end();
+			// 	// Answer to client
+			// }
 			else {
-				it = _pfds.begin();
-				while (ret_poll > 0 && it != end) {
-					ret_poll = handleChange(ret_poll, it);
-					it++;
-					// end = _pfds.end();
+				for (clients_vector::iterator it = _pfds.begin(); it != _pfds.end(); it++) {
+					if ((*it).revents == POLLRDHUP) {
+						users_map::iterator	user_x = _users.find(it->fd);
+						if (user_x != _users.end())
+							user_x->second.setStatus(DELETE);
+					}
+					else if ((*it).revents == POLLIN)
+						this->readData(it);
 				}
-				it = _pfds.begin();
-				end = _pfds.end();
-				// Answer to client
+				for (users_map::iterator it = _users.begin(); it != _users.end(); it++) {
+					if (it->second.getStatus() == DELETE) {
+						removeClient(it);
+						break ;
+					}
+				}
 			}
 		}
 	}
@@ -75,23 +93,29 @@ void	ircServer::startListen()
 int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {
 	if (it->revents & POLLERR) {
 		removeClient(it);
+		ret_poll--;
 		std::cerr << "ERROR: An error has occured" << std::endl;
 	}
-	else if (it->revents & POLLHUP) {	// MAC
-		std::cout << "Client " << it->fd << " disconnected" << std::endl;
-		removeClient(it);
-	}
+	// else if (it->revents & POLLHUP) {	// MAC
+	// 	std::cout << "Client " << it->fd << " disconnected" << std::endl;
+	// 	removeClient(it);
+	// 	ret_poll--;
+	// }
 	else if (it->revents & POLLRDHUP) { // LINUX
 		std::cout << "Client " << it->fd << " closed connection" << std::endl;
 		removeClient(it);
+		ret_poll--;
 	}
-	else if (it->revents & POLLNVAL) {
-		removeClient(it);
-		std::cerr << "ERROR: Invalid fd member" << std::endl;
-	}
+	// else if (it->revents & POLLNVAL) {
+	// 	removeClient(it);
+	// 	ret_poll--;
+	// 	std::cerr << "ERROR: Invalid fd member" << std::endl;
+	// }
 	else if (it->revents & POLLIN) {
+		std::cout << "read data " << it->fd << std::endl;
 		this->readData(it);
 		ret_poll--;
+		std::cout << "retpol and of read " << ret_poll << std::endl;
 	}
 	return (ret_poll);
 }

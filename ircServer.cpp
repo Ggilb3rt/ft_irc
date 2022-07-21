@@ -6,12 +6,13 @@
 		-accept (-1 handled, 0 seems inoperant) but don't want to exit() when -1,
 				just print err and go againt, use an arbitrary limit ?
 		-send : must create send()function
+		- when client make ctrl+D more than one time he is stucked
 		-segfault :
 			- start fd_killer and ctrl+c before it ends
-			- wait reach max fd, connect another client; send data from new client, make fd_killer close
-					--> can't close all fd before open new one
-					xx> again it was an iterator update, the end iterator inside the while(ret_poll>0)
-						--> this solution create segfault with basic usage
+					--> no more segfault but don't remove users, but probleme probably come from tester :
+						I try to connect all clients before sending something -> no readData() -> no user_x.setStatus(DELETE)
+						? add POLLRDHUP will help? -> nope
+						I change the fd_killer, now he revc after send, it's help to remove all users but still one (if ctr+C between connect() and send())
 	- Parsing : 
 		- check README to get syntax requirements
 		- implement lexer
@@ -46,7 +47,11 @@
 				- start fd_killer.sh, when process close all sockets, segfault (don't know if problem from fd_killer or us)
 					if I close only one socket and use nc => no problems
 					==> update iterator in while(ret_poll>0 ...), it was invalidate when removeClient()
-
+				- wait reach max fd, connect another client; send data from new client, make fd_killer close
+					--> can't close all fd before open new one
+					xx> again it was an iterator update, the end iterator inside the while(ret_poll>0)
+						--> this solution create segfault with basic usage
+					==> it works with new version of clients managers
 
 */
 

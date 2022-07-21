@@ -14,9 +14,9 @@ int		ircServer::readData(clients_vector::iterator client)
 				std::cerr << "ERROR recv : " << errno << std::endl;
 			else if (recv_ret == 0) {
 				user_x->second.setStatus(DELETE);
+				std::cout << "remote host " << client->fd << " closed the connection" << std::endl;
 				return 0;
 			}
-			// 	std::cout << "remote host close the connection" << std::endl;
 			else {
 				for (int i = recv_ret; i < maxlen ; i++)
 					buff[i] = '\0';

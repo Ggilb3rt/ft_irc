@@ -114,6 +114,14 @@ int main(int argc, char *argv[])
             }
             // std::cout << "connect " << co_ret << std::endl;
             send(_master_sockfd[i], ret.c_str(), ret.length(), 0);
+            
+            if ((numbytes = recv(_master_sockfd[i], buf, MAXDATASIZE-1, 0)) == -1) {
+                perror("recv");
+                exit(1);
+            }
+            while (numbytes < MAXDATASIZE)
+                buf[numbytes++] = '\0';
+            printf("client: received '%s'\n",buf);
         }
         break;
     }
@@ -136,23 +144,22 @@ int main(int argc, char *argv[])
 
     freeaddrinfo(servinfo); // all done with this structure
 
-    for (int i = 3; i < max_fd; i++) {
-        if ((numbytes = recv(_master_sockfd[i], buf, MAXDATASIZE-1, 0)) == -1) {
-            perror("recv");
-            exit(1);
-        }
-        while (numbytes < MAXDATASIZE)
-            buf[numbytes++] = '\0';
-        printf("client: received '%s'\n",buf);
-    }
+    // for (int i = 3; i < max_fd; i++) {
+    //     if ((numbytes = recv(_master_sockfd[i], buf, MAXDATASIZE-1, 0)) == -1) {
+    //         perror("recv");
+    //         exit(1);
+    //     }
+    //     while (numbytes < MAXDATASIZE)
+    //         buf[numbytes++] = '\0';
+    //     printf("client: received '%s'\n",buf);
+    // }
 
     char next;
     std::cout << "(choose a char to continue ...)" << std::endl;
     std::cin >> next;
-    // close(_master_sockfd[99]);
     for (int i = 3; i < max_fd - 1; i++) {
         close(_master_sockfd[i]);
-        // std::cout << "close" << i << " ";
+        std::cout << "close" << i << " ";
     }
 
     std::cout << "(choose a char to quit ...)" << std::endl;

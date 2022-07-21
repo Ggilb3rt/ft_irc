@@ -94,6 +94,7 @@ std::string	ircServer::join(user_id id, std::string chan, std::string key)
 			return ("..."); // user already in
 	}
 	return (rpl_manager->createResponse(RPL_TOPIC, chan, exist->second.getDescription()));
+	(void)key;
 	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
 }
 
@@ -135,4 +136,7 @@ std::string ircServer::part(user_id id, const std::vector<std::string> chans)
 std::string ircServer::kick(std::string chan, user_id id, std::string comment)
 {
 	return ("kick");
+	(void)chan;
+	(void)id;
+	(void)comment;
 }

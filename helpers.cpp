@@ -30,10 +30,11 @@ void ircServer::printUsers()
 	
 	std::cout << "==All users==\n";
 	while (it != end) {
-		std::cout << it->first << " ==>\n\t-"
-			<< it->second.getId() << "\n\t-"
-			<< it->second.getNick() << "\n\t-"
-			<< it->second.getName() << "\n";
+		std::cout << it->first << " ==>\n\tid : "
+			<< it->second.getId() << "\n\tnick : "
+			<< it->second.getNick() << "\n\tname : "
+			<< it->second.getName() << "\n\tstatus : "
+			<< it->second.getStatus() << "\n";
 		it++;
 	}
 	std::cout << std::endl;

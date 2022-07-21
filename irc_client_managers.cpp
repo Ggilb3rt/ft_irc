@@ -8,6 +8,7 @@ void	ircServer::addClient(int fd)
 	ret = _users.insert(std::pair<int, user>(fd, user(fd)));
 	if (ret.second == false)
 		std::cerr << "ERROR : fd " << fd << " is already in use." << std::endl;
+	std::cout << "addclient : " << ret.first->second.getId() << " " << fd << std::endl;
 }
 
 void		ircServer::addClient(int fd, std::string nick, std::string name)

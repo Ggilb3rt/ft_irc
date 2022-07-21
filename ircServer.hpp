@@ -32,7 +32,7 @@ class ircServer
 {
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
-#define MASK (POLLIN + POLLHUP + POLLERR + POLLNVAL + POLLRDHUP)
+#define MASK (POLLIN) //+ POLLHUP + POLLERR + POLLNVAL + POLLRDHUP)
 
 #define DELETE	1
 

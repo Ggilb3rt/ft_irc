@@ -5,17 +5,16 @@ int		ircServer::readData(clients_vector::iterator client)
 {
 		int		    maxlen = MSG_MAX_SIZE;
         char	    buff[maxlen];
-		int		    recv_ret = 0;
+		int		    recv_ret = 1;
 		users_map::iterator	user_x = _users.find(client->fd);
 
 		if (user_x != _users.end()) {
 			recv_ret = recv(client->fd, buff, maxlen-1, 0);
-			std::cout << "recv ret " << recv_ret << std::endl;
 			if (recv_ret == -1)
 				std::cerr << "ERROR recv : " << errno << std::endl;
 			else if (recv_ret == 0) {
 				user_x->second.setStatus(DELETE);
-				return 1;
+				return 0;
 			}
 			// 	std::cout << "remote host close the connection" << std::endl;
 			else {
@@ -38,8 +37,7 @@ int		ircServer::readData(clients_vector::iterator client)
 				send(client->fd, res.c_str(), res.length(), 0);
 				std::cout << "Send reponse " << res << std::endl;
 			}
-		std::cout << "user_x is ot end\n";
 		}
-		std::cout << "user_x : " << user_x->first << " " << user_x->second.getId() << std::endl;
+		// std::cout << "user_x : " << user_x->first << " " << user_x->second.getId() << std::endl;
 		return recv_ret;
 }

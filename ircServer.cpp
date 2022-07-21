@@ -55,13 +55,13 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	this->init();
 
 	/* TESTS for TOPIC and rplManager*/
-	this->_channel.insert(std::pair<std::string, channel>("lol", channel("lol", 4)));
-	std::cout << "Return from TOPIC (not exist) : " << this->topic(4, "lolo") << std::endl;
-	std::cout << "Return from TOPIC (geter) : " << this->topic(4, "lol") << std::endl;
-	std::cout << "Return from TOPIC (seter): " << this->topic(4, "lol", "New topic for lol") << std::endl;
-	std::cout << "Return from TOPIC (not in): " << this->topic(6, "lol", "fouille merde") << std::endl;
-	this->join(6, "lol");
-	std::cout << "Return from TOPIC (not allowed): " << this->topic(6, "lol", "fouille merde") << std::endl;
+	// this->_channel.insert(std::pair<std::string, channel>("lol", channel("lol", 4)));
+	// std::cout << "Return from TOPIC (not exist) : " << this->topic(4, "lolo") << std::endl;
+	// std::cout << "Return from TOPIC (geter) : " << this->topic(4, "lol") << std::endl;
+	// std::cout << "Return from TOPIC (seter): " << this->topic(4, "lol", "New topic for lol") << std::endl;
+	// std::cout << "Return from TOPIC (not in): " << this->topic(6, "lol", "fouille merde") << std::endl;
+	// this->join(6, "lol");
+	// std::cout << "Return from TOPIC (not allowed): " << this->topic(6, "lol", "fouille merde") << std::endl;
 
 
 

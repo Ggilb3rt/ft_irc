@@ -18,13 +18,13 @@ class user
 
 		user(int fd) :
 			_id(fd),
-			_status(1)
+			_status(0)
 		{}
 		user(int fd, std::string nick, std::string name) :
 			_id(fd),
 			_nick(nick),
 			_name(name),
-			_status(1),
+			_status(0),
 			_msg()
 		{}
 		~user() {}

@@ -60,8 +60,12 @@ void	ircServer::startListen()
 					// 	if (user_x != _users.end())
 					// 		user_x->second.setStatus(DELETE);
 					// }
-					if ((*it).revents == POLLIN)
+					if ((*it).revents == POLLIN) {
 						this->readData(it);
+						ret_poll--;
+					}
+					if (ret_poll == 0)
+						break ;
 				}
 				for (users_map::iterator it = _users.begin(); it != _users.end(); it++) {
 					if (it->second.getStatus() == DELETE) {

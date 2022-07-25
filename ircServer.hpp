@@ -104,7 +104,7 @@ private:
 	std::string	topic(user_id id, std::string current_chan, const char *msg = NULL);
 	std::string	join(user_id id, std::string chan, std::string key = ""); // key == password ?
 	std::string	part(user_id, const std::vector<std::string> chans);
-	std::string kick(std::string chan, user_id id, std::string comment = "");
+	std::string kick(std::string chan, user_id victim, user_id kicker, std::string comment = "");
 
 public:
 	ircServer(char *_port);

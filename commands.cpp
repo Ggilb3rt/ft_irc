@@ -32,13 +32,12 @@ std::string	ircServer::topic(user_id id, std::string current_chan, const char *m
 	/*
 		TOPIC REPLIES
 			- ERR_NEEDMOREPARAMS
-			- ERR_NOTONCHANNEL
-			- RPL_NOTOPIC
-			- RPL_TOPIC
-			- ERR_CHANOPRIVSNEEDED
+			-x ERR_NOTONCHANNEL (in setDescription())
+			-x RPL_NOTOPIC (in setDescription())
+			-x RPL_TOPIC
+			-x ERR_CHANOPRIVSNEEDED (in setDescription())
 	*/
 	rplManager				*rpl_manager = rplManager::getInstance();
-	// std::string				response;
 	int						ret;
 	channel_map::iterator	it;
 
@@ -78,7 +77,7 @@ std::string	ircServer::join(user_id id, std::string chan, std::string key)
            - ERR_INVITEONLYCHAN              - ERR_BADCHANNELKEY
            - ERR_CHANNELISFULL               - ERR_BADCHANMASK
            - ERR_NOSUCHCHANNEL               - ERR_TOOMANYCHANNELS
-           - RPL_TOPIC
+           -x RPL_TOPIC
 	*/
 
 
@@ -101,8 +100,8 @@ std::string ircServer::part(user_id id, const std::vector<std::string> chans)
 {
 	/*
 		PART REPLIES
-		- ERR_NEEDMOREPARAMS             - ERR_NOSUCHCHANNEL
-        - ERR_NOTONCHANNEL
+		-x ERR_NEEDMOREPARAMS             -x ERR_NOSUCHCHANNEL
+        -x ERR_NOTONCHANNEL
 	*/
 	rplManager									*rpl_manager = rplManager::getInstance();
 	std::vector<std::string>::const_iterator	chan = chans.begin();
@@ -127,12 +126,53 @@ std::string ircServer::part(user_id id, const std::vector<std::string> chans)
 			// must send ERR_NOTONCHANNEL not print
 			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, *chan);
 		}
+		if (it_chan->second.getSize() == 0)
+			it_chan = _channel.erase(it_chan);
 		chan++;
 	}
 	return ("part");
 }
 
-std::string ircServer::kick(std::string chan, user_id id, std::string comment)
+std::string ircServer::kick(std::string chan, user_id victim, user_id kicker, std::string comment)
 {
+	/*
+		KICK REPLIES
+           - ERR_NEEDMOREPARAMS              -x ERR_NOSUCHCHANNEL
+           - ERR_BADCHANMASK                 -x ERR_CHANOPRIVSNEEDED
+           -x ERR_NOTONCHANNEL
+	*/
+	rplManager									*rpl_manager = rplManager::getInstance();
+	channel_map::iterator						it_chan;
+	
+	it_chan = _channel.find(chan);
+	if (it_chan == _channel.end()) {
+		std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, chan);
+		return ("ERR_NOSUCHCHANNEL");
+	}
+	// check if kicker is operator
+	if (it_chan->second.isOperator(kicker)) {
+		if (it_chan->second.removeUser(victim) == 0) {
+			// check if victim exist
+			// must send ERR_NOTONCHANNEL not print
+			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, chan);
+			return ("ERR_NOTONCHANNEL");
+		}
+	}
+	else {
+		std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, chan);
+		return ("ERR_CHANOPRIVSNEEDED");
+	}
+	if (it_chan->second.getSize() == 0)
+		it_chan = _channel.erase(it_chan);
+
+	// must be send as reponse ?
+	std::cout << victim << " kicked by " << kicker;
+	if (comment.size() > 0)
+		std::cout << " using " << comment << " has a reason";
+	std::cout << std::endl; 
 	return ("kick");
 }
+
+
+// QUIT cmd
+//? SQUIT is an alias to QUIT ?

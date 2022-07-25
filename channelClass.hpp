@@ -24,10 +24,8 @@ private:
 
 	channel() {}
 
-	bool		isOnChannel(user_id id) const;
-	bool		isOperator(user_id id) const;
-
 public:
+
 	channel(std::string name, user_id creator) : _name(name), _description("Super channel " + name)
 	{
 		_users.insert(std::pair<user_id, role>(creator, true));
@@ -46,6 +44,8 @@ public:
 
 
 	// USAGE
+	bool		isOnChannel(user_id id) const;
+	bool		isOperator(user_id id) const;
 	void		replaceLastOperator();
 	void		sendToAll(ircServer& server, const char *msg) const;
 	//void		sendToOne(const char *msg) const;	

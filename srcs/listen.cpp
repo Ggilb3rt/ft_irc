@@ -3,7 +3,6 @@
 void	ircServer::startListen()
 {
 	int				ret_poll = 0;
-	int 			quit = 0;
 	struct pollfd	master;
 	
 	master.fd = _master_sockfd;

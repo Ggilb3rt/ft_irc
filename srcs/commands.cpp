@@ -93,6 +93,7 @@ std::string	ircServer::join(user_id id, std::string chan, std::string key)
 			return ("..."); // user already in
 	}
 	return (rpl_manager->createResponse(RPL_TOPIC, chan, exist->second.getDescription()));
+	(void)key;
 	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
 }
 
@@ -127,7 +128,7 @@ std::string ircServer::part(user_id id, const std::vector<std::string> chans)
 			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, *chan);
 		}
 		if (it_chan->second.getSize() == 0)
-			it_chan = _channel.erase(it_chan);
+			_channel.erase(it_chan);
 		chan++;
 	}
 	return ("part");
@@ -163,7 +164,7 @@ std::string ircServer::kick(std::string chan, user_id victim, user_id kicker, st
 		return ("ERR_CHANOPRIVSNEEDED");
 	}
 	if (it_chan->second.getSize() == 0)
-		it_chan = _channel.erase(it_chan);
+		_channel.erase(it_chan);
 
 	// must be send as reponse ?
 	std::cout << victim << " kicked by " << kicker;
@@ -196,7 +197,7 @@ std::string	ircServer::names(std::vector<std::string> chans())
 	*/
 
 	// if chans.size() == 0 ==> print all
-
+	(void)chans;
 	return ("names");
 }
 
@@ -211,6 +212,6 @@ std::string	ircServer::list(std::vector<std::string> chans())
 	// if chans.size() == 0 ==> print all
 
 	// need RPL_LIST
-
+	(void)chans;
 	return ("list");
 }

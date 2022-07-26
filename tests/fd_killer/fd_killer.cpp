@@ -54,7 +54,7 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 
-#define PORT "6697" // the port client will be connecting to 
+#define PORT "6667" // the port client will be connecting to 
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
 #define MAX_FD 1023

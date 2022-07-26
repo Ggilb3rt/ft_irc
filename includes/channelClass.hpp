@@ -31,6 +31,7 @@ public:
 			_name(name), _description("Super channel " + name), _mode(0)
 	{
 		_users.insert(std::pair<user_id, role>(creator, true));
+		(void)_mode;
 	}
 	~channel() {}
 

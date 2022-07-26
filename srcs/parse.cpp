@@ -6,18 +6,20 @@ void    ircServer::parse(clients_vector::iterator it, std::string query, int cha
         sendToClient(it->fd, "Message must be less than 510 characters");
     }
     else if (*(query.begin()) == '/') {
-        handleCommands(query);
+        handleCommands(it, query);
     }
     else {
-        sendToChannel(query, channel);
+       // sendToChannel(query, channel);
     }
     // check if it starts with /
     //  -> no? send msg, return;
     // check if command exists
     //  handleCmd
+	(void)channel;
 }
 
 void    ircServer::handleCommands(clients_vector::iterator it, std::string query)
 {
-    
+    (void)it;
+	(void)query;
 }

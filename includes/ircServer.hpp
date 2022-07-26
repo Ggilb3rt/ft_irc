@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <poll.h>
 
+#include <cerrno>
 #include <cstring>
 #include <csignal>
 #include <iostream>
@@ -81,7 +82,7 @@ private:
 	void			parse(std::string msg);
 
 	// execute
-	void			parse(clients_vector::iterator it, std::string query);
+	void			parse(clients_vector::iterator it, std::string query, int channel);
 	void			handleCommands(clients_vector::iterator it, std::string query);
 	void			handleNick(users_map::iterator it, std::string newNick);
 

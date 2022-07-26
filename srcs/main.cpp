@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 
 
 	base.printAddrInfo();
-	// base.startListen();
+	base.startListen();
 
 	delete rpl_manager;
 

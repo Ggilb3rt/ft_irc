@@ -22,6 +22,12 @@ user_id	ircServer::getUserByNick(std::string nick)
 	return (0);
 }
 
+ircServer::users_map::iterator	ircServer::getUserById(user_id id)
+{
+	return (_users.find(id));
+}
+
+
 // just for debug
 void ircServer::printUsers()
 {

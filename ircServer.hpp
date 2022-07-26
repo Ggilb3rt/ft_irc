@@ -1,10 +1,6 @@
 #ifndef IRC_SERVER_HPP
     #define IRC_SERVER_HPP
 
-#include <iostream>
-#include <sstream>
-#include <cstring>
-#include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -13,6 +9,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
+
+#include <cstring>
+#include <csignal>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 #include <map>
 
@@ -20,7 +22,6 @@
 #include "rplManager.hpp"
 #include "userClass.hpp"
 #include "channelClass.hpp"
-
 
 typedef struct	s_lex {
 	int			type;
@@ -55,6 +56,7 @@ private:
 	struct sockaddr_in			their_addr;
 	socklen_t					addr_size;
 
+
 	users_map					_users;
 	clients_vector				_pfds;
 	unsigned int				_nick_suffixe;
@@ -64,6 +66,7 @@ private:
 
 
 	// init
+	// void			set_signal_status(int signum);
 	void			init();
 	void			initAddrInfo();
 	void			createMasterSocket();
@@ -95,6 +98,7 @@ private:
 	// helpers
 	void			sendToClient(int fd, const char *msg);
 	user_id			getUserByNick(std::string nick);
+	users_map::iterator getUserById(user_id id);
 	void			printUsers();
 	void			printChannels();
 
@@ -105,8 +109,17 @@ private:
 	std::string	join(user_id id, std::string chan, std::string key = ""); // key == password ?
 	std::string	part(user_id, const std::vector<std::string> chans);
 	std::string kick(std::string chan, user_id victim, user_id kicker, std::string comment = "");
+	std::string	quit(user_id client, std::string message = "");
+	
+	std::string	names(std::vector<std::string> chans());
+	std::string	list(std::vector<std::string> chans());
 
 public:
+	// volatile std::sig_atomic_t	_signal_status;
+	
+	// void			start_signal();
+	// static void		signal_handler(int signum);
+	
 	ircServer(char *_port);
 	~ircServer();
 

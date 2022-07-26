@@ -173,6 +173,44 @@ std::string ircServer::kick(std::string chan, user_id victim, user_id kicker, st
 	return ("kick");
 }
 
+std::string	ircServer::quit(user_id client, std::string message)
+{
+	users_map::iterator	user_it = this->getUserById(client);
 
-// QUIT cmd
-//? SQUIT is an alias to QUIT ?
+	if (user_it != _users.end()) {
+		this->removeClient(user_it);
+		if (message.size() > 0)
+			std::cout << "QUIT :" << message << std::endl;
+		else
+			std::cout << "QUIT :" << user_it->second.getName() << std::endl;
+	}
+	return ("quit");
+}
+
+std::string	ircServer::names(std::vector<std::string> chans())
+{
+	/*
+		NAMES REPLIES
+        	- RPL_NAMREPLY
+			- RPL_ENDOFNAMES
+	*/
+
+	// if chans.size() == 0 ==> print all
+
+	return ("names");
+}
+
+std::string	ircServer::list(std::vector<std::string> chans())
+{
+	/*
+		LIST REPLIES
+			- ERR_NOSUCHSERVER               - RPL_LISTSTART (obsolete. Not used.)
+           	- RPL_LIST                       - RPL_LISTEND
+	*/
+
+	// if chans.size() == 0 ==> print all
+
+	// need RPL_LIST
+
+	return ("list");
+}

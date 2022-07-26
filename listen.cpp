@@ -15,7 +15,8 @@ void	ircServer::startListen()
 
 	_pfds.push_back(master);
 
-	while (!quit) { // here must be infinit loop, quit with signals
+	//while (_signal_status != SIGINT) { // here must be infinit loop, quit with signals
+	while (!quit) {
 		ret_poll = poll(_pfds.data(), _pfds.size(), 0);
 
 		// std::cout << "How many connections ?: " << _pfds.size() << std::endl;

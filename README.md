@@ -37,6 +37,25 @@ In irssi[^client]
 /connect ft_irc
 ```
 
+## Terminal helpers
+### netcat
+nc ip port
+-C is used to send "\r\n" instead of "\n"
+-c is equivalent for mac
+
+```bash
+nc -C 127.0.0.1 6697
+```
+### Background / Foreground
+Press CTRL+Z which will suspend the current foreground job.
+You can find all background jobs with ```jobs``` then bring a certain job to the foreground with ```fg``` or kill it with ```kill```
+```bash
+nc -C 127.0.0.1 6697
+#[CRTL+Z]
+jobs # will print all jobs
+fg %1 # will bring to the foreground the job 1 (prints before)
+kill %3 # will kill job 3
+```
 
 
 ## Search
@@ -110,21 +129,21 @@ Needed commands (cf RFC1459 4.x) :
 __We have to debate about what is needed and what is not following the subject.__
 - Connection (4.1)
   - (PASS ??)
-  - NICK
-  - USER
+  - [ ] NICK
+  - [ ] USER
   - SERVER (not needed, only server-server)
   - OPER
-  - QUIT
+  - [x] QUIT
   - SQUIT (not needed, only server-server or alias of QUIT)
 - Channel (4.2)
-  - JOIN
-  - PART
-  - MODE
-  - TOPIC
-  - NAME
-  - LIST
-  - INVITE
-  - KICK
+  - [x] JOIN
+  - [x] PART
+  - [ ] MODE
+  - [x] TOPIC
+  - [ ] NAMES
+  - [ ] LIST
+  - [ ] INVITE
+  - [x] KICK
 - Server (4.3) (only with 'this' because no server-server communication)
   - VERSION
   - STATS
@@ -135,8 +154,8 @@ __We have to debate about what is needed and what is not following the subject._
   - ADMIN
   - INFO
 - Sending messages (4.4)
-  - PRIVMSG (mode +n, +m, +v (RFC2811 2.4)) (! irssi use command "/MSG user message" syntax)
-  - NOTICE
+  - [ ] PRIVMSG (mode +n, +m, +v (RFC2811 2.4)) (! irssi use command "/MSG user message" syntax)
+  - [ ] NOTICE
 - User (4.5)
   - WHO
   - WHOIS
@@ -148,7 +167,7 @@ __We have to debate about what is needed and what is not following the subject._
   - ERROR
 - OPTIONALS
   - lol nope
-- plus all operators specials habilities
+- all operators specials habilities are needed
 
 ### Error replies
 [RFC1459 section 6](https://www.rfcreader.com/#rfc1459_line1993), we just have to copie paste all in a file

@@ -2,10 +2,9 @@
 
 /*
 	TODO:
+	- signals : need it to quit infinite loop (tests no leaks)
 	- Finish error management :
 		-send : must create send()function
-		- when client make ctrl+D more than one time he is stucked
-			--> probleme from nc ? the rest of the server is ok, sooooo fuck it ?
 		-segfault :
 			- start fd_killer and ctrl+c before it ends
 					--> no more segfault but don't remove users, but probleme probably come from tester :
@@ -19,7 +18,8 @@
 	- Commands :
 		- user_id getUserByName(std::string name);
 			--> needed for kick (and other cmds), convertir le nom en id dans le parser
-		- implement commands in README
+			--> getUserByNick already exist
+		- implement commands in README [ ]
 	- Miscellaneous :
 		?- Remove ip v6 ?
 		- Code cleanup
@@ -36,6 +36,8 @@
 		- error: when buffer uncomplete the program blocks ;
 				sending message from another client put it in waiting list
 			==> solution : one buffer by client
+		- when client make ctrl+D more than one time he is stucked
+			--> probleme from nc ? the rest of the server is ok, sooooo fuck it ?
 	- Channels :
 		- when client disconnect : 
 			- remove channel if it was the last in
@@ -59,6 +61,17 @@
 					==> it works with new version of clients managers
 
 */
+
+// void	ircServer::start_signal()
+// {
+// 	std::signal(SIGINT, ircServer::signal_handler);
+// }
+
+// static void	signal_handler(int signum)
+// {
+// 	base._signal_status = signum;
+// }
+
 
 ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 {
@@ -130,67 +143,71 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	channel_map::iterator it = _channel.begin();
 	channel_map::iterator end = _channel.end();
 
-	this->part(20, std::vector<std::string>(1, std::string("ChannelDeRoger")));
-	this->part(83, std::vector<std::string>(1, std::string("ChannelDeRoger")));
-
-	// way before part CMD
-	while (it !=end){
-		it->second.removeUser(17);
-		if (it->second.getSize() == 0)
-			it = _channel.erase(it);
-		else {
-			it->second.replaceLastOperator();
-			it++;
-		}
-	}
-	it = _channel.begin();
-	end = _channel.end();
-	while (it !=end) {
-		it->second.removeUser(8);
-		if (it->second.getSize() == 0)
-			it = _channel.erase(it);
-		else {
-			it->second.replaceLastOperator();
-			it++;
-		}
-	}
-	it = _channel.begin();
-	end = _channel.end();
-	while (it !=end) {
-		it->second.removeUser(15);
-		if (it->second.getSize() == 0)
-			it = _channel.erase(it);
-		else {
-			it->second.replaceLastOperator();
-			it++;
-		}
-	}
-	it = _channel.begin();
-	end = _channel.end();
-	while (it !=end) {
-		it->second.removeUser(18);
-		if (it->second.getSize() == 0)
-			it = _channel.erase(it);
-		else {
-			it->second.replaceLastOperator();
-			it++;
-		}
-	}
-	this->printChannels();
-
-	it = _channel.begin();
-	end = _channel.end();
-	while (it !=end) {
-		it->second.removeUser(16);
-		if (it->second.getSize() == 0)
-			it = _channel.erase(it);
-		else {
-			it->second.replaceLastOperator();
-			it++;
-		}
-	}
+	std::cout << "use QUIT\n";
+	this->quit(17);
+	this->quit(8);	// not exist ; ignore
+	this->quit(15);
+	this->quit(18, "Babyee !!");
+	this->quit(16);
+	// way before part and quit CMD
+	// while (it !=end){
+	// 	it->second.removeUser(17);
+	// 	if (it->second.getSize() == 0)
+	// 		it = _channel.erase(it);
+	// 	else {
+	// 		it->second.replaceLastOperator();
+	// 		it++;
+	// 	}
+	// }
+	// it = _channel.begin();
+	// end = _channel.end();
+	// while (it !=end) {
+	// 	it->second.removeUser(8);
+	// 	if (it->second.getSize() == 0)
+	// 		it = _channel.erase(it);
+	// 	else {
+	// 		it->second.replaceLastOperator();
+	// 		it++;
+	// 	}
+	// }
+	// it = _channel.begin();
+	// end = _channel.end();
+	// while (it !=end) {
+	// 	it->second.removeUser(15);
+	// 	if (it->second.getSize() == 0)
+	// 		it = _channel.erase(it);
+	// 	else {
+	// 		it->second.replaceLastOperator();
+	// 		it++;
+	// 	}
+	// }
+	// it = _channel.begin();
+	// end = _channel.end();
+	// while (it !=end) {
+	// 	it->second.removeUser(18);
+	// 	if (it->second.getSize() == 0)
+	// 		it = _channel.erase(it);
+	// 	else {
+	// 		it->second.replaceLastOperator();
+	// 		it++;
+	// 	}
+	// }
+	// this->printChannels();
+	// it = _channel.begin();
+	// end = _channel.end();
+	// while (it !=end) {
+	// 	it->second.removeUser(16);
+	// 	if (it->second.getSize() == 0)
+	// 		it = _channel.erase(it);
+	// 	else {
+	// 		it->second.replaceLastOperator();
+	// 		it++;
+	// 	}
+	// }
 
 	std::cout << "use PART\n";
+	this->part(20, std::vector<std::string>(1, std::string("ChannelDeRoger")));
+	this->part(83, std::vector<std::string>(1, std::string("ChannelDeRoger")));
 	this->part(4, std::vector<std::string>(1, std::string("GardienDeLaPaix")));	// error 442
 	this->part(4, std::vector<std::string>(1, std::string("lolilol"))); // error 403
 	this->part(4, std::vector<std::string>(0, std::string(""))); // error 461
@@ -203,7 +220,7 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	this->kick("Vive18", 55, 19);// error ERR_NOTONCHANNEL
 	this->kick("pouet", 21, 19);// error ERR_NOSUCHCHANNEL
 	this->kick("Vive18", 21, 19, "jl'aime pas");
-	this->kick("Vive18", 19, 19); //? auto kill possible
+	this->kick("Vive18", 19, 19); //? auto kick possible => oui
 	this->printChannels();
 
 

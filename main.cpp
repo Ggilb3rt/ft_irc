@@ -12,6 +12,13 @@
 
 #include "ircServer.hpp"
 
+// volatile std::sig_atomic_t g_signal_status;
+
+// void	signal_handler(int signal)
+// {
+// 	g_signal_status = signal;
+// }
+
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
@@ -19,8 +26,18 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+
 	ircServer	base(argv[1]);
 	rplManager	*rpl_manager = rplManager::getInstance();
+
+
+// 	std::signal(SIGINT, signal_handler);
+
+	 
+//   std::cout << "SignalValue: " << g_signal_status << '\n';
+//   std::cout << "Sending signal: " << SIGINT << '\n';
+//   std::raise(SIGINT);
+//   std::cout << "SignalValue: " << g_signal_status << '\n';
 
 	/* Replie manager TESTS */
 	std::cout << "rpl_manager addr " << rpl_manager << std::endl;

@@ -10,14 +10,15 @@
 
 #include <iostream>
 
+#include "bit_mask.hpp"
 #include "ircServer.hpp"
 
-// volatile std::sig_atomic_t g_signal_status;
+volatile std::sig_atomic_t g_signal_status = 0;
 
-// void	signal_handler(int signal)
-// {
-// 	g_signal_status = signal;
-// }
+void	signal_handler(int signal)
+{
+	g_signal_status = signal;
+}
 
 int main(int argc, char **argv)
 {
@@ -26,18 +27,32 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-
+	std::signal(SIGINT, signal_handler);
 	ircServer	base(argv[1]);
 	rplManager	*rpl_manager = rplManager::getInstance();
 
 
-// 	std::signal(SIGINT, signal_handler);
+	/* CHAN_MASK tests */
+	int	chan_mode = 0;
 
-	 
-//   std::cout << "SignalValue: " << g_signal_status << '\n';
-//   std::cout << "Sending signal: " << SIGINT << '\n';
-//   std::raise(SIGINT);
-//   std::cout << "SignalValue: " << g_signal_status << '\n';
+	chan_mode = set_bit(chan_mode, CHAN_MASK_M);
+	chan_mode = set_bit(chan_mode, CHAN_MASK_I);
+	chan_mode = set_bit(chan_mode, CHAN_MASK_O);
+	chan_mode = toggle_bit(chan_mode, CHAN_MASK_O);
+	chan_mode = clear_bit(chan_mode, CHAN_MASK_V);
+	chan_mode = set_bit(chan_mode, CHAN_MASK_V);
+	chan_mode = clear_bit(chan_mode, CHAN_MASK_V);
+
+	if (get_bit(chan_mode, CHAN_MASK_B))
+		std::cout << "Mask B is set\n"; // no
+	if (get_bit(chan_mode, CHAN_MASK_I))
+		std::cout << "Mask I is set\n"; // yes
+	if (get_bit(chan_mode, CHAN_MASK_M))
+		std::cout << "Mask M is set\n"; // yes
+	if (get_bit(chan_mode, CHAN_MASK_O))
+		std::cout << "Mask O is set\n"; // no
+	if (get_bit(chan_mode, CHAN_MASK_V))
+		std::cout << "Mask V is set\n"; // no
 
 	/* Replie manager TESTS */
 	std::cout << "rpl_manager addr " << rpl_manager << std::endl;
@@ -49,7 +64,7 @@ int main(int argc, char **argv)
 
 
 	base.printAddrInfo();
-	base.startListen();
+	// base.startListen();
 
 	delete rpl_manager;
 

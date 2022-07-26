@@ -7,16 +7,13 @@ void	ircServer::startListen()
 	struct pollfd	master;
 	
 	master.fd = _master_sockfd;
-	master.events = POLLIN; //? heeeeuuuuu si on avait mis le MASK ici ca n'aurai pas tout regle depuis longtemps ?
-
-
-	clients_vector::iterator it = _pfds.begin();
-	clients_vector::iterator end = _pfds.end();
-
+	master.events = POLLIN;
 	_pfds.push_back(master);
 
-	//while (_signal_status != SIGINT) { // here must be infinit loop, quit with signals
-	while (!quit) {
+	// clients_vector::iterator it = _pfds.begin();
+	// clients_vector::iterator end = _pfds.end();
+
+	while (g_signal_status != SIGINT) {
 		ret_poll = poll(_pfds.data(), _pfds.size(), 0);
 
 		// std::cout << "How many connections ?: " << _pfds.size() << std::endl;
@@ -26,7 +23,7 @@ void	ircServer::startListen()
 		}
 		else if (ret_poll > 0) {
 			if (_pfds[0].revents & POLLIN && _pfds.size() < FDLIMIT) {
-				struct pollfd	newClient;//!!!!
+				struct pollfd	newClient;	//!!!!
 
 				addr_size = sizeof(their_addr);
 				newClient.fd = accept(_master_sockfd, (struct sockaddr *)&their_addr, &addr_size); 
@@ -37,8 +34,8 @@ void	ircServer::startListen()
 					newClient.events = MASK;
 					_pfds.push_back(newClient);
 					this->addClient(newClient.fd);
-					it = _pfds.begin();
-					end = _pfds.end();
+					// it = _pfds.begin();
+					// end = _pfds.end();
 					this->printUsers();
 				}
 			}
@@ -59,7 +56,7 @@ void	ircServer::startListen()
 					// if ((*it).revents == POLLRDHUP || (*it).revents == POLLHUP) {
 					// 	users_map::iterator	user_x = _users.find(it->fd);
 					// 	if (user_x != _users.end())
-					// 		user_x->second.setStatus(DELETE);
+					// 		user_x->second.setStatus(USER_STATUS_DEL);
 					// }
 					if ((*it).revents == POLLIN) {
 						this->readData(it);
@@ -69,7 +66,7 @@ void	ircServer::startListen()
 						break ;
 				}
 				for (users_map::iterator it = _users.begin(); it != _users.end(); it++) {
-					if (it->second.getStatus() == DELETE) {
+					if (it->second.getStatus() == USER_STATUS_DEL) {
 						removeClient(it);
 						this->printUsers();
 						break ;

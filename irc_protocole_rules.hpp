@@ -12,4 +12,30 @@
 #define CHAN_NAME_FORBID_COMMA ","
 #define CHAN_NAME_FORBID_CTRLG "\a"
 
+enum chan_mask {
+	CHAN_MASK_O,
+	CHAN_MASK_P,
+	CHAN_MASK_S,
+	CHAN_MASK_I,
+	CHAN_MASK_N,
+	CHAN_MASK_M,
+	CHAN_MASK_L,
+	CHAN_MASK_B,
+	CHAN_MASK_V,
+	CHAN_MASK_K
+};
+
+//            o - give/take channel operator privileges;
+//            p - private channel flag;
+//            s - secret channel flag;
+//            i - invite-only channel flag;
+//            t - topic settable by channel operator only flag;
+//            n - no messages to channel from clients on the outside;
+//            m - moderated channel;
+//            l - set the user limit to channel;
+//            b - set a ban mask to keep users out;
+//            v - give/take the ability to speak on a moderated channel;
+//            k - set a channel key (password).
+
+
 #endif

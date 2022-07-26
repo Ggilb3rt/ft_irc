@@ -23,6 +23,8 @@
 #include "userClass.hpp"
 #include "channelClass.hpp"
 
+extern volatile std::sig_atomic_t g_signal_status;
+
 typedef struct	s_lex {
 	int			type;
 	std::string	lexeme;
@@ -36,7 +38,7 @@ class ircServer
 #define FDLIMIT 1021
 #define MASK (POLLIN) // + POLLRDHUP + POLLHUP) //+ POLLERR + POLLNVAL + POLLRDHUP)
 
-#define DELETE	1
+#define USER_STATUS_DEL	1
 
 
 typedef		std::map<int, user>						users_map;

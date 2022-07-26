@@ -21,12 +21,14 @@ private:
 	const std::string		_name;
 	std::string				_description;
 	users_list				_users;
+	int						_mode;
 
 	channel() {}
 
 public:
 
-	channel(std::string name, user_id creator) : _name(name), _description("Super channel " + name)
+	channel(std::string name, user_id creator) :
+			_name(name), _description("Super channel " + name), _mode(0)
 	{
 		_users.insert(std::pair<user_id, role>(creator, true));
 	}

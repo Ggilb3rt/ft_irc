@@ -4,7 +4,8 @@ SRCS =	main.cpp \
 		irc_client_managers.cpp irc_channel_managers.cpp \
 		channelClass.cpp \
 		commands.cpp \
-		helpers.cpp rplManager.cpp
+		helpers.cpp rplManager.cpp \
+		bit_mask.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 

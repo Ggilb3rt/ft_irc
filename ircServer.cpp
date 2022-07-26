@@ -8,7 +8,7 @@
 		-segfault :
 			- start fd_killer and ctrl+c before it ends
 					--> no more segfault but don't remove users, but probleme probably come from tester :
-						I try to connect all clients before sending something -> no readData() -> no user_x.setStatus(DELETE)
+						I try to connect all clients before sending something -> no readData() -> no user_x.setStatus(USER_STATUS_DEL)
 						? add POLLRDHUP will help? -> nope
 						I change the fd_killer, now he revc after send, it's help to remove all users but still one (if ctr+C between connect() and send())
 	- Parsing : 

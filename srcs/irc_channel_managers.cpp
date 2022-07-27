@@ -1,6 +1,6 @@
 #include "ircServer.hpp"
 
-void	ircServer::channelNameCorrection(std::string &name)
+void					ircServer::channelNameCorrection(std::string &name)
 {
 	// RFC said channel name must start with '#' or '&'
 	// I think we should remove '#' or '&' in each cmd and add it only for print
@@ -30,7 +30,7 @@ ircServer::channel_pair	ircServer::addChannel(std::string name, user_id id)
 	return (ret);
 }
 
-void	ircServer::removeChannel(channel_map::iterator &it)
+void					ircServer::removeChannel(channel_map::iterator &it)
 {
-	it = _channel.erase(it);
+	_channel.erase(it);
 }

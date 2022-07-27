@@ -36,5 +36,5 @@
 .vscode/
 ./bircd/bircd
 client
-ft_irc
+ircserv
 ./tests/fd_killer

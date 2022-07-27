@@ -10,7 +10,6 @@
 
 #include <iostream>
 
-#include "bit_mask.hpp"
 #include "ircServer.hpp"
 
 volatile std::sig_atomic_t g_signal_status = 0;
@@ -64,7 +63,7 @@ int main(int argc, char **argv)
 
 
 	base.printAddrInfo();
-	base.startListen();
+	// base.startListen();
 
 	delete rpl_manager;
 

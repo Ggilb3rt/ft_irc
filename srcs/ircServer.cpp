@@ -59,19 +59,10 @@
 					xx> again it was an iterator update, the end iterator inside the while(ret_poll>0)
 						--> this solution create segfault with basic usage
 					==> it works with new version of clients managers
+	- Miscellaneous :
+		- bit mask system : setter, cleaner, toggler, getter
 
 */
-
-// void	ircServer::start_signal()
-// {
-// 	std::signal(SIGINT, ircServer::signal_handler);
-// }
-
-// static void	signal_handler(int signum)
-// {
-// 	base._signal_status = signum;
-// }
-
 
 ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 {
@@ -95,138 +86,118 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 			- try to change desciption with operator and basic user
 			- remove x/2 users
 				- try to kick some of them with operator and basic user
-	
+	*/
 	std::cout << "\n\n===========STARTING SIMULATION TEST============\n\n";
 
 	// create users
-	this->printUsers();
+	this->printUsers();								// empty
 	std::cout << "----------------Creating Users----------------\n";
 	std::string	names[5] = {"Roger", "Marcel", "Corine", "Corine", "Boby"};
 	std::string	nicks[5] = {"Rabbit", "Patoulatchi", "Corine", "Roger", "Toby"};
 	for (int i = 15; i < 20; i++) {
 		this->addClient(i, nicks[i-15], names[i-15]);
 	}
-	this->addClient(17);
-	this->addClient(20, "Rabbit", "anotherName");
-	this->addClient(21, "Rabbit", "anotherName");
-	this->printUsers();
+	this->addClient(17);							// error already in use
+	this->addClient(20, "Rabbit", "anotherName");	// error rename x
+	this->addClient(21, "Rabbit", "anotherName");	// errir rename x+1
+	this->printUsers();								// users with id from 15 to 21
 
 	// create/join channels
-	this->printChannels();
+	this->printChannels();							// empty
 	std::cout << "----------------Creating and joining some channels----------------\n";
 	this->join(_users.find(15)->second.getId(), "ChannelDeRoger");
 	this->join(_users.find(16)->second.getId(), "GardienDeLaPaix");
 	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");
-	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");
+	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");		// error already in
 	this->join(_users.find(19)->second.getId(), "GardienDeLaPaix");
-	this->join(_users.find(18)->second.getId(), "Gardien de la paix");
+	this->join(_users.find(18)->second.getId(), "Gardien de la paix");	// replace spaces by _
 	this->join(_users.find(18)->second.getId(), "ChannelDeRoger");
 	this->join(_users.find(18)->second.getId(), "Vive18");
 	for (int i = 15; i < 22; i++)
-		this->join(_users.find(i)->second.getId(), "Vive18");
-	this->printChannels();
+		this->join(_users.find(i)->second.getId(), "Vive18");			// one error with 18 already in
+	this->printChannels();												// print all channels with users and functions
 
 	// get and set descriptions
 	std::cout << "----------------Getting or Updating descriptions----------------\n";
-	std::cout << this->topic(_users.find(18)->second.getId(), "Vive18");
-	std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");
-	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger");
-	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger", "ViveMoi");
-	std::cout << this->topic(_users.find(19)->second.getId(), "Pouet", "ViveMoi");
+	std::cout << this->topic(_users.find(18)->second.getId(), "Vive18");						// print topic
+	std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");	// change topic
+	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger");				// print topic
+	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger", "ViveMoi");		// error operator
+	std::cout << this->topic(_users.find(19)->second.getId(), "Pouet", "ViveMoi");				// error channel not exist
+	std::cout << this->topic(_users.find(19)->second.getId(), "ChannelDeRoger");				// print topic
 	std::cout << std::endl;
 	this->printChannels();
+
+	// get and set modes (without cmd MODES for now)
+	std::cout << "----------------Getting or Updating Channels modes----------------\n";
+	_channel.find("Vive18")->second.addFlag(CHAN_MASK_P);     
+	_channel.find("Vive18")->second.addFlag(CHAN_MASK_N);
+	_channel.find("Vive18")->second.addFlag(CHAN_MASK_N);	// not problems
+	_channel.find("Vive18")->second.addFlag(CHAN_MASK_K);
+	_channel.find("Vive18")->second.addFlag(CHAN_MASK_O);
+	_channel.find("Vive18")->second.removeFlag(CHAN_MASK_P);
+	std::cout << "Flags kno are sets, p and i not" << std::endl;
+	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_P) << std::endl;	// 0
+	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_I) << std::endl;	// 0
+	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_K) << std::endl;	// 1
+	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_N) << std::endl;	// 1
+	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_O) << std::endl;	// 1
+	this->printChannels();
+
 
 	// remove x/2 users
 	std::cout << "----------------QUIT/PART/KICK/disconnecting users----------------\n";
 	//can't remove client with .removeClient() because I need _pfds
 	// only remove client from channels (like in .reomoveClient())
-	channel_map::iterator it = _channel.begin();
-	channel_map::iterator end = _channel.end();
 
 	std::cout << "use QUIT\n";
-	this->quit(17);
-	this->quit(8);	// not exist ; ignore
+	this->printUsers();
 	this->quit(15);
-	this->quit(18, "Babyee !!");
 	this->quit(16);
-	// way before part and quit CMD
-	// while (it !=end){
-	// 	it->second.removeUser(17);
-	// 	if (it->second.getSize() == 0)
-	// 		it = _channel.erase(it);
-	// 	else {
-	// 		it->second.replaceLastOperator();
-	// 		it++;
-	// 	}
-	// }
-	// it = _channel.begin();
-	// end = _channel.end();
-	// while (it !=end) {
-	// 	it->second.removeUser(8);
-	// 	if (it->second.getSize() == 0)
-	// 		it = _channel.erase(it);
-	// 	else {
-	// 		it->second.replaceLastOperator();
-	// 		it++;
-	// 	}
-	// }
-	// it = _channel.begin();
-	// end = _channel.end();
-	// while (it !=end) {
-	// 	it->second.removeUser(15);
-	// 	if (it->second.getSize() == 0)
-	// 		it = _channel.erase(it);
-	// 	else {
-	// 		it->second.replaceLastOperator();
-	// 		it++;
-	// 	}
-	// }
-	// it = _channel.begin();
-	// end = _channel.end();
-	// while (it !=end) {
-	// 	it->second.removeUser(18);
-	// 	if (it->second.getSize() == 0)
-	// 		it = _channel.erase(it);
-	// 	else {
-	// 		it->second.replaceLastOperator();
-	// 		it++;
-	// 	}
-	// }
-	// this->printChannels();
-	// it = _channel.begin();
-	// end = _channel.end();
-	// while (it !=end) {
-	// 	it->second.removeUser(16);
-	// 	if (it->second.getSize() == 0)
-	// 		it = _channel.erase(it);
-	// 	else {
-	// 		it->second.replaceLastOperator();
-	// 		it++;
-	// 	}
-	// }
+	this->quit(17);
+	this->quit(8);					// not exist ; ignore
+	this->quit(18, "Babyee !!");
+	this->printUsers();
 
 	std::cout << "use PART\n";
-	this->part(20, std::vector<std::string>(1, std::string("ChannelDeRoger")));
-	this->part(83, std::vector<std::string>(1, std::string("ChannelDeRoger")));
+	this->part(18, std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
+	this->part(83, std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
 	this->part(4, std::vector<std::string>(1, std::string("GardienDeLaPaix")));	// error 442
-	this->part(4, std::vector<std::string>(1, std::string("lolilol"))); // error 403
-	this->part(4, std::vector<std::string>(0, std::string(""))); // error 461
+	this->part(4, std::vector<std::string>(1, std::string("lolilol")));			// error 403
+	this->part(4, std::vector<std::string>(0, std::string("")));				// error 461
 	this->part(19, std::vector<std::string>(1, std::string("GardienDeLaPaix")));
 	this->printChannels();
 
 	std::cout << "use KICK\n";
 	this->kick("Vive18", 20, 19);
-	this->kick("Vive18", 19, 21); // error ERR_CHANOPRIVSNEEDED
-	this->kick("Vive18", 55, 19);// error ERR_NOTONCHANNEL
-	this->kick("pouet", 21, 19);// error ERR_NOSUCHCHANNEL
+	this->kick("Vive18", 19, 21); 					// error ERR_CHANOPRIVSNEEDED
+	this->kick("Vive18", 55, 19);					// error ERR_NOTONCHANNEL
+	this->kick("pouet", 21, 19);					// error ERR_NOSUCHCHANNEL
 	this->kick("Vive18", 21, 19, "jl'aime pas");
-	this->kick("Vive18", 19, 19); //? auto kick possible => oui
+	this->kick("Vive18", 19, 19); 					// auto kick possible => oui
 	this->printChannels();
 
 
+	// mode cmd
+	std::cout << "----------------MODE cmd now test conversion of flags to mask----------------\n";
+	channel_map::iterator modeIt = _channel.begin();
+	modeIt->second.convertModeFlagsToMask("qwertyuiopasdfghjklzxcvbnm");
+	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
+	modeIt->second.convertModeFlagsToMask("-tyuio+pasdfghjk-lzxcvbnm");
+	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
+	modeIt->second.convertModeFlagsToMask("-tyuio+pasdfghjklzxcvbnm");
+	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
+	modeIt->second.convertModeFlagsToMask("+o");
+	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
+	modeIt->second.convertModeFlagsToMask("+o-o");
+	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
+	modeIt->second.convertModeFlagsToMask("+p-si+mz");
+	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
+	modeIt->second.convertModeFlagsToMask("+-psi");
+	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
 	std::cout << "====================================================\n\n";
 	// END SIMULATION test
-	*/
+
 }
 
 ircServer::~ircServer()

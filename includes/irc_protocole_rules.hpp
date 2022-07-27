@@ -12,11 +12,15 @@
 #define CHAN_NAME_FORBID_COMMA ","
 #define CHAN_NAME_FORBID_CTRLG "\a"
 
+
+#define CHAN_FLAGS_QT 11
+#define CHAN_FLAGS_VALID "opsitnmlbvk"
 enum chan_mask {
 	CHAN_MASK_O,
 	CHAN_MASK_P,
 	CHAN_MASK_S,
 	CHAN_MASK_I,
+	CHAN_MASK_T,
 	CHAN_MASK_N,
 	CHAN_MASK_M,
 	CHAN_MASK_L,

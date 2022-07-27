@@ -1,11 +1,11 @@
 #include "rplManager.hpp"
 
 
-rplManager	*rplManager::_rplManager = nullptr;
+rplManager	*rplManager::_rplManager = NULL;
 
 rplManager	*rplManager::getInstance()
 {
-	if (_rplManager == nullptr)
+	if (_rplManager == NULL)
 		_rplManager = new rplManager();
 	return _rplManager;
 }

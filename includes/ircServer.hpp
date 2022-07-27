@@ -11,6 +11,7 @@
 #include <poll.h>
 
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <csignal>
 #include <iostream>
@@ -20,6 +21,7 @@
 #include <map>
 
 #include "irc_protocole_rules.hpp"
+#include "bit_mask.hpp"
 #include "rplManager.hpp"
 #include "userClass.hpp"
 #include "channelClass.hpp"
@@ -90,6 +92,7 @@ private:
 	// client managements
 	void			addClient(int fd);
 	void			addClient(int fd, std::string nick, std::string name);
+	void			removeAllUsersFromChans(int id_user);
 	void			removeClient(clients_vector::iterator &it);
 	void			removeClient(users_map::iterator &it);
 
@@ -118,11 +121,6 @@ private:
 	std::string	list(std::vector<std::string> chans());
 
 public:
-	// volatile std::sig_atomic_t	_signal_status;
-	
-	// void			start_signal();
-	// static void		signal_handler(int signum);
-	
 	ircServer(char *_port);
 	~ircServer();
 

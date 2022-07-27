@@ -53,9 +53,10 @@ void ircServer::printChannels()
 	
 	std::cout << "==All channels==\n";
 	while (it != end) {
-		std::cout << it->first << " ==>\n\t-"
-			<< it->second.getName() << "\n\t-"
-			<< it->second.getDescription() << "\n\t-";
+		std::cout << it->first << " ==>\n\t- Name : "
+			<< it->second.getName() << "\n\t- Desc : "
+			<< it->second.getDescription() << "\n\t- Modes : "
+			<< it->second.convertModeMaskToFlags() << "\n\t-";
 			it->second.printUsers();
 		it++;
 	}

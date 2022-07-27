@@ -21,17 +21,20 @@ private:
 	const std::string		_name;
 	std::string				_description;
 	users_list				_users;
-	int						_mode;
+	int						_modes;
 
 	channel() {}
 
+
 public:
+	int				convertModeFlagsToMask(std::string param); //! should be private (after tests)
+	std::string		convertModeMaskToFlags();	//! should be private (after tests)
+
 
 	channel(std::string name, user_id creator) :
-			_name(name), _description("Super channel " + name), _mode(0)
+			_name(name), _description("Super channel " + name), _modes(0)
 	{
 		_users.insert(std::pair<user_id, role>(creator, true));
-		(void)_mode;
 	}
 	~channel() {}
 
@@ -42,8 +45,14 @@ public:
 	bool		addUser(user_id user_fd);
 	size_t		removeUser(user_id user_fd);
 	void		setUserRole(user_id id, role new_role);
-	size_t		getSize();
+	size_t		getSize() const;
 	// users_list::iterator		getUser(user_id id);
+	
+	bool		isFlagSets(int flag) const;
+	//! not sure if needded
+	void		addFlag(int flag);
+	void		removeFlag(int flag);
+	void		toggleFlag(int flag);
 
 
 	// USAGE

@@ -18,6 +18,8 @@
 #define ERR_NEEDMOREPARAMS_MSG		" :Not enough parameters" // 461 <command>
 
 // REPLIES
+#define RPL_OKCONNECT		001
+#define RPL_OKCONNECT_MSG	" :Welcome to the internet"
 #define	RPL_UMODEIS			221
 #define	RPL_UMODEIS_MSG		"i" // 221 "<user mode string>"
 #define RPL_CHANNELMODEIS	324

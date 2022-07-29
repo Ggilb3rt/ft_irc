@@ -12,7 +12,7 @@ rplManager	*rplManager::getInstance()
 
 rplManager::rplManager()
 {
-	list.insert(new_pair(1, " :lol internet"));
+	list.insert(new_pair(RPL_OKCONNECT, RPL_OKCONNECT_MSG));
 	list.insert(new_pair(14, " :petit mais puissant"));
 	list.insert(new_pair(ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG));
 	list.insert(new_pair(ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG));

@@ -165,16 +165,16 @@ void		channel::replaceLastOperator()
 	this->setUserRole(_users.begin()->first, true);
 }
 
-void		channel::sendToAll(ircServer& server, const char *msg) const
-{
-	std::map<user_id, role>::const_iterator	it = _users.begin();
+// void		channel::sendToAll(ircServer& server, const char *msg) const
+// {
+// 	std::map<user_id, role>::const_iterator	it = _users.begin();
 
-	// maybe need to add an header to the msg
-	while (it != _users.end()) {
-		server.sendToClient(it->first, msg);
-		it++;
-	}
-}
+// 	// maybe need to add an header to the msg
+// 	while (it != _users.end()) {
+// 		server.sendToClient(it->first, msg);
+// 		it++;
+// 	}
+// }
 
 
 

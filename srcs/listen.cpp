@@ -65,15 +65,67 @@ void	ircServer::startListen()
 						break ;
 				}
 				for (users_map::iterator it = _users.begin(); it != _users.end(); it++) {
+					std::cout << "STATUS == " << it->second.getStatus() << std::endl;
 					if (it->second.getStatus() == USER_STATUS_DEL) {
 						removeClient(it);
 						this->printUsers();
 						break ;
 					}
+					else if (it->second.getStatus() == USER_STATUS_PENDING) {
+						registerUser(it);
+						//check client buffer for CAP USER and NICK and 
+					}
 				}
 			}
 		}
 	}
+}
+
+std::string	getChunk(std::string msg, std::string param) {
+	std::string chunk;
+	size_t pos_param;
+	size_t pos_end;
+
+	pos_param = msg.find(param);
+	pos_end = msg.find(END_MSG, pos_param);
+	std::cout << "PARAM == " << param << std::endl;
+	if (pos_param == std::string::npos || pos_end == std::string::npos)
+		return (std::string());
+	// get from param to end_msg
+	chunk = msg.substr(pos_param, pos_end - pos_param);
+	std::cout << "PARAM == " << param << std::endl;
+	return (chunk);
+}
+
+void	ircServer::registerUser(users_map::iterator &it) {
+
+	std::cout << "CLIENT FD == " << it->first << std::endl;
+	if (getChunk(it->second._msg, "CAP").size() > 0 && 
+		getChunk(it->second._msg, "PASS").size() > 0  &&
+		getChunk(it->second._msg, "NICK").size() > 0  &&
+		getChunk(it->second._msg, "USER").size() > 0  ) {
+
+		if (!parse(it, getChunk(it->second._msg, "PASS"))) {
+			it->second.setStatus(USER_STATUS_DEL);
+			std::cout << "PASS FAILED\n";
+			return ;
+		}
+		if (!parse(it, getChunk(it->second._msg, "NICK"))) {
+			it->second.setStatus(USER_STATUS_DEL);
+			std::cout << "NICK FAILED\n";
+			return ;
+		}
+		// TODO --> CHECK ':'
+		// if (!handleUser(it, getChunk(it->second._msg, "USER"))) {
+		// 	newUser.setStatus(USER_STATUS_DEL);
+		// 	return ;
+		// }
+		it->second.setStatus(USER_STATUS_CONNECTED);
+		it->second._msg.clear();
+		std::string res;
+		sendToClient(it->first, RPL_OKCONN, it->second.getNick());
+		std::cout << "Send reponse " << res << std::endl;
+		}
 }
 
 int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {

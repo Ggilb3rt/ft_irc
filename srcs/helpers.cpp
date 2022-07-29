@@ -1,9 +1,9 @@
 #include "ircServer.hpp"
 
-void	ircServer::sendToClient(int fd, const char *msg)
+void	ircServer::sendToClient(int fd, int code, std::string param_1, std::string param_2)
 {
-    std::string res = msg;
-    res += END_MSG;
+	rplManager	*instance = rplManager::getInstance();
+	std::string	res	= instance->createResponse(code, param_1, param_2);
     if (send(fd, res.c_str(), res.length(), 0) == -1) {
         std::cerr << strerror(errno) << std::endl;
     }

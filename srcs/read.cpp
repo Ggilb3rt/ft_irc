@@ -1,12 +1,19 @@
 #include "ircServer.hpp"
 #include "userClass.hpp"
 
+// std::string	getLine(std::string buffer) {
+// 	buffer.find()
+// }
+
 int		ircServer::readData(clients_vector::iterator client)
 {
 		int		    maxlen = MSG_MAX_SIZE;
         char	    buff[maxlen];
 		int		    recv_ret = 1;
 		users_map::iterator	user_x = _users.find(client->fd);
+    	size_t      pos = 0;
+    	size_t      old = 0;
+		std::string	buffer;
 
 		if (user_x != _users.end()) {
 			recv_ret = recv(client->fd, buff, maxlen-1, 0);
@@ -23,20 +30,16 @@ int		ircServer::readData(clients_vector::iterator client)
 				user_x->second._msg += buff;
 				std::cout << "My buffer[" << recv_ret << "] in fd["
 						<< user_x->second.getId() << "] |"
-						<< buff << std::endl;
+						<< buff << "|" << std::endl;
 			}
-
+			buffer = buff;
+			while (pos != std::string::npos) {
+				pos = buffer.find("\r\n", old);
+				parse(user_x, buffer.substr(old, pos - old));
+        		old = pos + 1;
+			}
 		//std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
 		// this->parse(msg);
-
-			if (user_x->second._msg.find(END_MSG) != std::string::npos) {
-				// must be in a sendData function
-				std::string res = "----hey you send me :\n" + user_x->second._msg + "----!----";
-				res += END_MSG;
-				user_x->second._msg = "";
-				send(client->fd, res.c_str(), res.length(), 0);
-				std::cout << "Send reponse " << res << std::endl;
-			}
 		}
 		// std::cout << "user_x : " << user_x->first << " " << user_x->second.getId() << std::endl;
 		return recv_ret;

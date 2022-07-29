@@ -4,27 +4,35 @@
 
 // considering the input is an iterator->[client_fd][user], and an already parsed string nick
 
-void    ircServer::handleNick(users_map::iterator pair, std::string newNick) {
+bool    ircServer::handleNick(users_map::iterator pair, std::vector<std::string> &argvec) {
+	std::string			newNick = argvec[0];
     users_map::iterator beg = _users.begin();
     users_map::iterator end = _users.end();
     std::string         res;
 
     while (beg != end) {
         if (beg->second.getNick() == newNick) {
-            sendToClient(pair->first, "Nickname already exists !");
-            newNick += "_";
-            break ;
+            sendToClient(pair->first, 403);
+			return (false);
         }
         beg++;
     }
     // if above 9 ask for another nickname ? or disconnect ?
     if (newNick.length() > 9) {
-        sendToClient(pair->first, "Nickname must be less than 10 characters !");
+        sendToClient(pair->first, 403);
+		return (false);
     }
     else {
         pair->second.setNick(newNick);
-        sendToClient(pair->first, "Nickname changed :)");
+		if (pair->second.getStatus() == USER_STATUS_CONNECTED)
+        	sendToClient(pair->first, 001);
+		return (true);
     }
+}
+
+bool		ircServer::checkPass(std::string pass) {
+	std::cout << "In pass cmd, pass == |" << pass << "|\n";
+	return (pass == this->_pass);
 }
 
 std::string	ircServer::topic(user_id id, std::string current_chan, const char *msg)

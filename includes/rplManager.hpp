@@ -18,6 +18,10 @@
 #define ERR_NEEDMOREPARAMS_MSG		" :Not enough parameters" // 461 <command>
 
 // REPLIES
+#define RPL_OKCONN			001
+#define RPL_OKCONN_MSG		" :Welcome to the internet Network !"
+#define RPL_UMODEIS			221
+#define RPL_UMODEIS_MSG		"i"
 #define	RPL_NOTOPIC			331
 #define RPL_NOTOPIC_MSG		" :No topic is set" // 331 <channel>
 #define RPL_TOPIC			332

@@ -9,15 +9,21 @@ void	ircServer::sendToClient(int fd, const char *msg)
     }
 }
 
-user_id	ircServer::getUserByNick(std::string nick)
+user_id	ircServer::getUserByNick(const std::string nick) const
 {
-	users_map::iterator		it = _users.begin();
-	users_map::iterator		end = _users.end();
+	// users_map::iterator		it = _users.begin();
+	// users_map::iterator		end = _users.end();
 
-	while (it != end) {
-		if (it->second.getNick() == nick)
-			return (it->first);
-		it++;
+	// while (it != end) {
+	// 	if (it->second.getNick() == nick)
+	// 		return (it->first);
+	// 	it++;
+	// }
+	for (users_map::const_iterator it_user = _users.begin();
+		it_user != _users.end();
+		it_user++) {
+			if (it_user->second.getNick().compare(nick.c_str()) == 0)
+				return (it_user->first);
 	}
 	return (0);
 }

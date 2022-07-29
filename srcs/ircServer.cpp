@@ -172,29 +172,63 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 
 	std::cout << "use QUIT\n";
 	this->printUsers();
-	this->quit(15);
-	this->quit(16);
-	this->quit(17);
-	this->quit(8);					// not exist ; ignore
-	this->quit(18, "Babyee !!");
+	this->quit(_users.find(15), std::vector<std::string>());
+	this->quit(_users.find(16), std::vector<std::string>());
+	this->quit(_users.find(8), std::vector<std::string>());							// not exist ; ignore
+	this->quit(_users.find(17), std::vector<std::string>(3, "Tchao les nazes"));
+	this->quit(_users.find(18), std::vector<std::string>(1, "Babyee !!"));
 	this->printUsers();
 
 	std::cout << "use PART\n";
-	this->part(18, std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
-	this->part(83, std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
-	this->part(4, std::vector<std::string>(1, std::string("GardienDeLaPaix")));	// error 442
-	this->part(4, std::vector<std::string>(1, std::string("lolilol")));			// error 403
-	this->part(4, std::vector<std::string>(0, std::string("")));				// error 461
-	this->part(19, std::vector<std::string>(1, std::string("GardienDeLaPaix")));
+	this->part(_users.find(18), std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
+	this->part(_users.find(83), std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
+	this->part(_users.find(4), std::vector<std::string>(1, std::string("GardienDeLaPaix")));	// error 442
+	this->part(_users.find(4), std::vector<std::string>(1, std::string("lolilol")));			// error 403
+	this->part(_users.find(4), std::vector<std::string>(0, std::string("")));				// error 461
+	this->part(_users.find(19), std::vector<std::string>(1, std::string("GardienDeLaPaix")));
+	// part with multiples params
+	this->join(_users.find(19)->second.getId(), "testPart");
+	this->join(_users.find(19)->second.getId(), "testPart2");
+	this->join(_users.find(19)->second.getId(), "testPart3");
+	this->join(_users.find(19)->second.getId(), "testPart4");
+	this->join(_users.find(20)->second.getId(), "testPartNotOn");
+	this->printChannels();
+	std::vector<std::string> multipart(1, "testPart");
+	multipart.push_back("testPart2");
+	multipart.push_back("pouet");			// error 403
+	multipart.push_back("testPart3");
+	multipart.push_back("testPartNotOn");	// error 442
+	multipart.push_back("testPart4");
+	this->part(_users.find(19), multipart);
 	this->printChannels();
 
+
+
 	std::cout << "use KICK\n";
-	this->kick("Vive18", 20, 19);
-	this->kick("Vive18", 19, 21); 					// error ERR_CHANOPRIVSNEEDED
-	this->kick("Vive18", 55, 19);					// error ERR_NOTONCHANNEL
-	this->kick("pouet", 21, 19);					// error ERR_NOSUCHCHANNEL
-	this->kick("Vive18", 21, 19, "jl'aime pas");
-	this->kick("Vive18", 19, 19); 					// auto kick possible => oui
+	std::vector<std::string> somekicks(1, "Vive18");
+	somekicks.push_back("Guest0");	//id 20
+	this->kick(_users.find(19), somekicks);
+	somekicks[1] = "Toby"; // id 19
+	this->kick(_users.find(21), somekicks);			// error ERR_CHANOPRIVSNEEDED
+	somekicks[1] = "RandomUser"; // id 55
+	this->kick(_users.find(19), somekicks);			// error ERR_NOTONCHANNEL
+	somekicks[0] = "banchannel";
+	somekicks[1] = "Guest1"; // id 21
+	this->kick(_users.find(19), somekicks);			// error ERR_NOSUCHCHANNEL
+	somekicks[0] = "Vive18";
+	somekicks.push_back("jl'aime pas lui");
+	this->kick(_users.find(19), somekicks);
+	somekicks.pop_back();
+	somekicks[1] = "Toby";
+	this->kick(_users.find(19), somekicks);			// auto kick
+	
+	// old way
+	// this->kick("Vive18", 20, 19);
+	// this->kick("Vive18", 19, 21); 					// error ERR_CHANOPRIVSNEEDED
+	// this->kick("Vive18", 55, 19);					// error ERR_NOTONCHANNEL
+	// this->kick("pouet", 21, 19);					// error ERR_NOSUCHCHANNEL
+	// this->kick("Vive18", 21, 19, "jl'aime pas");
+	// this->kick("Vive18", 19, 19); 					// auto kick possible => oui
 	this->printChannels();
 
 

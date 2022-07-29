@@ -133,17 +133,17 @@ __We have to debate about what is needed and what is not following the subject._
   - [ ] USER
   - SERVER (not needed, only server-server)
   - OPER
-  - [-] QUIT
+  - [x] QUIT
   - SQUIT (not needed, only server-server or alias of QUIT)
 - Channel (4.2)
   - [-] JOIN
-  - [–] PART
+  - [x] PART
   - [ ] MODE
   - [x] TOPIC
   - [ ] NAMES
   - [ ] LIST
   - [ ] INVITE
-  - [-] KICK
+  - [x] KICK (question with ERR_BADCHANMASK)
 - Server (4.3) (only with 'this' because no server-server communication)
   - VERSION
   - STATS

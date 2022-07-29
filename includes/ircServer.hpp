@@ -101,19 +101,20 @@ private:
 
 	// helpers
 	void			sendToClient(int fd, const char *msg);
-	user_id			getUserByNick(std::string nick);
+	user_id			getUserByNick(const std::string nick) const;
 	users_map::iterator getUserById(user_id id);
 	void			printUsers();
 	void			printChannels();
 
 
 
-	// cmds //? must return char* with response inside
+	// cmds //! il faudrait que tout les params soient const
 	bool	topic(users_map::iterator user, std::vector<std::string> params);
+	bool	join(users_map::iterator user, std::vector<std::string> params);
 	std::string	join(user_id id, std::string chan, std::string key = ""); // key == password ?
-	std::string	part(user_id, const std::vector<std::string> chans);
-	std::string kick(std::string chan, user_id victim, user_id kicker, std::string comment = "");
-	std::string	quit(user_id client, std::string message = "");
+	bool	part(users_map::iterator user, const std::vector<std::string> params);
+	bool	kick(users_map::iterator user, const std::vector<std::string> params);
+	bool	quit(users_map::iterator user, std::vector<std::string> params);
 
 	bool	mode(users_map::iterator user, std::vector<std::string> params);
 	std::string	names(std::vector<std::string> chans());

@@ -51,7 +51,8 @@ bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 	chan_it = _channel.find(chan);
 	if (chan_it == _channel.end()) {
 		std::cerr << "Channel " << chan << " does not exist" << std::endl;
-		//std::cout << (rpl_manager->createResponse(2, chan)); //! reponse non indiquée dans RFC, probablement juste ignorer
+		//! reponse non indiquée dans RFC, probablement juste ignorer
+		//std::cout << (rpl_manager->createResponse(2, chan));
 		return (false);
 	}
 	if (read_topic) {
@@ -73,6 +74,43 @@ bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 	return (false);
 }
 
+
+bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
+{
+	// 1.  the user must be invited if the channel is invite-only;
+	// 2.  the user's nick/username/hostname must not match any
+	//     active bans;
+	// 3.  the correct key (password) must be given if it is set.
+
+
+	/*
+		JOIN REPLIES
+			- ERR_NEEDMOREPARAMS              - ERR_BANNEDFROMCHAN
+			- ERR_INVITEONLYCHAN              - ERR_BADCHANNELKEY
+			- ERR_CHANNELISFULL               - ERR_BADCHANMASK
+			- ERR_NOSUCHCHANNEL               - ERR_TOOMANYCHANNELS
+			-> RPL_TOPIC
+	*/
+
+	(void)user; (void)params;
+
+	// rplManager				*rpl_manager = rplManager::getInstance();
+	// channel_map::iterator	exist;
+	
+
+	// exist = _channel.find(chan);
+	// if (exist == _channel.end())
+	// 	exist = this->addChannel(chan, id).first;
+	// else {
+	// 	if (!(exist->second.addUser(id)))
+	// 		return (true); // user already in, just ignore
+	// }
+	// std::cout << rpl_manager->createResponse(RPL_TOPIC, chan, exist->second.getDescription());
+	
+	// (void)key;
+	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
+	return (true);
+}
 
 std::string	ircServer::join(user_id id, std::string chan, std::string key)
 {
@@ -108,7 +146,7 @@ std::string	ircServer::join(user_id id, std::string chan, std::string key)
 	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
 }
 
-std::string ircServer::part(user_id id, const std::vector<std::string> chans)
+bool	ircServer::part(users_map::iterator user, const std::vector<std::string> params)
 {
 	/*
 		PART REPLIES
@@ -116,14 +154,14 @@ std::string ircServer::part(user_id id, const std::vector<std::string> chans)
         -> ERR_NOTONCHANNEL
 	*/
 	rplManager									*rpl_manager = rplManager::getInstance();
-	std::vector<std::string>::const_iterator	chan = chans.begin();
-	std::vector<std::string>::const_iterator	end = chans.end();
+	std::vector<std::string>::const_iterator	chan = params.begin();
+	std::vector<std::string>::const_iterator	end = params.end();
 	channel_map::iterator						it_chan;
 
-	if (chans.size() == 0) {
+	if (params.size() == 0) {
 		//must send ERR_NEEDMOREPARAMS
 		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "PART");
-		return ("Part nope");
+		return (false);
 	}
 
 	while (chan != end) {
@@ -134,7 +172,7 @@ std::string ircServer::part(user_id id, const std::vector<std::string> chans)
 			chan++;
 			continue;
 		}
-		if (it_chan->second.removeUser(id) == 0) {
+		if (it_chan->second.removeUser(user->first) == 0) {
 			// must send ERR_NOTONCHANNEL not print
 			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, *chan);
 		}
@@ -142,63 +180,75 @@ std::string ircServer::part(user_id id, const std::vector<std::string> chans)
 			_channel.erase(it_chan);
 		chan++;
 	}
-	return ("part");
+	return (true);
 }
 
-std::string ircServer::kick(std::string chan, user_id victim, user_id kicker, std::string comment)
+bool	ircServer::kick(users_map::iterator user, const std::vector<std::string> params)
 {
 	/*
 		KICK REPLIES
-           - ERR_NEEDMOREPARAMS              -> ERR_NOSUCHCHANNEL
-           - ERR_BADCHANMASK                 -> ERR_CHANOPRIVSNEEDED
+           -> ERR_NEEDMOREPARAMS              -> ERR_NOSUCHCHANNEL
+           -x ERR_BADCHANMASK (no infos on RFC1459 4.2.8)                 
+		   -> ERR_CHANOPRIVSNEEDED
            -> ERR_NOTONCHANNEL
 	*/
-	rplManager									*rpl_manager = rplManager::getInstance();
-	channel_map::iterator						it_chan;
+	rplManager				*rpl_manager = rplManager::getInstance();
+	channel_map::iterator	it_chan;
+	user_id					kicker = user->first;
+	user_id					victim;
+	std::string				cur_chan;
+	std::string				comment;
 	
-	it_chan = _channel.find(chan);
+	if (params.size() < 2) {
+		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "KICK");
+		return (false);
+	}
+	cur_chan = params[0];
+	victim = this->getUserByNick(params[1]);
+	comment = params.size() > 2 ? params[2] : "";
+	it_chan = _channel.find(cur_chan);
 	if (it_chan == _channel.end()) {
-		std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, chan);
-		return ("ERR_NOSUCHCHANNEL");
+		std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, cur_chan);
+		return (false);
 	}
 	// check if kicker is operator
 	if (it_chan->second.isOperator(kicker)) {
 		if (it_chan->second.removeUser(victim) == 0) {
 			// check if victim exist
-			// must send ERR_NOTONCHANNEL not print
-			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, chan);
-			return ("ERR_NOTONCHANNEL");
+			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, cur_chan);
+			return (false);
 		}
 	}
 	else {
-		std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, chan);
-		return ("ERR_CHANOPRIVSNEEDED");
+		std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, cur_chan);
+		return (false);
 	}
 	if (it_chan->second.getSize() == 0)
 		_channel.erase(it_chan);
 
-	// must be send as reponse ?
+	// must be send as reponse to the channel ? (ie all other users in the channel)
 	std::cout << victim << " kicked by " << kicker;
 	if (comment.size() > 0)
-		std::cout << " using " << comment << " has a reason";
-	std::cout << std::endl; 
-	return ("kick");
+		std::cout << " using \"" << comment << "\" has a reason";
+	std::cout << std::endl;
+	return (true);
 }
 
-std::string	ircServer::quit(user_id client, std::string message)
+bool	ircServer::quit(users_map::iterator user, std::vector<std::string> params)
 {
-	users_map::iterator	user_it = this->getUserById(client);
-
-	if (user_it != _users.end()) {
-		this->removeClient(user_it);
-		if (message.size() > 0)
-			std::cout << "QUIT :" << message << std::endl;
+	/*
+		QUIT REPLIES
+			none.
+	*/
+	if (user != _users.end()) {
+		if (params.size() > 0)
+			std::cout << "QUIT :" << params[0] << std::endl;
 		else
-			std::cout << "QUIT :" << user_it->second.getName() << std::endl;
+			std::cout << "QUIT :" << user->second.getNick() << std::endl;
+		this->removeClient(user);
 	}
-	return ("quit");
+	return (true);
 }
-
 
 bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 {

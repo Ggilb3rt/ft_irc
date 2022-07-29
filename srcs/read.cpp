@@ -34,6 +34,8 @@ int		ircServer::readData(clients_vector::iterator client)
 				std::string res = "----hey you send me :\n" + user_x->second._msg + "----!----";
 				res += END_MSG;
 				user_x->second._msg = "";
+				res = "001";
+				res += END_MSG;
 				send(client->fd, res.c_str(), res.length(), 0);
 				std::cout << "Send reponse " << res << std::endl;
 			}

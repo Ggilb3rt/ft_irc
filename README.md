@@ -133,17 +133,17 @@ __We have to debate about what is needed and what is not following the subject._
   - [ ] USER
   - SERVER (not needed, only server-server)
   - OPER
-  - [x] QUIT
+  - [-] QUIT
   - SQUIT (not needed, only server-server or alias of QUIT)
 - Channel (4.2)
-  - [x] JOIN
-  - [x] PART
+  - [-] JOIN
+  - [–] PART
   - [ ] MODE
   - [x] TOPIC
   - [ ] NAMES
   - [ ] LIST
   - [ ] INVITE
-  - [x] KICK
+  - [-] KICK
 - Server (4.3) (only with 'this' because no server-server communication)
   - VERSION
   - STATS

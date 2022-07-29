@@ -17,8 +17,8 @@ int		channel::convertModeFlagsToMask(std::string param)
 	// +psi
 	// +-psi ==> -psi ==> 0
 	// +p+s+i ==> +psi
-	// +p-si+m ==> +pm-si ==> +pm
-	// +p-si+mz  ==> +pm-si ==> +pm
+	// +p-si+m ==> +pm-si ==> +pm (if s,i not set)
+	// +p-si+mz  ==> +pm-si ==> +pm (if s,i not set)
 
 	// +opsitnmlbvk						==> +psitnm (because o and b limits other modes (don't understand))
 	// +psitnmlvk						==> +psitnm (because l, v and k needs options)
@@ -41,15 +41,13 @@ int		channel::convertModeFlagsToMask(std::string param)
 		else if (valid_flags.find(*it) != std::string::npos) {
 			if (mask_add) {
 				std::cout << *it;
+				//! if k already sets ==> send ERR_KEYSET 467
 				mask = set_bit(mask, valid_flags.find(*it));
 			}
 			else
 				mask = clear_bit(mask, valid_flags.find(*it));
 		}
 	}
-
-
-
 	std::cout << mask << std::endl;
 	this->_modes = mask;
 	return (mask);
@@ -69,8 +67,18 @@ std::string		channel::convertModeMaskToFlags()
 		}
 		i++;
 	}
-
 	return (flags);
+}
+
+bool			channel::isInBanList(std::string nick)
+{
+	for (std::vector<std::string>::iterator it = this->_banlist.begin() ;
+		it != this->_banlist.end() ; it++) {
+			if (it->compare(nick) == 0)
+				return (true);
+				//! send ERR_BANNEDFROMCHAN 467 (maybe not here, in cmd MODE)
+	}
+	return (false);
 }
 
 
@@ -82,8 +90,9 @@ int		channel::setDescription(user_id id, std::string description)
 {
 	if (!isOnChannel(id))
 		return (ERR_NOTONCHANNEL);
-	if (!isOperator(id))
-		return (ERR_CHANOPRIVSNEEDED);
+	if (isFlagSets(CHAN_MASK_T))
+		if (!isOperator(id))
+			return (ERR_CHANOPRIVSNEEDED);
 	this->_description = description;
 	if (this->_description == "")
 		return (RPL_NOTOPIC);

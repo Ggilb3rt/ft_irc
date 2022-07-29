@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile.settings.mk                               :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lusokol <lusokol@student.42.fr>            +#+  +:+       +#+         #
+#    By: ggilbert <ggilbert@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/21 21:06:11 by rotrojan          #+#    #+#              #
-#    Updated: 2022/04/06 16:04:10 by lusokol          ###   ########.fr        #
+#    Updated: 2022/07/28 17:05:52 by ggilbert         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@
 NAME = ircserv
 
 # Port to host the server
-PORT = 6667
+PORT = 6697
 
 # Password for the server
 PSWD = 

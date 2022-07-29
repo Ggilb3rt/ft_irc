@@ -18,10 +18,13 @@ class channel
 typedef		std::map<user_id, role>	users_list;
 
 private:
-	const std::string		_name;
-	std::string				_description;
-	users_list				_users;
-	int						_modes;
+	const std::string			_name;
+	std::string					_description;
+	users_list					_users;
+	int							_modes;
+	int							_user_limit;
+	std::string					_password;
+	std::vector<std::string>	_banlist;
 
 	channel() {}
 
@@ -29,12 +32,17 @@ private:
 public:
 	int				convertModeFlagsToMask(std::string param); //! should be private (after tests)
 	std::string		convertModeMaskToFlags();	//! should be private (after tests)
+	int				getUserLimit() { return _user_limit; }
+	std::string		getPassword() {return _password; }
+	bool			isInBanList(std::string nick);
 
 
 	channel(std::string name, user_id creator) :
-			_name(name), _description("Super channel " + name), _modes(0)
+			_name(name), _description("Super channel " + name), _modes(0),
+			_user_limit(0), _password(""), _banlist()
 	{
 		_users.insert(std::pair<user_id, role>(creator, true));
+		(void)_user_limit; (void)_password; (void)_banlist;
 	}
 	~channel() {}
 

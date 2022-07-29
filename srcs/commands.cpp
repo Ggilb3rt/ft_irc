@@ -27,39 +27,50 @@ void    ircServer::handleNick(users_map::iterator pair, std::string newNick) {
     }
 }
 
-std::string	ircServer::topic(user_id id, std::string current_chan, const char *msg)
+bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 {
-	/*
+		/*
 		TOPIC REPLIES
-			- ERR_NEEDMOREPARAMS
-			-x ERR_NOTONCHANNEL (in setDescription())
-			-x RPL_NOTOPIC (in setDescription())
-			-x RPL_TOPIC
-			-x ERR_CHANOPRIVSNEEDED (in setDescription())
+			-> ERR_NEEDMOREPARAMS
+			-> ERR_NOTONCHANNEL (in setDescription())
+			-> RPL_NOTOPIC (in setDescription())
+			-> RPL_TOPIC
+			-> ERR_CHANOPRIVSNEEDED (in setDescription())
 	*/
 	rplManager				*rpl_manager = rplManager::getInstance();
 	int						ret;
-	channel_map::iterator	it;
+	channel_map::iterator	chan_it;
+	std::string				chan;
+	bool					read_topic = params.size() < 2 ? true : false;
 
-	it = _channel.find(current_chan);
-	if (it == _channel.end()) {
-		std::cerr << "Channel does not exist" << std::endl;
-		return (rpl_manager->createResponse(2, current_chan)); //! reponse non indiquée dans RFC
+	if (params.size() == 0) {
+		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "TOPIC");
+		return (false);
 	}
-	if (msg == NULL) {
-		return (rpl_manager->createResponse(
+	chan = params[0];
+	chan_it = _channel.find(chan);
+	if (chan_it == _channel.end()) {
+		std::cerr << "Channel " << chan << " does not exist" << std::endl;
+		//std::cout << (rpl_manager->createResponse(2, chan)); //! reponse non indiquée dans RFC, probablement juste ignorer
+		return (false);
+	}
+	if (read_topic) {
+		std::cout << (rpl_manager->createResponse(
 							RPL_TOPIC,
-							current_chan,
-							it->second.getDescription().c_str()));
+							chan,
+							chan_it->second.getDescription().c_str()));
+		return (true);
 	}
-	ret = it->second.setDescription(id, msg);
+	ret = chan_it->second.setDescription(user->first, params[1]);
 	if (ret == RPL_TOPIC) {
-			return (rpl_manager->createResponse(
+			std::cout << (rpl_manager->createResponse(
 							RPL_TOPIC,
-							current_chan,
-							it->second.getDescription().c_str()));
+							chan,
+							chan_it->second.getDescription().c_str()));
+			return (true);
 	}
-	return (rpl_manager->createResponse(ret, current_chan));
+	std::cout << (rpl_manager->createResponse(ret, chan));
+	return (false);
 }
 
 
@@ -77,7 +88,7 @@ std::string	ircServer::join(user_id id, std::string chan, std::string key)
            - ERR_INVITEONLYCHAN              - ERR_BADCHANNELKEY
            - ERR_CHANNELISFULL               - ERR_BADCHANMASK
            - ERR_NOSUCHCHANNEL               - ERR_TOOMANYCHANNELS
-           -x RPL_TOPIC
+           -> RPL_TOPIC
 	*/
 
 
@@ -101,8 +112,8 @@ std::string ircServer::part(user_id id, const std::vector<std::string> chans)
 {
 	/*
 		PART REPLIES
-		-x ERR_NEEDMOREPARAMS             -x ERR_NOSUCHCHANNEL
-        -x ERR_NOTONCHANNEL
+		-> ERR_NEEDMOREPARAMS             -> ERR_NOSUCHCHANNEL
+        -> ERR_NOTONCHANNEL
 	*/
 	rplManager									*rpl_manager = rplManager::getInstance();
 	std::vector<std::string>::const_iterator	chan = chans.begin();
@@ -138,9 +149,9 @@ std::string ircServer::kick(std::string chan, user_id victim, user_id kicker, st
 {
 	/*
 		KICK REPLIES
-           - ERR_NEEDMOREPARAMS              -x ERR_NOSUCHCHANNEL
-           - ERR_BADCHANMASK                 -x ERR_CHANOPRIVSNEEDED
-           -x ERR_NOTONCHANNEL
+           - ERR_NEEDMOREPARAMS              -> ERR_NOSUCHCHANNEL
+           - ERR_BADCHANMASK                 -> ERR_CHANOPRIVSNEEDED
+           -> ERR_NOTONCHANNEL
 	*/
 	rplManager									*rpl_manager = rplManager::getInstance();
 	channel_map::iterator						it_chan;
@@ -187,6 +198,54 @@ std::string	ircServer::quit(user_id client, std::string message)
 	}
 	return ("quit");
 }
+
+
+bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
+{
+	(void)user; (void)params;
+	/*
+		MODE REPLIES
+			ERR_NEEDMOREPARAMS
+			RPL_CHANNELMODEIS
+			ERR_CHANOPRIVSNEEDED          	ERR_NOSUCHNICK
+		-> ERR_NOTONCHANNEL               	ERR_KEYSET
+			RPL_BANLIST                   	RPL_ENDOFBANLIST
+		-> ERR_UNKNOWNMODE               	-> ERR_NOSUCHCHANNEL
+			ERR_USERSDONTMATCH            	RPL_UMODEIS
+			ERR_UMODEUNKNOWNFLAG
+	*/
+
+	/*
+		check if params[0] (channel) not exist
+			send(ERR_NOSUCHCHANNEL) return
+		check if id is not in params[0]
+			send(ERR_NOTONCHANNEL) return
+
+
+		check in params[1] if find char !CHAN_FLAGS_VALID && != '+' && != '-'
+			send(ERR_UNKNOWNMODE) return
+		
+		
+		
+		
+		need to check and convert params[1] :
+			+p-si+mz		==> +pm-si		==> +pm-si
+			+opsitnmlbvk					==> +psitnm (because o and b limits other modes (don't understand))
+			+psitnmlvk						==> +psitnm (because l, v and k needs options)
+			+psitnmlvk 5					==> +psitnml (because l == 5)
+			+psitnmlvk 5 userInChan			==> +psitnmlv (because v == userInChan)
+			+psitnmlvk 5 userNotInChan		==> +psitnml (because userNotInChan)
+			+psitnmlvk 5 userInChan pass	==> +psitnmlvk (because k == pass)
+			+psitnmlvkb 5 userInChan pass	==> +psitnmlvk (send error ban)
+
+
+		then this->convertModeFlagsToMask(params);
+	*/
+	return (true);
+}
+
+
+
 
 std::string	ircServer::names(std::vector<std::string> chans())
 {

@@ -69,9 +69,7 @@ private:
 	channel_map					_channel;
 
 
-
 	// init
-	// void			set_signal_status(int signum);
 	void			init();
 	void			initAddrInfo();
 	void			createMasterSocket();
@@ -111,12 +109,13 @@ private:
 
 
 	// cmds //? must return char* with response inside
-	std::string	topic(user_id id, std::string current_chan, const char *msg = NULL);
+	bool	topic(users_map::iterator user, std::vector<std::string> params);
 	std::string	join(user_id id, std::string chan, std::string key = ""); // key == password ?
 	std::string	part(user_id, const std::vector<std::string> chans);
 	std::string kick(std::string chan, user_id victim, user_id kicker, std::string comment = "");
 	std::string	quit(user_id client, std::string message = "");
-	
+
+	bool	mode(users_map::iterator user, std::vector<std::string> params);
 	std::string	names(std::vector<std::string> chans());
 	std::string	list(std::vector<std::string> chans());
 

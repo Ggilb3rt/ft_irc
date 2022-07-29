@@ -18,6 +18,10 @@
 #define ERR_NEEDMOREPARAMS_MSG		" :Not enough parameters" // 461 <command>
 
 // REPLIES
+#define	RPL_UMODEIS			221
+#define	RPL_UMODEIS_MSG		"i" // 221 "<user mode string>"
+#define RPL_CHANNELMODEIS	324
+#define RPL_CHANNELMODEIS_MSG	"" // 324 "<channel> <mode> <mode params>"
 #define	RPL_NOTOPIC			331
 #define RPL_NOTOPIC_MSG		" :No topic is set" // 331 <channel>
 #define RPL_TOPIC			332

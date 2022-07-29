@@ -18,6 +18,8 @@ rplManager::rplManager()
 	list.insert(new_pair(ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG));
 	list.insert(new_pair(ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG));
 	list.insert(new_pair(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG));
+	list.insert(new_pair(RPL_UMODEIS, RPL_UMODEIS_MSG));
+	list.insert(new_pair(RPL_CHANNELMODEIS, RPL_CHANNELMODEIS_MSG));
 	list.insert(new_pair(RPL_NOTOPIC, RPL_NOTOPIC_MSG));
 	list.insert(new_pair(RPL_TOPIC, RPL_TOPIC_MSG));
 }

@@ -119,12 +119,32 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 
 	// get and set descriptions
 	std::cout << "----------------Getting or Updating descriptions----------------\n";
-	std::cout << this->topic(_users.find(18)->second.getId(), "Vive18");						// print topic
-	std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");	// change topic
-	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger");				// print topic
-	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger", "ViveMoi");		// error operator
-	std::cout << this->topic(_users.find(19)->second.getId(), "Pouet", "ViveMoi");				// error channel not exist
-	std::cout << this->topic(_users.find(19)->second.getId(), "ChannelDeRoger");				// print topic
+	this->topic(_users.begin(), std::vector<std::string> ());								// error need more params
+	std::vector<std::string>	printVive18(1, "Vive18");
+	this->topic(_users.find(18), printVive18);												// print topic
+	// std::cout << this->topic(_users.find(18)->second.getId(), "Vive18");						// print topic
+	std::vector<std::string>	printChannelDeRoger(1, "ChannelDeRoger");
+	std::vector<std::string>	changeChannelDeRoger(printChannelDeRoger);
+	std::vector<std::string>	forbidchangeChannelDeRoger(printChannelDeRoger);
+	changeChannelDeRoger.push_back("Vive Roger");
+	_channel.find("ChannelDeRoger")->second.addFlag(CHAN_MASK_T);
+	forbidchangeChannelDeRoger.push_back("ViveMoi");
+	this->topic(_users.find(15), changeChannelDeRoger);										// change topic
+	this->topic(_users.find(18), printChannelDeRoger);										// print topic
+	this->topic(_users.find(18), forbidchangeChannelDeRoger);								// error operator
+	this->topic(_users.find(19), std::vector<std::string> (1, "Pouet"));					// error channel not exist
+	this->topic(_users.find(19), printChannelDeRoger);										// print topic
+	changeChannelDeRoger.pop_back();
+	changeChannelDeRoger.push_back("my topic is better");
+	changeChannelDeRoger.push_back("must be ignored");
+	this->topic(_users.find(15), changeChannelDeRoger);										// change topic
+
+	// OLD WAY 
+	// std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");	// change topic
+	// std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger");				// print topic
+	// std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger", "ViveMoi");		// error operator
+	// std::cout << this->topic(_users.find(19)->second.getId(), "Pouet", "ViveMoi");				// error channel not exist
+	// std::cout << this->topic(_users.find(19)->second.getId(), "ChannelDeRoger");				// print topic
 	std::cout << std::endl;
 	this->printChannels();
 

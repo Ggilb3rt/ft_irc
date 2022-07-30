@@ -83,6 +83,28 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 	// 3.  the correct key (password) must be given if it is set.
 
 
+
+	/*
+		RFC :
+			Command: JOIN
+   			Parameters: <channel>{,<channel>} [<key>{,<key>}]
+	
+
+		Commande envoye par irssi	===>	Commande recu par le serveur
+		/join chan pass				===>	JOIN #chan pass					=> OK
+		/join lol internet pouet	===>	JOIN #lol internet				=> OK
+		/join abc,def,ghi  			===>	JOIN #abc,#def,#ghi				=> OK
+		/join foo,bar,gogo fubar	===>	JOIN #foo,#bar,#gogo fubar,x,x	=> OK
+
+		La ca part en couille
+		/join foo, bar, gogo fubar	===>	JOIN #foo,# bar,x				=> WTF
+
+	*/
+
+		// /join opuet, lol, intert pass #poo
+		// JOIN #opuet,# lol,x
+
+
 	/*
 		JOIN REPLIES
 			- ERR_NEEDMOREPARAMS              - ERR_BANNEDFROMCHAN
@@ -94,7 +116,7 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 
 	(void)user; (void)params;
 
-	// rplManager				*rpl_manager = rplManager::getInstance();
+	rplManager				*rpl_manager = rplManager::getInstance();
 	// channel_map::iterator	exist;
 	
 

@@ -30,6 +30,11 @@ brew install irssi
 ```
 #### Connect Irssi to our server
 In irssi[^client]
+Quick connection
+```bash
+/connect localhost <port> <password> <username>
+```
+
 ```bash
 /network add ft_irc
 /server add -network ft_irc 127.0.0.1 6697

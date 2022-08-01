@@ -141,7 +141,7 @@ __We have to debate about what is needed and what is not following the subject._
   - [x] QUIT
   - SQUIT (not needed, only server-server or alias of QUIT)
 - Channel (4.2)
-  - [-] JOIN
+  - [x] JOIN
   - [x] PART
   - [ ] MODE
   - [x] TOPIC

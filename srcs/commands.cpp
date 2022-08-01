@@ -172,6 +172,7 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 		}
 		if (user_not_in)
 			std::cout << rpl_manager->createResponse(RPL_TOPIC, chan_exist->first, chan_exist->second.getDescription());
+		// send NAMES
 		i++;
 	}
 	return (true);

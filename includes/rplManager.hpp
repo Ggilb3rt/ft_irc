@@ -8,6 +8,14 @@
 #include <map>
 
 // ERRORS
+#define	RPL_LIST					322
+#define RPL_LIST_MSG				" :" // 322 <channel> <# visible> :<topic>
+#define RPL_LISTEND					323
+#define RPL_LISTEND_MSG				" :End of LIST" // 323
+#define RPL_NAMREPLY				353
+#define RPL_NAMREPLY_MSG			" :" // 353 "( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
+#define RPL_ENDOFNAMES				366
+#define RPL_ENDOFNAMES_MSG			" :" // 366 <channel> :End of NAMES list
 #define ERR_NOSUCHCHANNEL			403
 #define ERR_NOSUCHCHANNEL_MSG		" :No such channel" // 403 <channel_name>
 #define ERR_NOTONCHANNEL			442

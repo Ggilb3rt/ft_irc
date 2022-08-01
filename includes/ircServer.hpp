@@ -116,8 +116,8 @@ private:
 	bool	quit(users_map::iterator user, std::vector<std::string> params);
 
 	bool	mode(users_map::iterator user, std::vector<std::string> params);
-	std::string	names(std::vector<std::string> chans());
-	std::string	list(std::vector<std::string> chans());
+	bool	names(users_map::iterator user, std::vector<std::string> params);
+	bool	list(users_map::iterator user, std::vector<std::string> params);
 
 public:
 	ircServer(char *_port);

@@ -22,7 +22,7 @@ private:
 	std::string					_description;
 	users_list					_users;
 	int							_modes;
-	int							_user_limit;
+	size_t						_user_limit;
 	std::string					_password;
 	std::vector<std::string>	_banlist;
 
@@ -30,12 +30,15 @@ private:
 
 
 public:
-	int				convertModeFlagsToMask(std::string param); //! should be private (after tests)
-	std::string		convertModeMaskToFlags();	//! should be private (after tests)
-	int				getUserLimit() { return _user_limit; }
+	//! should be private (after tests)
+	int				convertModeFlagsToMask(std::string param);
+	std::string		convertModeMaskToFlags();
+	size_t			getUserLimit() { return _user_limit; }
+	void			setUserLimit(size_t new_limit) { _user_limit = new_limit; }
 	std::string		getPassword() {return _password; }
+	void			setPassword(std::string s) { _password = s; }
 	bool			isInBanList(std::string nick);
-
+	//! should be private (after tests)
 
 	channel(std::string name, user_id creator) :
 			_name(name), _description("Super channel " + name), _modes(0),

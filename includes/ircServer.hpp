@@ -111,7 +111,6 @@ private:
 	// cmds //! il faudrait que tout les params soient const
 	bool	topic(users_map::iterator user, std::vector<std::string> params);
 	bool	join(users_map::iterator user, std::vector<std::string> params);
-	std::string	join(user_id id, std::string chan, std::string key = ""); // key == password ?
 	bool	part(users_map::iterator user, const std::vector<std::string> params);
 	bool	kick(users_map::iterator user, const std::vector<std::string> params);
 	bool	quit(users_map::iterator user, std::vector<std::string> params);

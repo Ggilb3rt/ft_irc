@@ -74,16 +74,23 @@ bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 	return (false);
 }
 
+//! VOIR AVEC PIERRE SI POSSIBLE D"UTILISER SON SPLIT POUR EVITER LES DOUBLONS
+std::vector<std::string>	split_in_vect(std::string base, std::string delimiter)
+{
+	std::vector<std::string>	ret;
+	size_t						found = 0;
+	size_t						start = 0;
+
+	while (found != std::string::npos) {
+		found = base.find(delimiter, start);
+		ret.push_back(base.substr(start, found - start));
+		start = found + delimiter.size();
+	}
+	return (ret);
+}
 
 bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 {
-	// 1.  the user must be invited if the channel is invite-only;
-	// 2.  the user's nick/username/hostname must not match any
-	//     active bans;
-	// 3.  the correct key (password) must be given if it is set.
-
-
-
 	/*
 		RFC :
 			Command: JOIN
@@ -95,77 +102,79 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 		/join lol internet pouet	===>	JOIN #lol internet				=> OK
 		/join abc,def,ghi  			===>	JOIN #abc,#def,#ghi				=> OK
 		/join foo,bar,gogo fubar	===>	JOIN #foo,#bar,#gogo fubar,x,x	=> OK
+		/join foo, bar, gogo fubar	===>	JOIN #foo,# bar,x				=> OK
 
-		La ca part en couille
-		/join foo, bar, gogo fubar	===>	JOIN #foo,# bar,x				=> WTF
-
+		===> params[0] = channels
+		===> params[1] = keys
+			must split on ,
 	*/
-
-		// /join opuet, lol, intert pass #poo
-		// JOIN #opuet,# lol,x
-
 
 	/*
 		JOIN REPLIES
-			- ERR_NEEDMOREPARAMS              - ERR_BANNEDFROMCHAN
-			- ERR_INVITEONLYCHAN              - ERR_BADCHANNELKEY
-			- ERR_CHANNELISFULL               - ERR_BADCHANMASK
-			- ERR_NOSUCHCHANNEL               - ERR_TOOMANYCHANNELS
+			-> ERR_NEEDMOREPARAMS              -x ERR_BANNEDFROMCHAN
+			-> ERR_INVITEONLYCHAN              -> ERR_BADCHANNELKEY
+			-> ERR_CHANNELISFULL               -x ERR_BADCHANMASK
+			-x ERR_NOSUCHCHANNEL               -x ERR_TOOMANYCHANNELS
 			-> RPL_TOPIC
 	*/
 
-	(void)user; (void)params;
+	rplManager					*rpl_manager = rplManager::getInstance();
+	std::vector<std::string>	chans;
+	std::vector<std::string>	keys;
+	channel_map::iterator		chan_exist;
+	bool						user_not_in = true;
 
-	rplManager				*rpl_manager = rplManager::getInstance();
-	// channel_map::iterator	exist;
-	
-
-	// exist = _channel.find(chan);
-	// if (exist == _channel.end())
-	// 	exist = this->addChannel(chan, id).first;
-	// else {
-	// 	if (!(exist->second.addUser(id)))
-	// 		return (true); // user already in, just ignore
-	// }
-	// std::cout << rpl_manager->createResponse(RPL_TOPIC, chan, exist->second.getDescription());
-	
-	// (void)key;
-	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
-	return (true);
-}
-
-std::string	ircServer::join(user_id id, std::string chan, std::string key)
-{
-	// 1.  the user must be invited if the channel is invite-only;
-    // 2.  the user's nick/username/hostname must not match any
-    //     active bans;
-    // 3.  the correct key (password) must be given if it is set.
-
-
-	/*
-		JOIN REPLIES
-           - ERR_NEEDMOREPARAMS              - ERR_BANNEDFROMCHAN
-           - ERR_INVITEONLYCHAN              - ERR_BADCHANNELKEY
-           - ERR_CHANNELISFULL               - ERR_BADCHANMASK
-           - ERR_NOSUCHCHANNEL               - ERR_TOOMANYCHANNELS
-           -> RPL_TOPIC
-	*/
-
-
-	rplManager				*rpl_manager = rplManager::getInstance();
-	channel_map::iterator	exist;
-	
-
-	exist = _channel.find(chan);
-	if (exist == _channel.end())
-		exist = this->addChannel(chan, id).first;
-	else {
-		if (!(exist->second.addUser(id)))
-			return ("..."); // user already in
+	if (params.size() == 0) {
+		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
+		return (false);
 	}
-	return (rpl_manager->createResponse(RPL_TOPIC, chan, exist->second.getDescription()));
-	(void)key;
-	// must send RPL_NAMREPLY too (send list of users in channel exist->second.getUsersNick())
+	chans = split_in_vect(params[0], MSG_MULTI_PARAM_DELIM);
+	if (params.size() >= 2) {
+		keys = split_in_vect(params[1], MSG_MULTI_PARAM_DELIM);
+		if (chans.size() != keys.size()) {
+			std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
+			return (false);
+		}
+	}
+	// search if chans chan_exist => create or check if can join
+	size_t	i = 0;
+	while (i < chans.size()) {
+		chan_exist = _channel.find(chans[i]);
+		if (chan_exist == _channel.end())
+			chan_exist = this->addChannel(chans[i], user->first).first;
+		else {
+			// check mode invite
+			if (chan_exist->second.isFlagSets(CHAN_MASK_I)) {
+				std::cout << rpl_manager->createResponse(ERR_INVITEONLYCHAN, chan_exist->first);
+				return (false);
+			}
+			// check mode limit then check limit not reach
+			if (chan_exist->second.isFlagSets(CHAN_MASK_L)) {
+				if (chan_exist->second.getUserLimit() <= chan_exist->second.getSize()) {
+					std::cout << rpl_manager->createResponse(ERR_CHANNELISFULL, chan_exist->first);
+					return (false);
+				}
+			}
+			// check user nick not in banlist
+				// must use a banMask, *!*@* == ban all users from all serves ==> fuck it
+			// check mode pass then check corresponding pass
+			if (chan_exist->second.isFlagSets(CHAN_MASK_K)) {
+				if (chans.size() != keys.size()) {
+					std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
+					return (false);
+				}
+				if (chan_exist->second.getPassword() != keys[i]) {
+					std::cout << rpl_manager->createResponse(ERR_BADCHANNELKEY, chan_exist->first);
+					return (false);
+				}
+			}
+			user_not_in = chan_exist->second.addUser(user->first);
+		}
+		if (user_not_in)
+			std::cout << rpl_manager->createResponse(RPL_TOPIC, chan_exist->first, chan_exist->second.getDescription());
+		i++;
+	}
+	return (true);
 }
 
 bool	ircServer::part(users_map::iterator user, const std::vector<std::string> params)

@@ -4,7 +4,7 @@
 // MESSAGES
 #define END_MSG "\r\n"
 #define MSG_MAX_SIZE 510
-
+#define MSG_MULTI_PARAM_DELIM ","
 
 // CHANNEL
 #define CHAN_NAME_MAX_SIZE 200

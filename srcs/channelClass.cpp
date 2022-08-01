@@ -40,7 +40,7 @@ int		channel::convertModeFlagsToMask(std::string param)
 			mask_add = true;
 		else if (valid_flags.find(*it) != std::string::npos) {
 			if (mask_add) {
-				std::cout << *it;
+				// std::cout << *it;
 				//! if k already sets ==> send ERR_KEYSET 467
 				mask = set_bit(mask, valid_flags.find(*it));
 			}
@@ -48,7 +48,7 @@ int		channel::convertModeFlagsToMask(std::string param)
 				mask = clear_bit(mask, valid_flags.find(*it));
 		}
 	}
-	std::cout << mask << std::endl;
+	// std::cout << mask << std::endl;
 	this->_modes = mask;
 	return (mask);
 }

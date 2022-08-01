@@ -16,6 +16,12 @@
 #define ERR_CHANOPRIVSNEEDED_MSG	" :You are not channel operator" // 482 <channel>
 #define ERR_NEEDMOREPARAMS			461
 #define ERR_NEEDMOREPARAMS_MSG		" :Not enough parameters" // 461 <command>
+#define ERR_CHANNELISFULL			471
+#define ERR_CHANNELISFULL_MSG		" :Cannot join channel (+l)" // 471 <channel>
+#define ERR_INVITEONLYCHAN			473
+#define ERR_INVITEONLYCHAN_MSG		" :Cannot join channel (+i)" // 473 <channel>
+#define ERR_BADCHANNELKEY			475
+#define ERR_BADCHANNELKEY_MSG		" :Cannot join channel (+k)" // 475 <channel>
 
 // REPLIES
 #define RPL_OKCONNECT		001

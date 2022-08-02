@@ -168,7 +168,7 @@ __We have to debate about what is needed and what is not following the subject._
 - Miscellaneous messages (4.6)
   - KILL
   - PING
-  - [?] PONG (not needed because only for client or server-server(?))
+  - [?] PONG (return with arguments of recieved PING)
   - ERROR
 - OPTIONALS
   - lol nope

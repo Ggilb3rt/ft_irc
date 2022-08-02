@@ -194,6 +194,24 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	this->names(_users.find(20), std::vector<std::string>(0, ""));							// print private when is in, not when out
 
 
+	// invite
+	std::cout << "\n\n----------------CMD INVITE----------------\n";
+	std::vector<std::string>	invite1(1, "Roger2");
+	invite1.push_back("Vive18");
+	this->invite(_users.find(20), std::vector<std::string>(0, ""));				// 461 ERR_NEEDMOREPARAMS
+	this->invite(_users.find(20), std::vector<std::string>(1, ""));				// 461 ERR_NEEDMOREPARAMS
+	this->invite(_users.find(20), std::vector<std::string>(2, ""));				// 401 ERR_NOSUCHNICK
+	this->invite(_users.find(20), std::vector<std::string>(2, "UserRandom"));	// 401 ERR_NOSUCHNICK
+	std::cout << this->invite(_users.find(20), std::vector<std::string>(2, "Roger2")) << std::endl;		// nothing (chan does not exist)
+	this->invite(_users.find(20), invite1);										// 443 ERR_USERONCHANNEL
+	invite1[1] = "Gardien_de_la_paix";
+	this->invite(_users.find(20), invite1);										// 442 ERR_NOTONCHANNEL
+	invite1[1] = "GardienDeLaPaix";
+	this->invite(_users.find(19), invite1);										// 341 RPL_INVITING
+	little_mode->second.convertModeFlagsToMask("+i");
+	this->invite(_users.find(19), invite1);										// 482 ERR_CHANOPRIVSNEEDED
+
+
 
 	// get and set descriptions
 	// std::cout << "----------------Getting or Updating descriptions----------------\n";

@@ -8,10 +8,14 @@
 #include <map>
 
 // ERRORS
+#define ERR_NOSUCHNICK				401
+#define ERR_NOSUCHNICK_MSG			" :No such nick/channel" // 401 <nickname>
 #define ERR_NOSUCHCHANNEL			403
 #define ERR_NOSUCHCHANNEL_MSG		" :No such channel" // 403 <channel_name>
 #define ERR_NOTONCHANNEL			442
 #define ERR_NOTONCHANNEL_MSG		" :You're not on that channel" // 442 <channel>
+#define ERR_USERONCHANNEL			443
+#define ERR_USERONCHANNEL_MSG		" :is already on channel" // 443 <user> <channel>
 #define ERR_CHANOPRIVSNEEDED		482
 #define ERR_CHANOPRIVSNEEDED_MSG	" :You are not channel operator" // 482 <channel>
 #define ERR_NEEDMOREPARAMS			461
@@ -38,6 +42,8 @@
 #define RPL_NOTOPIC_MSG				" :No topic is set" // 331 <channel>
 #define RPL_TOPIC					332
 #define RPL_TOPIC_MSG				" :" // 332 <channel> <topic>
+#define RPL_INVITING				341
+#define RPL_INVITING_MSG			" " // 341 <channel> <nick>
 #define RPL_NAMREPLY				353
 #define RPL_NAMREPLY_MSG			" :" // 353 "( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
 #define RPL_ENDOFNAMES				366

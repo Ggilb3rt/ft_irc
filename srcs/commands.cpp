@@ -390,3 +390,54 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 	std::cout << rpl_manager->createResponse(RPL_LISTEND);
 	return (true);
 }
+
+bool	ircServer::invite(users_map::iterator user, std::vector<std::string> params)
+{
+	/*
+		LIST REPLIES
+          -> ERR_NEEDMOREPARAMS             -> ERR_NOSUCHNICK
+          -> ERR_NOTONCHANNEL               -> ERR_USERONCHANNEL
+          -> ERR_CHANOPRIVSNEEDED
+          -> RPL_INVITING                   -x RPL_AWAY (works with )
+	*/
+
+	rplManager					*rpl_manager = rplManager::getInstance();
+	channel_map::iterator		chan_exist;
+	user_id						invited_user;
+	std::string					rep;
+
+	if (params.size() < 2) {
+		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "INVITE");
+		return (false);
+	}
+	invited_user = this->getUserByNick(params[0]);
+	if (invited_user == 0) {
+		std::cout << rpl_manager->createResponse(ERR_NOSUCHNICK, params[0]);
+		return (false);
+	}
+	chan_exist = _channel.find(params[1]);
+	if (chan_exist != _channel.end()) {
+		if (!chan_exist->second.isOnChannel(user->first)) {
+			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, chan_exist->first);
+			return (false);
+		}
+		if (chan_exist->second.isOnChannel(invited_user)) {
+			rep = params[0];
+			rep += " ";
+			rep += chan_exist->first;
+			std::cout << rpl_manager->createResponse(ERR_USERONCHANNEL, rep);
+			return (false);
+		}
+		if (chan_exist->second.isFlagSets(CHAN_MASK_I)
+			&& !chan_exist->second.isOperator(user->first)) {
+			std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, chan_exist->first);
+			return (false);
+		}
+		rep = chan_exist->first;
+		rep += " ";
+		rep += params[0];
+		std::cout << rpl_manager->createResponse(RPL_INVITING, rep);
+		return (true);
+	}
+	return (false);
+}

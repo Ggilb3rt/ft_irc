@@ -14,6 +14,8 @@ rplManager::rplManager()
 {
 	list.insert(new_pair(RPL_OKCONNECT, RPL_OKCONNECT_MSG));
 	list.insert(new_pair(14, " :petit mais puissant"));
+	list.insert(new_pair(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG));
+	list.insert(new_pair(ERR_USERONCHANNEL, ERR_USERONCHANNEL_MSG));
 	list.insert(new_pair(ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG));
 	list.insert(new_pair(ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG));
 	list.insert(new_pair(ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG));
@@ -29,6 +31,7 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_LISTEND, RPL_LISTEND_MSG));
 	list.insert(new_pair(RPL_NAMREPLY, RPL_NAMREPLY_MSG));
 	list.insert(new_pair(RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG));
+	list.insert(new_pair(RPL_INVITING, RPL_INVITING_MSG));
 
 }
 

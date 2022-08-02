@@ -124,6 +124,8 @@ private:
 	bool	mode(users_map::iterator user, std::vector<std::string> params);
 	bool	names(users_map::iterator user, std::vector<std::string> params);
 	bool	list(users_map::iterator user, std::vector<std::string> params);
+	bool	invite(users_map::iterator user, std::vector<std::string> params);
+
 
 public:
 	ircServer(char *_port);

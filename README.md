@@ -133,7 +133,7 @@ Not all implementations use CR-LF[^RFC1459_8]
 Needed commands (cf RFC1459 4.x) :
 __We have to debate about what is needed and what is not following the subject.__
 - Connection (4.1)
-  - (PASS ??)
+  - [ ] PASS
   - [ ] NICK
   - [ ] USER
   - SERVER (not needed, only server-server)
@@ -147,7 +147,7 @@ __We have to debate about what is needed and what is not following the subject._
   - [x] TOPIC
   - [x] NAMES
   - [x] LIST
-  - [ ] INVITE
+  - [x] INVITE
   - [x] KICK (question with ERR_BADCHANMASK)
 - Server (4.3) (only with 'this' because no server-server communication)
   - VERSION

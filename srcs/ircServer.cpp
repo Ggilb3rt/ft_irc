@@ -139,9 +139,38 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	this->join(_users.find(20), try_key);
 
 
-
 	this->printChannels();
 
+
+
+
+	// list
+	std::cout << "----------------CMD LIST----------------\n";
+	this->list(_users.find(20), std::vector<std::string>(0, ""));
+	std::cout << "\nprivate chan, user in\n";
+	little_mode->second.convertModeFlagsToMask("+p");
+	this->list(_users.find(20), std::vector<std::string>(0, ""));	// print chan without topic
+	std::cout << "\nprivate chan, user out\n";
+	this->part(_users.find(20), std::vector<std::string>(1, "ChannelDeRoger"));
+	this->list(_users.find(20), std::vector<std::string>(0, ""));	// don't print ChannelDeRoger
+	
+	std::cout << "\nsecret chan, user out\n";
+	little_mode->second.convertModeFlagsToMask("-p+s");
+	this->list(_users.find(20), std::vector<std::string>(0, ""));	// don't print ChannelDeRoger
+	std::cout << "\njoin back chan\n";
+	this->join(_users.find(20), std::vector<std::string>(1, "ChannelDeRoger"));
+	std::cout << "\nsecret chan, user in\n";
+	this->list(_users.find(20), std::vector<std::string>(0, ""));
+
+	std::cout << "\nlist a list\n";
+	this->list(_users.find(20), std::vector<std::string>(1, ""));								// end
+	this->list(_users.find(20), std::vector<std::string>(1, "Gardien_de_la_paix"));				// print 1
+	this->list(_users.find(20), std::vector<std::string>(1, "Vive18,ChannelDeRoger"));			// print 2
+	this->list(_users.find(20), std::vector<std::string>(1, "Vive18,ChannelDeRoger,Pouet"));	// print 2
+	std::vector<std::string>	list_some(1, "Gardien_de_la_paix");
+	list_some.push_back("Vive18");
+	list_some.push_back("Vive18");
+	this->list(_users.find(20), list_some);														// print 1
 
 
 	// get and set descriptions

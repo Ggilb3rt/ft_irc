@@ -146,7 +146,7 @@ __We have to debate about what is needed and what is not following the subject._
   - [ ] MODE
   - [x] TOPIC
   - [ ] NAMES
-  - [-] LIST
+  - [x] LIST
   - [ ] INVITE
   - [x] KICK (question with ERR_BADCHANMASK)
 - Server (4.3) (only with 'this' because no server-server communication)

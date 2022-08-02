@@ -8,14 +8,6 @@
 #include <map>
 
 // ERRORS
-#define	RPL_LIST					322
-#define RPL_LIST_MSG				" :" // 322 <channel> <# visible> :<topic>
-#define RPL_LISTEND					323
-#define RPL_LISTEND_MSG				" :End of LIST" // 323
-#define RPL_NAMREPLY				353
-#define RPL_NAMREPLY_MSG			" :" // 353 "( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
-#define RPL_ENDOFNAMES				366
-#define RPL_ENDOFNAMES_MSG			" :" // 366 <channel> :End of NAMES list
 #define ERR_NOSUCHCHANNEL			403
 #define ERR_NOSUCHCHANNEL_MSG		" :No such channel" // 403 <channel_name>
 #define ERR_NOTONCHANNEL			442
@@ -32,16 +24,24 @@
 #define ERR_BADCHANNELKEY_MSG		" :Cannot join channel (+k)" // 475 <channel>
 
 // REPLIES
-#define RPL_OKCONNECT		001
-#define RPL_OKCONNECT_MSG	" :Welcome to the internet"
-#define	RPL_UMODEIS			221
-#define	RPL_UMODEIS_MSG		"i" // 221 "<user mode string>"
-#define RPL_CHANNELMODEIS	324
-#define RPL_CHANNELMODEIS_MSG	"" // 324 "<channel> <mode> <mode params>"
-#define	RPL_NOTOPIC			331
-#define RPL_NOTOPIC_MSG		" :No topic is set" // 331 <channel>
-#define RPL_TOPIC			332
-#define RPL_TOPIC_MSG		" :" // 332 <channel> <topic>
+#define RPL_OKCONNECT				001
+#define RPL_OKCONNECT_MSG			" :Welcome to the internet"
+#define	RPL_UMODEIS					221
+#define	RPL_UMODEIS_MSG				"i" // 221 "<user mode string>"
+#define	RPL_LIST					322
+#define RPL_LIST_MSG				" :" // 322 <channel> <# visible> :<topic>
+#define RPL_LISTEND					323
+#define RPL_LISTEND_MSG				" :End of LIST" // 323
+#define RPL_CHANNELMODEIS			324
+#define RPL_CHANNELMODEIS_MSG		"" // 324 "<channel> <mode> <mode params>"
+#define	RPL_NOTOPIC					331
+#define RPL_NOTOPIC_MSG				" :No topic is set" // 331 <channel>
+#define RPL_TOPIC					332
+#define RPL_TOPIC_MSG				" :" // 332 <channel> <topic>
+#define RPL_NAMREPLY				353
+#define RPL_NAMREPLY_MSG			" :" // 353 "( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
+#define RPL_ENDOFNAMES				366
+#define RPL_ENDOFNAMES_MSG			" :" // 366 <channel> :End of NAMES list
 
 
 class	rplManager

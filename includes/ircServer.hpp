@@ -103,6 +103,9 @@ private:
 	void			sendToClient(int fd, const char *msg);
 	user_id			getUserByNick(const std::string nick) const;
 	users_map::iterator getUserById(user_id id);
+	void			listRplConditions(users_map::iterator &user,
+								channel_map::iterator &all_chans_it,
+								rplManager *rpl_manager);
 	void			printUsers();
 	void			printChannels();
 

@@ -191,7 +191,6 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 	channel_map::iterator						it_chan;
 
 	if (params.size() == 0) {
-		//must send ERR_NEEDMOREPARAMS
 		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "PART");
 		return (false);
 	}
@@ -199,13 +198,11 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 	while (chan != end) {
 		it_chan = _channel.find(*chan);
 		if (it_chan == _channel.end()) {
-			// must send ERR_NOSUSHCHANNEL not print
 			std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, *chan);
 			chan++;
 			continue;
 		}
 		if (it_chan->second.removeUser(user->first) == 0) {
-			// must send ERR_NOTONCHANNEL not print
 			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, *chan);
 		}
 		if (it_chan->second.getSize() == 0)
@@ -351,22 +348,6 @@ bool	ircServer::names(users_map::iterator user, std::vector<std::string> params)
 bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 {
 	/*
-		Commande envoye par irssi			===>	Commande recu par le serveur
-		/list -YES							===>	LIST							=> OK
-		/list #foo #bar						===>	LIST #foo #bar						=> LIST #foo
-		/list #foo,#bar						===>	LIST #foo,#bar						=> LIST #foo,#bar
-		/list #foo #bar #poo lol			===>	LIST #foo #bar #poo lol				=> LIST #foo
-		/list #foo #bar lol,internet #pouet	===>	LIST #foo #bar lol,internet #pouet	=> LIST #foo
-
-		on prends juste en compte avec , sans espaces
-
-
-		privates channels listed with "Prv" without topic unless user is in
-		secrets channels not listed unlles user is in 
-	*/
-
-
-	/*
 		LIST REPLIES
 			-x ERR_NOSUCHSERVER               -x RPL_LISTSTART (obsolete. Not used.)
            	-> RPL_LIST                       -> RPL_LISTEND
@@ -381,47 +362,19 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 		chans = split_in_vect(params[0], MSG_MULTI_PARAM_DELIM);
 		for (std::vector<std::string>::iterator chan = chans.begin();
 			chan != chans.end(); chan++) {
-			// find channel
 			all_chans_it = _channel.find(*chan);
 			if (all_chans_it != _channel.end()) {
-				// check if private or secret
-				if (all_chans_it->second.isFlagSets(CHAN_MASK_P)
-					|| all_chans_it->second.isFlagSets(CHAN_MASK_S)) {
-					if (all_chans_it->second.isOnChannel(user->first)) {
-						std::cout << rpl_manager->createResponse(RPL_LIST, *chan, all_chans_it->second.getDescription());
-						return (true);
-					}
-				}
+				this->listRplConditions(user, all_chans_it, rpl_manager);
 			}
 		}
 	}
 	else {
-		//print all
+		all_chans_it = _channel.begin();
+		while (all_chans_it != _channel.end()) {
+			this->listRplConditions(user, all_chans_it, rpl_manager);
+			all_chans_it++;
+		}
 	}
-
-
-	// if chans.size() == 0 ==> print all
 	std::cout << rpl_manager->createResponse(RPL_LISTEND);
 	return (true);
 }
-
-
-/*
-{
-	channel_map::iterator	it = _channel.begin();
-	channel_map::iterator	end = _channel.end();
-	
-	std::cout << "==All channels==\n";
-	while (it != end) {
-		std::cout << it->first << " ==>\n\t- Name : "
-			<< it->second.getName() << "\n\t- Desc : "
-			<< it->second.getDescription() << "\n\t- Modes : "
-			<< it->second.convertModeMaskToFlags() << "\n\t-";
-			it->second.printUsers();
-		it++;
-	}
-	std::cout << std::endl;
-}
-
-
-*/

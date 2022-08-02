@@ -323,25 +323,37 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 	return (true);
 }
 
+
+
 bool	ircServer::names(users_map::iterator user, std::vector<std::string> params)
 {
 	/*
-		Commande envoye par irssi	===>	Commande recu par le serveur
-		/names						===>	nothing "Not joined to any channel"	=> OK
-		/names #foo #bar			===>	NAMES #foo #bar
-		/names #foo,#bar			===>	NAMES #foo,#bar
-	
-	*/
-
-
-	/*
 		NAMES REPLIES
-        	- RPL_NAMREPLY
-			- RPL_ENDOFNAMES
+        	-> RPL_NAMREPLY
+			-> RPL_ENDOFNAMES
 	*/
 
-	// if chans.size() == 0 ==> print all
-	(void)params; (void)user;
+	rplManager					*rpl_manager = rplManager::getInstance();
+	std::vector<std::string>	chans;
+	bool						print_all = !(params.size());
+	channel_map::iterator		all_chans_it;
+
+	if (!print_all) {
+		chans = split_in_vect(params[0], MSG_MULTI_PARAM_DELIM);
+		for (std::vector<std::string>::iterator chan = chans.begin();
+			chan != chans.end(); chan++) {
+			all_chans_it = _channel.find(*chan);
+			if (all_chans_it != _channel.end())
+				this->namesRplConditions(user, all_chans_it, rpl_manager);
+		}
+	}
+	else {
+		all_chans_it = _channel.begin();
+		while (all_chans_it != _channel.end()) {
+			this->namesRplConditions(user, all_chans_it, rpl_manager);
+			all_chans_it++;
+		}
+	}
 	return (true);
 }
 

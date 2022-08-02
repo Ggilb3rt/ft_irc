@@ -27,6 +27,9 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_TOPIC, RPL_TOPIC_MSG));
 	list.insert(new_pair(RPL_LIST, RPL_LIST_MSG));
 	list.insert(new_pair(RPL_LISTEND, RPL_LISTEND_MSG));
+	list.insert(new_pair(RPL_NAMREPLY, RPL_NAMREPLY_MSG));
+	list.insert(new_pair(RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG));
+
 }
 
 rplManager::~rplManager()

@@ -145,7 +145,7 @@ __We have to debate about what is needed and what is not following the subject._
   - [x] PART
   - [ ] MODE
   - [x] TOPIC
-  - [ ] NAMES
+  - [x] NAMES
   - [x] LIST
   - [ ] INVITE
   - [x] KICK (question with ERR_BADCHANMASK)

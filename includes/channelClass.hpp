@@ -15,7 +15,10 @@ class channel
 #define user_id int
 #define role	bool
 
-typedef		std::map<user_id, role>	users_list;
+friend class ircServer;
+
+typedef		std::map<user_id, role>					users_list;
+typedef		std::map<user_id, role>::const_iterator	users_list_const_it;
 
 private:
 	const std::string			_name;

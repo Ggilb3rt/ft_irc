@@ -41,7 +41,7 @@
 #define RPL_NAMREPLY				353
 #define RPL_NAMREPLY_MSG			" :" // 353 "( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
 #define RPL_ENDOFNAMES				366
-#define RPL_ENDOFNAMES_MSG			" :" // 366 <channel> :End of NAMES list
+#define RPL_ENDOFNAMES_MSG			" :End of NAMES" // 366 <channel> :End of NAMES list
 
 
 class	rplManager

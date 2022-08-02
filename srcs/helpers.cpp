@@ -33,6 +33,26 @@ ircServer::users_map::iterator	ircServer::getUserById(user_id id)
 	return (_users.find(id));
 }
 
+void	ircServer::namesRplConditions(users_map::iterator &user, channel_map::iterator &all_chans_it, rplManager *rpl_manager)
+{
+	users_map::iterator			current_user;
+
+	if (all_chans_it->second.isFlagSets(CHAN_MASK_P)
+		|| all_chans_it->second.isFlagSets(CHAN_MASK_S)) {
+		if (!all_chans_it->second.isOnChannel(user->first))
+			return ;
+	}
+	for (channel::users_list_const_it user_in_chan = all_chans_it->second._users.begin();
+		user_in_chan != all_chans_it->second._users.end(); user_in_chan++) {
+		current_user = _users.find(user_in_chan->first);
+		if (current_user != _users.end())
+			std::cout << rpl_manager->createResponse(RPL_NAMREPLY,
+													all_chans_it->first,
+													current_user->second.getNick());
+	}
+	std::cout << rpl_manager->createResponse(RPL_ENDOFNAMES, all_chans_it->first);
+}
+
 void	ircServer::listRplConditions(users_map::iterator &user, channel_map::iterator &all_chans_it, rplManager *rpl_manager)
 {
 	if (all_chans_it->second.isFlagSets(CHAN_MASK_P)) {

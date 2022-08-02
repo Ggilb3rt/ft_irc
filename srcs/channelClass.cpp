@@ -191,7 +191,7 @@ void		channel::sendToAll(ircServer& server, const char *msg) const
 // DEBUG
 void		channel::printUsers() const
 {
-	std::map<user_id, role>::const_iterator	it = _users.begin();
+	users_list_const_it	it = _users.begin();
 
 	std::cout << "Users in channel " << _name << " : " << std::endl;
 	while (it != _users.end()) {

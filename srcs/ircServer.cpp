@@ -92,8 +92,8 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	// create users
 	this->printUsers();								// empty
 	std::cout << "----------------Creating Users----------------\n";
-	std::string	names[5] = {"Roger", "Marcel", "Corine", "Corine", "Boby"};
-	std::string	nicks[5] = {"Rabbit", "Patoulatchi", "Corine", "Roger", "Toby"};
+	std::string	names[5] = {"Roger", "Marcel", "Corine", "Corine", "Bobby McFerrin"};
+	std::string	nicks[5] = {"Rabbit", "Patoulatchi", "Corine", "Roger2", "Toby"};
 	for (int i = 15; i < 20; i++) {
 		this->addClient(i, nicks[i-15], names[i-15]);
 	}
@@ -147,6 +147,8 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	// list
 	std::cout << "----------------CMD LIST----------------\n";
 	this->list(_users.find(20), std::vector<std::string>(0, ""));
+	std::cout << "\nvector with one empty el\n";
+	this->list(_users.find(20), std::vector<std::string>(1, ""));
 	std::cout << "\nprivate chan, user in\n";
 	little_mode->second.convertModeFlagsToMask("+p");
 	this->list(_users.find(20), std::vector<std::string>(0, ""));	// print chan without topic
@@ -173,6 +175,26 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	this->list(_users.find(20), list_some);														// print 1
 
 
+	// names
+	std::cout << "\n\n----------------CMD NAMES----------------\n";
+	this->names(_users.find(20), std::vector<std::string>(0, ""));							// print all
+	std::cout << "\nvector with one empty el\n";
+	this->names(_users.find(20), std::vector<std::string>(1, ""));							// print nothing
+	std::cout << "\nbasics\n";
+	this->names(_users.find(20), std::vector<std::string>(4, "ChannelDeRoger"));
+	this->names(_users.find(20), std::vector<std::string>(1, "Vive18,Gardien_de_la_paix"));
+	std::cout << "\nsecret chan, user out\n";
+	this->names(_users.find(19), std::vector<std::string>(1, "ChannelDeRoger"));
+	std::cout << "\nprivate chan, user out\n";
+	little_mode->second.convertModeFlagsToMask("+p");
+	this->names(_users.find(19), std::vector<std::string>(1, "ChannelDeRoger"));
+	little_mode++;
+	little_mode->second.convertModeFlagsToMask("+p");
+	std::cout << "\nall chan with some private chan, other not\n";
+	this->names(_users.find(20), std::vector<std::string>(0, ""));							// print private when is in, not when out
+
+
+
 	// get and set descriptions
 	// std::cout << "----------------Getting or Updating descriptions----------------\n";
 	// this->topic(_users.begin(), std::vector<std::string> ());								// error need more params
@@ -195,12 +217,6 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	// changeChannelDeRoger.push_back("must be ignored");
 	// this->topic(_users.find(15), changeChannelDeRoger);										// change topic
 
-	// OLD WAY 
-	// std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");	// change topic
-	// std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger");				// print topic
-	// std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger", "ViveMoi");		// error operator
-	// std::cout << this->topic(_users.find(19)->second.getId(), "Pouet", "ViveMoi");				// error channel not exist
-	// std::cout << this->topic(_users.find(19)->second.getId(), "ChannelDeRoger");				// print topic
 	std::cout << std::endl;
 	this->printChannels();
 

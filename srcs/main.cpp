@@ -19,6 +19,26 @@ void	signal_handler(int signal)
 	g_signal_status = signal;
 }
 
+
+ void bin(long n)
+  {
+    long i;
+    std::cout << "0";
+    for (i = 1 << 30; i > 0; i = i / 2)
+    {
+      if((n & i) != 0)
+      {
+        std::cout << "1";
+      }
+      else
+      {
+        std::cout << "0";
+      }
+    }
+	std::cout << std::endl;
+  }
+
+
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
@@ -26,21 +46,30 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	(void)argv;
 	std::signal(SIGINT, signal_handler);
-	ircServer	base(argv[1]);
+	// ircServer	base(argv[1]);
 	rplManager	*rpl_manager = rplManager::getInstance();
 
 
 	/* CHAN_MASK tests */
 	int	chan_mode = 0;
 
+	bin(chan_mode);
 	chan_mode = set_bit(chan_mode, CHAN_MASK_M);
+	bin(chan_mode);
 	chan_mode = set_bit(chan_mode, CHAN_MASK_I);
+	bin(chan_mode);
 	chan_mode = set_bit(chan_mode, CHAN_MASK_O);
+	bin(chan_mode);
 	chan_mode = toggle_bit(chan_mode, CHAN_MASK_O);
+	bin(chan_mode);
 	chan_mode = clear_bit(chan_mode, CHAN_MASK_V);
+	bin(chan_mode);
 	chan_mode = set_bit(chan_mode, CHAN_MASK_V);
+	bin(chan_mode);
 	chan_mode = clear_bit(chan_mode, CHAN_MASK_V);
+	bin(chan_mode);
 
 	if (get_bit(chan_mode, CHAN_MASK_B))
 		std::cout << "Mask B is set\n"; // no
@@ -53,6 +82,9 @@ int main(int argc, char **argv)
 	if (get_bit(chan_mode, CHAN_MASK_V))
 		std::cout << "Mask V is set\n"; // no
 
+	bin(chan_mode);
+	
+
 	/* Replie manager TESTS */
 	std::cout << "rpl_manager addr " << rpl_manager << std::endl;
 	rpl_manager->printAll();
@@ -62,7 +94,7 @@ int main(int argc, char **argv)
 	// end replie manager tests
 
 
-	base.printAddrInfo();
+	// base.printAddrInfo();
 	// base.startListen();
 
 	delete rpl_manager;

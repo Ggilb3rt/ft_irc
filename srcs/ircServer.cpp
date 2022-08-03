@@ -324,8 +324,22 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 
 	// mode cmd
 	std::cout << "----------------MODE cmd now test conversion of flags to mask----------------\n";
+	this->mode(_users.find(20), std::vector<std::string>(0, ""));
+	this->mode(_users.find(20), std::vector<std::string>(1, ""));
+	this->mode(_users.find(20), std::vector<std::string>(2, ""));
+	this->mode(_users.find(20), std::vector<std::string>(2, "pouet"));
+	this->mode(_users.find(20), std::vector<std::string>(2, "Gardien_de_la_paix"));
+	std::vector<std::string>	all_you_need_is_love(1, "Vive18");
+	all_you_need_is_love.push_back("qwertyuiopasdfghjklzxcvbnm1234567890!@#$%&*()^_=}{[]|\\:;,.></?\'\"`~");
+	this->mode(_users.find(20), all_you_need_is_love);					// opsitnmlbvk
+	all_you_need_is_love[1] = "-tyuio+pasdfghjk-lzxcvbnm";
+	this->mode(_users.find(20), all_you_need_is_love);					// psk
+	all_you_need_is_love[1] = "+o";
+	this->mode(_users.find(20), all_you_need_is_love);					// o || opsk ?
+	
+
 	channel_map::iterator modeIt = _channel.begin();
-	modeIt->second.convertModeFlagsToMask("qwertyuiopasdfghjklzxcvbnm");
+	modeIt->second.convertModeFlagsToMask("qwertyuiopasdfghjklzxcvbnm1234567890!@#$%&*()^_=}{[]|\\:;,.></?\'\"`~");
 	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
 	modeIt->second.convertModeFlagsToMask("-tyuio+pasdfghjk-lzxcvbnm");
 	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
@@ -340,7 +354,12 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	modeIt->second.convertModeFlagsToMask("+-psi");
 	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
 	std::cout << "====================================================\n\n";
+
+
+	// this->printChannels();
+
 	// END SIMULATION test
+
 
 }
 

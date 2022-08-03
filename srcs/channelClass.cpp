@@ -49,7 +49,7 @@ int		channel::convertModeFlagsToMask(std::string param)
 		}
 	}
 	// std::cout << mask << std::endl;
-	this->_modes = mask;
+	// this->_modes = mask;
 	return (mask);
 }
 

@@ -92,24 +92,6 @@ std::vector<std::string>	split_in_vect(std::string base, std::string delimiter)
 bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 {
 	/*
-		RFC :
-			Command: JOIN
-   			Parameters: <channel>{,<channel>} [<key>{,<key>}]
-	
-
-		Commande envoye par irssi	===>	Commande recu par le serveur
-		/join chan pass				===>	JOIN #chan pass					=> OK
-		/join lol internet pouet	===>	JOIN #lol internet				=> OK
-		/join abc,def,ghi  			===>	JOIN #abc,#def,#ghi				=> OK
-		/join foo,bar,gogo fubar	===>	JOIN #foo,#bar,#gogo fubar,x,x	=> OK
-		/join foo, bar, gogo fubar	===>	JOIN #foo,# bar,x				=> OK
-
-		===> params[0] = channels
-		===> params[1] = keys
-			must split on ,
-	*/
-
-	/*
 		JOIN REPLIES
 			-> ERR_NEEDMOREPARAMS              -x ERR_BANNEDFROMCHAN
 			-> ERR_INVITEONLYCHAN              -> ERR_BADCHANNELKEY
@@ -281,17 +263,35 @@ bool	ircServer::quit(users_map::iterator user, std::vector<std::string> params)
 
 bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 {
-	(void)user; (void)params;
+	//! need to do mode user i because irssi send it at the begining
+
+
+	//! je dois trouver les flags avec des params avant de set quoi que ce soi :
+	//! 	utiliser convertModeFlagsToMask() pour avoir les flags +
+	//!		checker si k o l ou (b) est/sont presents
+	//!		verifier les parametres en consequences
+	//!		return ERR_NEEDMOREPARAMS en cas de problemes
+
+	//!	transformer convertModeFlagsToMask() en deux fonctions : une pour get les + et une pour get les -
+	//!	et add ou remove en fonction
+
 	/*
+
+	 Parameters: <channel> {[+|-]|o|p|s|i|t|n|b|v} [<limit>] [<user>]
+               [<ban mask>]
+
+
+
+
 		MODE REPLIES
-			ERR_NEEDMOREPARAMS
-			RPL_CHANNELMODEIS
-			ERR_CHANOPRIVSNEEDED          	ERR_NOSUCHNICK
-		-> ERR_NOTONCHANNEL               	ERR_KEYSET
-			RPL_BANLIST                   	RPL_ENDOFBANLIST
-		-> ERR_UNKNOWNMODE               	-> ERR_NOSUCHCHANNEL
-			ERR_USERSDONTMATCH            	RPL_UMODEIS
-			ERR_UMODEUNKNOWNFLAG
+			-> ERR_NEEDMOREPARAMS
+			- RPL_CHANNELMODEIS
+			- ERR_CHANOPRIVSNEEDED          	- ERR_NOSUCHNICK
+			-> ERR_NOTONCHANNEL               	-x ERR_KEYSET
+			- RPL_BANLIST                   	- RPL_ENDOFBANLIST
+			-x ERR_UNKNOWNMODE               	-> ERR_NOSUCHCHANNEL
+			- ERR_USERSDONTMATCH            	- RPL_UMODEIS
+			-x ERR_UMODEUNKNOWNFLAG
 	*/
 
 	/*
@@ -320,6 +320,31 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 
 		then this->convertModeFlagsToMask(params);
 	*/
+	rplManager				*rpl_manager = rplManager::getInstance();
+	channel_map::iterator	it_chan;
+	int						mode;
+
+	if (params.size() < 2) {
+		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
+		return (false);
+	}
+	it_chan = _channel.find(params[0]);
+	if (it_chan == _channel.end()) {
+		std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, params[0]);
+		return (false);
+	}
+	if (!it_chan->second.isOnChannel(user->first)) {
+		std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, params[0]);
+		return (false);
+	}
+	mode = it_chan->second.convertModeFlagsToMask(params[1]);
+
+
+	it_chan->second._modes = mode;
+	// it_chan->second.addFlag(mode);
+	std::cout << "Channel <" << it_chan->first << "> mode " << it_chan->second.convertModeMaskToFlags() << " | " << it_chan->second._modes << std::endl;
+
+	(void)user;
 	return (true);
 }
 

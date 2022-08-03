@@ -7,7 +7,7 @@
 
 */
 
-int		channel::convertModeFlagsToMask(std::string param)
+int		channel::convertPositiveFlagsToMask(std::string param)
 {
 	//? don't know if should set _modes or return the mask
 	//! I do it before return
@@ -39,19 +39,39 @@ int		channel::convertModeFlagsToMask(std::string param)
 		else if (*it == '+')
 			mask_add = true;
 		else if (valid_flags.find(*it) != std::string::npos) {
-			if (mask_add) {
-				// std::cout << *it;
-				//! if k already sets ==> send ERR_KEYSET 467
+			if (mask_add)
 				mask = set_bit(mask, valid_flags.find(*it));
-			}
 			else
 				mask = clear_bit(mask, valid_flags.find(*it));
 		}
 	}
 	// std::cout << mask << std::endl;
-	// this->_modes = mask;
 	return (mask);
 }
+
+int		channel::convertNegativeFlagsToMask(std::string param)
+{
+
+	std::string	valid_flags = CHAN_FLAGS_VALID;
+	int			mask = 0;
+	bool		mask_add = true;
+
+	for (std::string::iterator it = param.begin(); it != param.end(); it++) {
+		if (*it == '-')
+			mask_add = false;
+		else if (*it == '+')
+			mask_add = true;
+		else if (valid_flags.find(*it) != std::string::npos) {
+			if (mask_add)
+				mask = clear_bit(mask, valid_flags.find(*it));
+			else
+				mask = set_bit(mask, valid_flags.find(*it));
+		}
+	}
+	// std::cout << mask << std::endl;
+	return (mask);
+}
+
 
 std::string		channel::convertModeMaskToFlags()
 {
@@ -132,8 +152,33 @@ size_t		channel::getSize() const { return (_users.size()); }
 // 	return (it);
 // }
 
-void		channel::addFlag(int flag) { _modes = set_bit(_modes, flag); }
-void		channel::removeFlag(int flag) { _modes = clear_bit(_modes, flag); }
+void		channel::addFlags(int flag)
+{
+	int			i = 0;
+
+	while (i < CHAN_FLAGS_QT) {
+		if (get_bit(flag, i)) {
+			_modes = set_bit(_modes, i);
+		}
+		i++;
+	}
+}
+void		channel::removeFlags(int flag)
+{
+	int			i = 0;
+
+	while (i < CHAN_FLAGS_QT) {
+		if (get_bit(flag, i)) {
+			_modes = clear_bit(_modes, i);
+			if (i == CHAN_MASK_L)
+				this->setUserLimit(0);
+			if (i == CHAN_MASK_K)
+				this->setPassword("");
+		}
+		i++;
+	}
+	// _modes = clear_bit(_modes, flag);
+}
 void		channel::toggleFlag(int flag) { _modes = toggle_bit(_modes, flag); }
 bool		channel::isFlagSets(int flag) const {return (get_bit(_modes, flag)); }
 

@@ -26,6 +26,8 @@
 #define ERR_INVITEONLYCHAN_MSG		" :Cannot join channel (+i)" // 473 <channel>
 #define ERR_BADCHANNELKEY			475
 #define ERR_BADCHANNELKEY_MSG		" :Cannot join channel (+k)" // 475 <channel>
+#define ERR_USERSDONTMATCH			502
+#define ERR_USERSDONTMATCH_MSG		" :Cannot change mode for other users"
 
 // REPLIES
 #define RPL_OKCONNECT				001
@@ -37,7 +39,7 @@
 #define RPL_LISTEND					323
 #define RPL_LISTEND_MSG				" :End of LIST" // 323
 #define RPL_CHANNELMODEIS			324
-#define RPL_CHANNELMODEIS_MSG		"" // 324 "<channel> <mode> <mode params>"
+#define RPL_CHANNELMODEIS_MSG		" " // 324 "<channel> <mode> <mode params>"
 #define	RPL_NOTOPIC					331
 #define RPL_NOTOPIC_MSG				" :No topic is set" // 331 <channel>
 #define RPL_TOPIC					332

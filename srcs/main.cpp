@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
 	(void)argv;
 	std::signal(SIGINT, signal_handler);
-	// ircServer	base(argv[1]);
+	ircServer	base(argv[1]);
 	rplManager	*rpl_manager = rplManager::getInstance();
 
 
@@ -71,8 +71,8 @@ int main(int argc, char **argv)
 	chan_mode = clear_bit(chan_mode, CHAN_MASK_V);
 	bin(chan_mode);
 
-	if (get_bit(chan_mode, CHAN_MASK_B))
-		std::cout << "Mask B is set\n"; // no
+	if (get_bit(chan_mode, CHAN_MASK_K))
+		std::cout << "Mask K is set\n"; // no
 	if (get_bit(chan_mode, CHAN_MASK_I))
 		std::cout << "Mask I is set\n"; // yes
 	if (get_bit(chan_mode, CHAN_MASK_M))

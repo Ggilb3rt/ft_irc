@@ -264,65 +264,28 @@ bool	ircServer::quit(users_map::iterator user, std::vector<std::string> params)
 bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 {
 	//! need to do mode user i because irssi send it at the begining
-
-
-	//! je dois trouver les flags avec des params avant de set quoi que ce soi :
-	//! 	utiliser convertModeFlagsToMask() pour avoir les flags +
-	//!		checker si k o l ou (b) est/sont presents
-	//!		verifier les parametres en consequences
-	//!		return ERR_NEEDMOREPARAMS en cas de problemes
-
-	//!	transformer convertModeFlagsToMask() en deux fonctions : une pour get les + et une pour get les -
-	//!	et add ou remove en fonction
-
-	/*
-
-	 Parameters: <channel> {[+|-]|o|p|s|i|t|n|b|v} [<limit>] [<user>]
-               [<ban mask>]
-
-
-
+	/*		
+	RFC for modes is fucked, no params needed for +k wtf ?!
+	so we will use Parameters: <channel> {[+|-]|o|p|s|i|t|n|m|l|v|k} [<limit>] [<user>] [<password>]
 
 		MODE REPLIES
 			-> ERR_NEEDMOREPARAMS
-			- RPL_CHANNELMODEIS
-			- ERR_CHANOPRIVSNEEDED          	- ERR_NOSUCHNICK
+			-> RPL_CHANNELMODEIS
+			-> ERR_CHANOPRIVSNEEDED          	-> ERR_NOSUCHNICK
 			-> ERR_NOTONCHANNEL               	-x ERR_KEYSET
-			- RPL_BANLIST                   	- RPL_ENDOFBANLIST
+			-x RPL_BANLIST                   	-x RPL_ENDOFBANLIST
 			-x ERR_UNKNOWNMODE               	-> ERR_NOSUCHCHANNEL
-			- ERR_USERSDONTMATCH            	- RPL_UMODEIS
+			-> ERR_USERSDONTMATCH            	-? RPL_UMODEIS
 			-x ERR_UMODEUNKNOWNFLAG
 	*/
 
-	/*
-		check if params[0] (channel) not exist
-			send(ERR_NOSUCHCHANNEL) return
-		check if id is not in params[0]
-			send(ERR_NOTONCHANNEL) return
-
-
-		check in params[1] if find char !CHAN_FLAGS_VALID && != '+' && != '-'
-			send(ERR_UNKNOWNMODE) return
-		
-		
-		
-		
-		need to check and convert params[1] :
-			+p-si+mz		==> +pm-si		==> +pm-si
-			+opsitnmlbvk					==> +psitnm (because o and b limits other modes (don't understand))
-			+psitnmlvk						==> +psitnm (because l, v and k needs options)
-			+psitnmlvk 5					==> +psitnml (because l == 5)
-			+psitnmlvk 5 userInChan			==> +psitnmlv (because v == userInChan)
-			+psitnmlvk 5 userNotInChan		==> +psitnml (because userNotInChan)
-			+psitnmlvk 5 userInChan pass	==> +psitnmlvk (because k == pass)
-			+psitnmlvkb 5 userInChan pass	==> +psitnmlvk (send error ban)
-
-
-		then this->convertModeFlagsToMask(params);
-	*/
 	rplManager				*rpl_manager = rplManager::getInstance();
 	channel_map::iterator	it_chan;
-	int						mode;
+	int						modes_to_add = 0;
+	int						modes_to_remove = 0;
+	std::string				limit;
+	std::string				user_edit;
+	std::string				pass;
 
 	if (params.size() < 2) {
 		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
@@ -337,14 +300,109 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 		std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, params[0]);
 		return (false);
 	}
-	mode = it_chan->second.convertModeFlagsToMask(params[1]);
+	modes_to_add = it_chan->second.convertPositiveFlagsToMask(params[1]);
+	modes_to_remove = it_chan->second.convertNegativeFlagsToMask(params[1]);
 
 
-	it_chan->second._modes = mode;
-	// it_chan->second.addFlag(mode);
-	std::cout << "Channel <" << it_chan->first << "> mode " << it_chan->second.convertModeMaskToFlags() << " | " << it_chan->second._modes << std::endl;
+	//! CHECK FOR REMOVE
+	// check if -o user == user_edit
+	//		else return ERR_USERSDONTMATCH
+	if (get_bit(modes_to_remove, CHAN_MASK_O)) {
+		if (params.size() != 3) {
+			std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
+			return (false);
+		}
+		if (user->first != this->getUserByNick(params[2])) {
+			std::cout << rpl_manager->createResponse(ERR_USERSDONTMATCH);
+			return (false);
+		}
+	}
 
-	(void)user;
+
+
+	//! CHECK FOR ADD
+	// check mode add who need params l|o|k
+	size_t	count = 0;
+	bool	L_set = get_bit(modes_to_add, CHAN_MASK_L);
+	bool	O_set = get_bit(modes_to_add, CHAN_MASK_O);
+	bool	K_set = get_bit(modes_to_add, CHAN_MASK_K);
+
+	if (L_set)
+		count++;
+	if (O_set)
+		count++;
+	if (K_set)
+		count++;
+	if ((params.size() - 2) < count) {
+		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
+		return (false);
+	}
+	/*
+	L | O | K | LO | LOK | LK | OK 
+	*/
+	if (L_set) {
+		limit = params[2];
+		if (O_set) {
+			user_edit = params[3];
+			if (K_set)
+				pass = params[4];
+		}
+		else if (K_set)
+			pass = params[3];
+	}
+	else if (O_set) {
+		user_edit = params[2];
+		if (K_set)
+			pass = params[3];
+	}
+	else if (K_set)
+		pass = params[2];
+
+	(void)limit;(void)user_edit;
+
+	// need to check if user is operator
+	if (O_set) {
+		if (!it_chan->second.isOperator(user->first)) {
+			std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, it_chan->first);
+			return (false);
+		}
+		if (!it_chan->second.isOnChannel(this->getUserByNick(user_edit))) {
+			std::cout << rpl_manager->createResponse(ERR_NOSUCHNICK, user_edit);
+			return (false);
+		}
+		it_chan->second.setUserRole(this->getUserByNick(user_edit), true);
+	}
+	// need to check if limit can atoi()
+	if (L_set) {
+		std::stringstream	ss;
+		size_t				num;					
+		
+		ss << limit;
+		ss >> num;
+		it_chan->second.setUserLimit(num);
+	}
+	// set password
+	if (K_set)
+		it_chan->second.setPassword(pass);
+
+
+
+
+
+	//! PRINT DEBUG
+	// std::cout << "what is limit " << limit
+	//				<< " |user_edit " << user_edit 
+	//				<< " |pass " << it_chan->second.getPassword() << std::endl;
+
+
+
+	// check if remove flags who need some reset l|k ==> done in removeFlags. Better to do it here ? 
+
+	//! CHANGE MODES
+	it_chan->second.removeFlags(modes_to_remove);
+	it_chan->second.addFlags(modes_to_add);
+	// std::cout << "Channel <" << it_chan->first << "> mode " << it_chan->second.convertModeMaskToFlags() << " | " << it_chan->second._modes << std::endl;
+	std::cout << rpl_manager->createResponse(RPL_CHANNELMODEIS, it_chan->first, it_chan->second.convertModeMaskToFlags());
 	return (true);
 }
 

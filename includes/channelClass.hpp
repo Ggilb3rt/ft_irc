@@ -34,7 +34,9 @@ private:
 
 public:
 	//! should be private (after tests)
-	int				convertModeFlagsToMask(std::string param);
+	int				convertPositiveFlagsToMask(std::string param);
+	int				convertNegativeFlagsToMask(std::string param);
+
 	std::string		convertModeMaskToFlags();
 	size_t			getUserLimit() { return _user_limit; }
 	void			setUserLimit(size_t new_limit) { _user_limit = new_limit; }
@@ -63,9 +65,9 @@ public:
 	// users_list::iterator		getUser(user_id id);
 	
 	bool		isFlagSets(int flag) const;
+	void		addFlags(int flag);
+	void		removeFlags(int flag);
 	//! not sure if needded
-	void		addFlag(int flag);
-	void		removeFlag(int flag);
 	void		toggleFlag(int flag);
 
 

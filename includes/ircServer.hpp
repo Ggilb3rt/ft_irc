@@ -106,7 +106,7 @@ private:
 
 	// helpers
 	void			sendToClient(int fd, int code, std::string param_1 = "", std::string param_2 = "");
-	user_id			getUserByNick(std::string nick);
+	user_id			getUserByNick(std::string nick) const;
 	users_map::iterator getUserById(user_id id);
 	void			namesRplConditions(users_map::iterator &user,
 								channel_map::iterator &all_chans_it,

@@ -12,7 +12,7 @@ rplManager	*rplManager::getInstance()
 
 rplManager::rplManager()
 {
-	list.insert(new_pair(RPL_OKCONNECT, RPL_OKCONNECT_MSG));
+	list.insert(new_pair(RPL_OKCONN, RPL_OKCONN_MSG));
 	list.insert(new_pair(14, " :petit mais puissant"));
 	list.insert(new_pair(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG));
 	list.insert(new_pair(ERR_USERONCHANNEL, ERR_USERONCHANNEL_MSG));

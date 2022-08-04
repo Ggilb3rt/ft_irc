@@ -4,35 +4,99 @@
 
 // considering the input is an iterator->[client_fd][user], and an already parsed string nick
 
+void	toLower(std::string &nickname) {
+	int	i = 0;
+
+	while (nickname.c_str()[i]) {
+		if (nickname.c_str()[i] >= 'A' && nickname.c_str()[i] <= 'Z')
+			nickname[i] = nickname.c_str()[i] + 32;
+		i++;
+	}
+}
+
+bool	isAlnum(char c) {
+	if (c >= '0' && c <= '9')
+		return (true);
+	if (c >= 'a' && c <= 'z')
+		return (true);
+	if (c >= 'A' && c <= 'Z')
+		return (true);
+	return (false);
+}
+
+bool	isSpecialOk(char c) {
+	if ((c >= '[' && c <= '}') || c == '-')
+		return (true);
+	return (false);
+}
+
+bool	isValid(std::string &nickname) {
+	int	i = 0;
+
+	if (nickname.c_str()[i] >= '0' && nickname.c_str()[i] <= '9')
+		return (false);
+	while (nickname.c_str()[i]) {
+		if (!isAlnum(nickname.c_str()[i]))
+			return (false);
+		if (!isSpecialOk(nickname.c_str()[i]))
+			return (false);
+		if (nickname.c_str()[i] == ' ')
+			nickname[i] = '_';
+		i++;
+	}
+	return (true);
+}
+
 bool    ircServer::handleNick(users_map::iterator pair, std::vector<std::string> &argvec) {
 	std::string			newNick = argvec[0];
     users_map::iterator beg = _users.begin();
     users_map::iterator end = _users.end();
-    std::string         res;
+    std::string        	 res;
 
+	// SIZE OF NICK ISNT VALID OR NOT IN SET OF CHARS
+	std::cout << "\n---HANDLENICK---\n" << "---> NICKNAME == |" << newNick << "|\n";
+	if (newNick.length() > 9 || !newNick.length() || !isValid(newNick)) {
+		std::cout << "ERR_ERRONEUSNICKNAME\n";
+        sendToClient(pair->first, 432);
+		return (false);
+    }
+	std::cout << "\n---HANDLENICK  2---\n" << "---> NICKNAME == |" << newNick << "|\n";
+
+	// MAKE IT CASE INSENSITIVE
+	toLower(newNick);
+
+	std::cout << "\n---HANDLENICK  3---\n" << "---> NICKNAME == |" << newNick << "|\n";
+
+	// CHECK FOR DOUBLON
     while (beg != end) {
         if (beg->second.getNick() == newNick) {
-            sendToClient(pair->first, 403);
+            sendToClient(pair->first, 433);
+			std::cout << "ERR_NICKNAMEINUSE\n";
 			return (false);
         }
         beg++;
     }
-    // if above 9 ask for another nickname ? or disconnect ?
-    if (newNick.length() > 9) {
-        sendToClient(pair->first, 403);
-		return (false);
-    }
-    else {
-        pair->second.setNick(newNick);
-		if (pair->second.getStatus() == USER_STATUS_CONNECTED)
-        	sendToClient(pair->first, 001);
-		return (true);
-    }
+    pair->second.setNick(newNick);
+	if (pair->second.getStatus() == USER_STATUS_CONNECTED)
+     	sendToClient(pair->first, 001);
+	return (true);
 }
+
+// bool		ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &argvec) {
+	
+// }
 
 bool		ircServer::checkPass(std::string pass) {
 	std::cout << "In pass cmd, pass == |" << pass << "|\n";
-	return (pass == this->_pass);
+	if (pass != this->_pass) {
+		return (false);
+	}
+	else if (pass.size() < 1) {
+		std::cout << "ERR_ERRNUMBARGS\n";
+		// sendToClient(pair->first, 461);
+		return (false);
+	}
+	return (true);
 }
 
 std::string	ircServer::topic(user_id id, std::string current_chan, const char *msg)

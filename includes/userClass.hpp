@@ -13,6 +13,7 @@ class user
 		int						_id;
 		std::string				_nick;
 		std::string				_name;
+		std::string				_username;
 		int						_status;
 
 

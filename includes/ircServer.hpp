@@ -87,7 +87,7 @@ private:
 	bool    		handleCommands(users_map::iterator &it, std::vector<std::string> &argvec);
 
 	// execute
-
+	bool			handleUser(users_map::iterator pair, std::vector<std::string> &argvec);
 	bool			handleNick(users_map::iterator pair, std::vector<std::string> &argvec);
 	bool			checkPass(std::string pass);
 

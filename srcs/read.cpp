@@ -33,10 +33,12 @@ int		ircServer::readData(clients_vector::iterator client)
 						<< buff << "|" << std::endl;
 			}
 			buffer = buff;
-			while (pos != std::string::npos) {
-				pos = buffer.find("\r\n", old);
-				parse(user_x, buffer.substr(old, pos - old));
-        		old = pos + 1;
+			if (user_x->second.getStatus() == USER_STATUS_CONNECTED) {
+				while (pos != std::string::npos) {
+					pos = buffer.find("\r\n", old);
+					parse(user_x, buffer.substr(old, pos - old));
+        			old = pos + 1;
+				}
 			}
 		//std::cout << "end reading : " << msg << "[" << msg.length() << "]" << std::endl;
 		// this->parse(msg);

@@ -18,17 +18,24 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     std::string                 longarg;
     std::vector<std::string>    argvec;
 
+    std::cout << "\n\n--------PARSE--------\n\n" << std::endl;
+
     if ((pos = query.find(":")) != std::string::npos) {
         pos += 1;
         longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
         query = query.substr(0, pos - 1);
     }
 
+    
     std::cout << "QUERY == " << query << std::endl;
     pos = 0;
-    
+
     while (pos != std::string::npos) {
         pos = query.find(' ', old);
+        if (query.c_str()[pos - 1] == ',') {
+            // TODO: send syntax error
+            return (false);
+        }
         std::cout << "OLD == " << old << " | POS == " << pos << " | SUB == |" << query.substr(old, pos - old) << "|\n";
         argvec.push_back(query.substr(old, pos - old));
         old = pos + 1;
@@ -36,6 +43,12 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 
     if (longarg.c_str())
         argvec.push_back(longarg);
+    else {
+        if (argvec[0] == "USER") {
+            // send err: no double dot before real name
+            return (false);
+        }
+    }
 
     return(handleCommands(it, argvec));
 }
@@ -54,23 +67,28 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
         std::cout << "JE SUIS ICIIIIII\n";
         return (checkPass(argvec[1]));
     }
+    // else if (argvec[0] == "QUIT") {
+    //     return (quit(argvec));
+    // }
     // else if (argvec[0] == "USER") {
-        
+    //   argvec.erase(argvec.begin());   
     // }
     // else if (argvec[0] == "MODE") {
-        
+    //    argvec.erase(argvec.begin());
     // }
     // else if (argvec[0] == "PING") {
-        
+    //    argvec.erase(argvec.begin());    
     // }
     // else if (argvec[0] == "TOPIC") {
-        
+    //    argvec.erase(argvec.begin());    
     // }
     // else if (argvec[0] == "JOIN") {
-        
+    //    argvec.erase(argvec.begin());
+    //    
     // }
     // else if (argvec[0] == "PART") {
-        
+    //    argvec.erase(argvec.begin());
+    //    
     // }
     return (false);
 }

@@ -15,26 +15,42 @@ class channel
 #define user_id int
 #define role	bool
 
-typedef		std::map<user_id, role>	users_list;
+friend class ircServer;
+
+typedef		std::map<user_id, role>					users_list;
+typedef		std::map<user_id, role>::const_iterator	users_list_const_it;
 
 private:
-	const std::string		_name;
-	std::string				_description;
-	users_list				_users;
-	int						_modes;
+	const std::string			_name;
+	std::string					_description;
+	users_list					_users;
+	int							_modes;
+	size_t						_user_limit;
+	std::string					_password;
+	std::vector<std::string>	_banlist;
 
 	channel() {}
 
 
 public:
-	int				convertModeFlagsToMask(std::string param); //! should be private (after tests)
-	std::string		convertModeMaskToFlags();	//! should be private (after tests)
+	//! should be private (after tests)
+	int				convertPositiveFlagsToMask(std::string param);
+	int				convertNegativeFlagsToMask(std::string param);
 
+	std::string		convertModeMaskToFlags();
+	size_t			getUserLimit() { return _user_limit; }
+	void			setUserLimit(size_t new_limit) { _user_limit = new_limit; }
+	std::string		getPassword() {return _password; }
+	void			setPassword(std::string s) { _password = s; }
+	bool			isInBanList(std::string nick);
+	//! should be private (after tests)
 
 	channel(std::string name, user_id creator) :
-			_name(name), _description("Super channel " + name), _modes(0)
+			_name(name), _description("Super channel " + name), _modes(0),
+			_user_limit(0), _password(""), _banlist()
 	{
 		_users.insert(std::pair<user_id, role>(creator, true));
+		(void)_user_limit; (void)_password; (void)_banlist;
 	}
 	~channel() {}
 
@@ -49,9 +65,9 @@ public:
 	// users_list::iterator		getUser(user_id id);
 	
 	bool		isFlagSets(int flag) const;
+	void		addFlags(int flag);
+	void		removeFlags(int flag);
 	//! not sure if needded
-	void		addFlag(int flag);
-	void		removeFlag(int flag);
 	void		toggleFlag(int flag);
 
 

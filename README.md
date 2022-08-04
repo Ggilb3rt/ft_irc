@@ -30,6 +30,11 @@ brew install irssi
 ```
 #### Connect Irssi to our server
 In irssi[^client]
+Quick connection
+```bash
+/connect localhost <port> <password> <username>
+```
+
 ```bash
 /network add ft_irc
 /server add -network ft_irc 127.0.0.1 6697
@@ -128,7 +133,7 @@ Not all implementations use CR-LF[^RFC1459_8]
 Needed commands (cf RFC1459 4.x) :
 __We have to debate about what is needed and what is not following the subject.__
 - Connection (4.1)
-  - (PASS ??)
+  - [ ] PASS
   - [ ] NICK
   - [ ] USER
   - SERVER (not needed, only server-server)
@@ -140,10 +145,10 @@ __We have to debate about what is needed and what is not following the subject._
   - [x] PART
   - [ ] MODE
   - [x] TOPIC
-  - [ ] NAMES
-  - [ ] LIST
-  - [ ] INVITE
-  - [x] KICK
+  - [x] NAMES
+  - [x] LIST
+  - [x] INVITE
+  - [x] KICK (question with ERR_BADCHANMASK)
 - Server (4.3) (only with 'this' because no server-server communication)
   - VERSION
   - STATS
@@ -163,7 +168,7 @@ __We have to debate about what is needed and what is not following the subject._
 - Miscellaneous messages (4.6)
   - KILL
   - PING
-  - PONG (not needed because only for client or server-server(?))
+  - [?] PONG (return with arguments of recieved PING)
   - ERROR
 - OPTIONALS
   - lol nope

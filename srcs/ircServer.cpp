@@ -92,8 +92,8 @@ ircServer::ircServer(char *port, std::string pass) : _port(port), _nick_suffixe(
 	// create users
 	this->printUsers();								// empty
 	std::cout << "----------------Creating Users----------------\n";
-	std::string	names[5] = {"Roger", "Marcel", "Corine", "Corine", "Boby"};
-	std::string	nicks[5] = {"Rabbit", "Patoulatchi", "Corine", "Roger", "Toby"};
+	std::string	names[5] = {"Roger", "Marcel", "Corine", "Corine", "Bobby McFerrin"};
+	std::string	nicks[5] = {"Rabbit", "Patoulatchi", "Corine", "Roger2", "Toby"};
 	for (int i = 15; i < 20; i++) {
 		this->addClient(i, nicks[i-15], names[i-15]);
 	}
@@ -102,100 +102,290 @@ ircServer::ircServer(char *port, std::string pass) : _port(port), _nick_suffixe(
 	this->addClient(21, "Rabbit", "anotherName");	// errir rename x+1
 	this->printUsers();								// users with id from 15 to 21
 
+
+
 	// create/join channels
 	this->printChannels();							// empty
 	std::cout << "----------------Creating and joining some channels----------------\n";
-	this->join(_users.find(15)->second.getId(), "ChannelDeRoger");
-	this->join(_users.find(16)->second.getId(), "GardienDeLaPaix");
-	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");
-	this->join(_users.find(17)->second.getId(), "GardienDeLaPaix");		// error already in
-	this->join(_users.find(19)->second.getId(), "GardienDeLaPaix");
-	this->join(_users.find(18)->second.getId(), "Gardien de la paix");	// replace spaces by _
-	this->join(_users.find(18)->second.getId(), "ChannelDeRoger");
-	this->join(_users.find(18)->second.getId(), "Vive18");
+	this->join(_users.find(15), std::vector<std::string>(1, "ChannelDeRoger"));
+	this->join(_users.find(16), std::vector<std::string>(1, "GardienDeLaPaix"));
+	this->join(_users.find(17), std::vector<std::string>(1, "GardienDeLaPaix,GardienDeLaPaix")); // error already in
+	this->join(_users.find(19), std::vector<std::string>(1, "GardienDeLaPaix"));
+	this->join(_users.find(18), std::vector<std::string>(1, "Gardien de la paix,ChannelDeRoger,Vive18"));	// replace spaces by _
 	for (int i = 15; i < 22; i++)
-		this->join(_users.find(i)->second.getId(), "Vive18");			// one error with 18 already in
-	this->printChannels();												// print all channels with users and functions
+		this->join(_users.find(i), std::vector<std::string>(1, "Vive18"));			// one error with 18 already in
+	this->join(_users.find(15), std::vector<std::string>());		// error ERR_NEEDMOREPARAMS
+	this->printChannels();					// print all channels with users and functions
+	std::vector<std::string>	need_more_key(1, "1,2,3,4");
+	need_more_key.push_back("1,2,3");
+	this->join(_users.find(15), need_more_key);						// error ERR_NEEDMOREPARAMS
+	//! NEED TO CHANGE THIS TESTS WHEN MODE WILL BE OK
+	channel_map::iterator little_mode = _channel.begin();
+	std::vector<std::string>	modeMoove(1, little_mode->first);
+	modeMoove.push_back("i");
+	this->mode(_users.find(15), modeMoove);
+	// little_mode->second.convertModeFlagsToMask("i");
+	this->join(_users.find(21), std::vector<std::string>(1, "ChannelDeRoger"));	// error ERR_INVITEONLYCHAN
+	modeMoove[1] = "-i+l";
+	modeMoove.push_back("limit");
+	this->mode(_users.find(15), modeMoove);
+	// little_mode->second.convertModeFlagsToMask("-i+l");
+	std::cout << "user limit " << little_mode->second.getUserLimit() << ", users in " << little_mode->second.getSize() << std::endl;
+	little_mode->second.setUserLimit(3);
+	this->join(_users.find(21), std::vector<std::string>(1, "ChannelDeRoger"));
+	this->join(_users.find(20), std::vector<std::string>(1, "ChannelDeRoger"));	// error ERR_CHANNELISFULL
+	std::cout << "user limit " << little_mode->second.getUserLimit() << ", users in " << little_mode->second.getSize() << std::endl;
+	modeMoove[1] = "-l+k";
+	this->mode(_users.find(15), modeMoove);
+	// little_mode->second.convertModeFlagsToMask("-l+k");
+	little_mode->second.setPassword("boom baby");
+	std::vector<std::string>	try_key(1, "ChannelDeRoger");
+	try_key.push_back("pouet");
+	this->join(_users.find(20), std::vector<std::string>(1, "ChannelDeRoger"));	// error ERR_NEEDMOREPARAMS
+	this->join(_users.find(20), try_key);										// error ERR_BADCHANNELKEY
+	try_key[1] = "boom baby";
+	this->join(_users.find(20), try_key);
 
-	// get and set descriptions
-	std::cout << "----------------Getting or Updating descriptions----------------\n";
-	std::cout << this->topic(_users.find(18)->second.getId(), "Vive18");						// print topic
-	std::cout << this->topic(_users.find(15)->second.getId(), "ChannelDeRoger", "ViveRoger");	// change topic
-	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger");				// print topic
-	std::cout << this->topic(_users.find(18)->second.getId(), "ChannelDeRoger", "ViveMoi");		// error operator
-	std::cout << this->topic(_users.find(19)->second.getId(), "Pouet", "ViveMoi");				// error channel not exist
-	std::cout << this->topic(_users.find(19)->second.getId(), "ChannelDeRoger");				// print topic
-	std::cout << std::endl;
+
 	this->printChannels();
 
-	// get and set modes (without cmd MODES for now)
-	std::cout << "----------------Getting or Updating Channels modes----------------\n";
-	_channel.find("Vive18")->second.addFlag(CHAN_MASK_P);     
-	_channel.find("Vive18")->second.addFlag(CHAN_MASK_N);
-	_channel.find("Vive18")->second.addFlag(CHAN_MASK_N);	// not problems
-	_channel.find("Vive18")->second.addFlag(CHAN_MASK_K);
-	_channel.find("Vive18")->second.addFlag(CHAN_MASK_O);
-	_channel.find("Vive18")->second.removeFlag(CHAN_MASK_P);
-	std::cout << "Flags kno are sets, p and i not" << std::endl;
-	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_P) << std::endl;	// 0
-	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_I) << std::endl;	// 0
-	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_K) << std::endl;	// 1
-	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_N) << std::endl;	// 1
-	std::cout << _channel.find("Vive18")->second.isFlagSets(CHAN_MASK_O) << std::endl;	// 1
-	this->printChannels();
 
 
-	// remove x/2 users
-	std::cout << "----------------QUIT/PART/KICK/disconnecting users----------------\n";
-	//can't remove client with .removeClient() because I need _pfds
-	// only remove client from channels (like in .reomoveClient())
 
-	std::cout << "use QUIT\n";
-	this->printUsers();
-	this->quit(15);
-	this->quit(16);
-	this->quit(17);
-	this->quit(8);					// not exist ; ignore
-	this->quit(18, "Babyee !!");
-	this->printUsers();
+	// list
+	std::cout << "----------------CMD LIST----------------\n";
+	this->list(_users.find(20), std::vector<std::string>(0, ""));
+	std::cout << "\nvector with one empty el\n";
+	this->list(_users.find(20), std::vector<std::string>(1, ""));
+	std::cout << "\nprivate chan, user in\n";
+	modeMoove[1] = "-k+p";
+	this->mode(_users.find(15), modeMoove);
+	// little_mode->second.convertModeFlagsToMask("+p");
+	this->list(_users.find(20), std::vector<std::string>(0, ""));	// print chan without topic
+	std::cout << "\nprivate chan, user out\n";
+	this->part(_users.find(20), std::vector<std::string>(1, "ChannelDeRoger"));
+	this->list(_users.find(20), std::vector<std::string>(0, ""));	// don't print ChannelDeRoger
+	
+	std::cout << "\nsecret chan, user out\n";
+	modeMoove[1] = "-p+s";
+	this->mode(_users.find(15), modeMoove);
+	// little_mode->second.convertModeFlagsToMask("-p+s");
+	this->list(_users.find(20), std::vector<std::string>(0, ""));	// don't print ChannelDeRoger
+	std::cout << "\njoin back chan\n";
+	this->join(_users.find(20), std::vector<std::string>(1, "ChannelDeRoger"));
+	std::cout << "\nsecret chan, user in\n";
+	this->list(_users.find(20), std::vector<std::string>(0, ""));
 
-	std::cout << "use PART\n";
-	this->part(18, std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
-	this->part(83, std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
-	this->part(4, std::vector<std::string>(1, std::string("GardienDeLaPaix")));	// error 442
-	this->part(4, std::vector<std::string>(1, std::string("lolilol")));			// error 403
-	this->part(4, std::vector<std::string>(0, std::string("")));				// error 461
-	this->part(19, std::vector<std::string>(1, std::string("GardienDeLaPaix")));
-	this->printChannels();
+	std::cout << "\nlist a list\n";
+	this->list(_users.find(20), std::vector<std::string>(1, ""));								// end
+	this->list(_users.find(20), std::vector<std::string>(1, "Gardien_de_la_paix"));				// print 1
+	this->list(_users.find(20), std::vector<std::string>(1, "Vive18,ChannelDeRoger"));			// print 2
+	this->list(_users.find(20), std::vector<std::string>(1, "Vive18,ChannelDeRoger,Pouet"));	// print 2
+	std::vector<std::string>	list_some(1, "Gardien_de_la_paix");
+	list_some.push_back("Vive18");
+	list_some.push_back("Vive18");
+	this->list(_users.find(20), list_some);														// print 1
 
-	std::cout << "use KICK\n";
-	this->kick("Vive18", 20, 19);
-	this->kick("Vive18", 19, 21); 					// error ERR_CHANOPRIVSNEEDED
-	this->kick("Vive18", 55, 19);					// error ERR_NOTONCHANNEL
-	this->kick("pouet", 21, 19);					// error ERR_NOSUCHCHANNEL
-	this->kick("Vive18", 21, 19, "jl'aime pas");
-	this->kick("Vive18", 19, 19); 					// auto kick possible => oui
-	this->printChannels();
+
+	// names
+	std::cout << "\n\n----------------CMD NAMES----------------\n";
+	this->names(_users.find(20), std::vector<std::string>(0, ""));							// print all
+	std::cout << "\nvector with one empty el\n";
+	this->names(_users.find(20), std::vector<std::string>(1, ""));							// print nothing
+	std::cout << "\nbasics\n";
+	this->names(_users.find(20), std::vector<std::string>(4, "ChannelDeRoger"));
+	this->names(_users.find(20), std::vector<std::string>(1, "Vive18,Gardien_de_la_paix"));
+	std::cout << "\nsecret chan, user out\n";
+	this->names(_users.find(19), std::vector<std::string>(1, "ChannelDeRoger"));
+	std::cout << "\nprivate chan, user out\n";
+	modeMoove[1] = "+p-s";
+	this->mode(_users.find(15), modeMoove);
+	// little_mode->second.convertModeFlagsToMask("+p");
+	this->names(_users.find(19), std::vector<std::string>(1, "ChannelDeRoger"));
+	little_mode++;
+	modeMoove[1] = "+p";
+	this->mode(_users.find(16), modeMoove);
+	// little_mode->second.convertModeFlagsToMask("+p");
+	std::cout << "\nall chan with some private chan, other not\n";
+	this->names(_users.find(20), std::vector<std::string>(0, ""));							// print private when is in, not when out
+
+
+	// invite
+	std::cout << "\n\n----------------CMD INVITE----------------\n";
+	std::vector<std::string>	invite1(1, "Roger2");
+	invite1.push_back("Vive18");
+	this->invite(_users.find(20), std::vector<std::string>(0, ""));				// 461 ERR_NEEDMOREPARAMS
+	this->invite(_users.find(20), std::vector<std::string>(1, ""));				// 461 ERR_NEEDMOREPARAMS
+	this->invite(_users.find(20), std::vector<std::string>(2, ""));				// 401 ERR_NOSUCHNICK
+	this->invite(_users.find(20), std::vector<std::string>(2, "UserRandom"));	// 401 ERR_NOSUCHNICK
+	std::cout << this->invite(_users.find(20), std::vector<std::string>(2, "Roger2")) << std::endl;		// nothing (chan does not exist)
+	this->invite(_users.find(20), invite1);										// 443 ERR_USERONCHANNEL
+	invite1[1] = "Gardien_de_la_paix";
+	this->invite(_users.find(20), invite1);										// 442 ERR_NOTONCHANNEL
+	invite1[1] = "GardienDeLaPaix";
+	this->invite(_users.find(19), invite1);										// 341 RPL_INVITING
+	modeMoove[1] = "+i-p";
+	this->mode(_users.find(16), modeMoove);
+	// little_mode->second.convertModeFlagsToMask("+i");
+	this->invite(_users.find(19), invite1);										// 482 ERR_CHANOPRIVSNEEDED
 
 
 	// mode cmd
 	std::cout << "----------------MODE cmd now test conversion of flags to mask----------------\n";
-	channel_map::iterator modeIt = _channel.begin();
-	modeIt->second.convertModeFlagsToMask("qwertyuiopasdfghjklzxcvbnm");
-	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
-	modeIt->second.convertModeFlagsToMask("-tyuio+pasdfghjk-lzxcvbnm");
-	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
-	modeIt->second.convertModeFlagsToMask("-tyuio+pasdfghjklzxcvbnm");
-	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
-	modeIt->second.convertModeFlagsToMask("+o");
-	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
-	modeIt->second.convertModeFlagsToMask("+o-o");
-	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
-	modeIt->second.convertModeFlagsToMask("+p-si+mz");
-	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
-	modeIt->second.convertModeFlagsToMask("+-psi");
-	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
+	this->mode(_users.find(20), std::vector<std::string>(0, ""));						//	ERR_NEEDMOREPARAMS
+	this->mode(_users.find(20), std::vector<std::string>(1, ""));						//	ERR_NEEDMOREPARAMS
+	this->mode(_users.find(20), std::vector<std::string>(2, ""));						//	ERR_NOSUCHCHANNEL
+	this->mode(_users.find(20), std::vector<std::string>(2, "pouet"));					//	pouet ERR_NOSUCHCHANNEL
+	this->mode(_users.find(20), std::vector<std::string>(2, "Gardien_de_la_paix"));		//	ERR_NOTONCHANNEL
+	std::vector<std::string>	all_you_need_is_love(1, "Vive18");
+	all_you_need_is_love.push_back("t");
+	this->mode(_users.find(20), all_you_need_is_love);									// t
+	all_you_need_is_love.push_back("7limitOfLOL");
+	all_you_need_is_love.push_back("Roger2");
+	all_you_need_is_love.push_back("passSoCOOL");
+	all_you_need_is_love[1] = "qwertyuiopasdfghjklzxcvbnm1234567890!@#$%&*()^_=}{[]|\\:;,.></?\'\"`~";
+	this->mode(_users.find(18), all_you_need_is_love);									// opsitnmlbvk
+	std::cout << "channel password " << this->_channel.find("Vive18")->second.getPassword() << std::endl;	// passSoCOOL
+	all_you_need_is_love[1] = "-tyui+pasdfghjk-lzxcvbnm";
+	this->mode(_users.find(20), all_you_need_is_love);					// psk
+	all_you_need_is_love[1] = "+o";
+	this->mode(_users.find(18), all_you_need_is_love);					// ERR_NOSUCHNICK
+	all_you_need_is_love[1] = "+p-si+mz";
+	this->mode(_users.find(20), all_you_need_is_love);					// pmk
+	all_you_need_is_love[1] = "+-psi";
+	this->mode(_users.find(20), all_you_need_is_love);					// mk
+	std::cout << "channel password " << this->_channel.find("Vive18")->second.getPassword() << std::endl;	// 7limitOfLOL
+	all_you_need_is_love[1] = "+-mkipiwrl";
+	this->mode(_users.find(20), all_you_need_is_love);					// empty
+	std::cout << "channel password " << this->_channel.find("Vive18")->second.getPassword() << std::endl;	// ""
+	all_you_need_is_love[1] = "+io";
+	this->mode(_users.find(20), all_you_need_is_love);					// ERR_CHANOPRIVSNEEDED
+	all_you_need_is_love[1] = "+k";
+	this->mode(_users.find(20), all_you_need_is_love);					// k
+	all_you_need_is_love[1] = "+l";
+	this->mode(_users.find(20), all_you_need_is_love);					// lk
+	std::cout << "channel limit " << this->_channel.find("Vive18")->second.getUserLimit() << std::endl;	// 7
+	all_you_need_is_love[1] = "-ilk";
+	this->mode(_users.find(20), all_you_need_is_love);					// empty
+	std::cout << "channel limit " << this->_channel.find("Vive18")->second.getUserLimit() << std::endl;	// 0
+	all_you_need_is_love[1] = "+kl";
+	this->mode(_users.find(20), all_you_need_is_love);					// lk
+	this->printChannels();
+	std::cout << "\nfocus on +-o mode\n";
+	std::vector<std::string>	love_love(1, "Vive18");
+	love_love.push_back("-lk");
+	this->mode(_users.find(18), love_love);								// 324 empty
+	love_love.push_back("Patoulatchi");
+	love_love[1] = "+o";
+	this->mode(_users.find(15), love_love);								// ERR_CHANOPRIVSNEEDED
+	this->mode(_users.find(18), love_love);								// 324 empty; 16 is operator
+	love_love[1] = "-o";
+	this->mode(_users.find(18), love_love);								// ERR_USERSDONTMATCH
+	this->mode(_users.find(16), love_love);								// 324 empty; 16 no more operator
+
+
+	// get and set descriptions
+	std::cout << "----------------Getting or Updating descriptions----------------\n";
+	this->topic(_users.begin(), std::vector<std::string> ());								// error need more params
+	std::vector<std::string>	printVive18(1, "Vive18");
+	this->topic(_users.find(18), printVive18);												// print topic
+	std::vector<std::string>	printChannelDeRoger(1, "ChannelDeRoger");
+	std::vector<std::string>	changeChannelDeRoger(printChannelDeRoger);
+	std::vector<std::string>	forbidchangeChannelDeRoger(printChannelDeRoger);
+	changeChannelDeRoger.push_back("Vive Roger");
+	std::vector<std::string>	add_mode_t(1, "ChannelDeRoger");
+	add_mode_t.push_back("+t");
+	this->mode(_users.find(15), add_mode_t);												// print 324 pt
+	forbidchangeChannelDeRoger.push_back("ViveMoi");
+	this->topic(_users.find(15), changeChannelDeRoger);										// change topic
+	this->topic(_users.find(18), printChannelDeRoger);										// print topic
+	this->topic(_users.find(18), forbidchangeChannelDeRoger);								// error operator
+	this->topic(_users.find(19), std::vector<std::string> (1, "Pouet"));					// error channel not exist
+	this->topic(_users.find(19), printChannelDeRoger);										// print topic
+	changeChannelDeRoger.pop_back();
+	changeChannelDeRoger.push_back("my topic is better");
+	changeChannelDeRoger.push_back("must be ignored");
+	this->topic(_users.find(15), changeChannelDeRoger);										// change topic
+
+	std::cout << std::endl;
+	this->printChannels();
+
+	// // remove x/2 users
+	// std::cout << "----------------QUIT/PART/KICK/disconnecting users----------------\n";
+	// //can't remove client with .removeClient() because I need _pfds
+	// // only remove client from channels (like in .reomoveClient())
+
+	std::cout << "use QUIT\n";
+	this->printUsers();
+	this->quit(_users.find(15), std::vector<std::string>());
+	this->quit(_users.find(16), std::vector<std::string>());
+	this->quit(_users.find(8), std::vector<std::string>());							// not exist ; ignore
+	this->quit(_users.find(17), std::vector<std::string>(3, "Tchao les nazes"));
+	this->quit(_users.find(18), std::vector<std::string>(1, "Babyee !!"));
+	this->printUsers();
+
+	std::cout << "use PART\n";
+	this->part(_users.find(18), std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
+	this->part(_users.find(83), std::vector<std::string>(1, std::string("ChannelDeRoger"))); // error 403
+	this->part(_users.find(4), std::vector<std::string>(1, std::string("GardienDeLaPaix")));	// error 442
+	this->part(_users.find(4), std::vector<std::string>(1, std::string("lolilol")));			// error 403
+	this->part(_users.find(4), std::vector<std::string>(0, std::string("")));				// error 461
+	this->part(_users.find(19), std::vector<std::string>(1, std::string("GardienDeLaPaix")));
+	// part with multiples params
+	this->join(_users.find(19), std::vector<std::string>(1, "testPart"));
+	this->join(_users.find(19), std::vector<std::string>(1, "testPart2"));
+	this->join(_users.find(19), std::vector<std::string>(1, "testPart3"));
+	this->join(_users.find(19), std::vector<std::string>(1, "testPart4"));
+	this->join(_users.find(20), std::vector<std::string>(1, "testPartNotOn"));
+	// this->join(_users.find(19)->second.getId(), "testPart");
+	// this->join(_users.find(19)->second.getId(), "testPart2");
+	// this->join(_users.find(19)->second.getId(), "testPart3");
+	// this->join(_users.find(19)->second.getId(), "testPart4");
+	// this->join(_users.find(20)->second.getId(), "testPartNotOn");
+	this->printChannels();
+	std::vector<std::string> multipart(1, "testPart");
+	multipart.push_back("testPart2");
+	multipart.push_back("pouet");			// error 403
+	multipart.push_back("testPart3");
+	multipart.push_back("testPartNotOn");	// error 442
+	multipart.push_back("testPart4");
+	this->part(_users.find(19), multipart);
+	this->printChannels();
+
+
+
+	// std::cout << "use KICK\n";
+	// std::vector<std::string> somekicks(1, "Vive18");
+	// somekicks.push_back("Guest0");	//id 20
+	// this->kick(_users.find(19), somekicks);
+	// somekicks[1] = "Toby"; // id 19
+	// this->kick(_users.find(21), somekicks);			// error ERR_CHANOPRIVSNEEDED
+	// somekicks[1] = "RandomUser"; // id 55
+	// this->kick(_users.find(19), somekicks);			// error ERR_NOTONCHANNEL
+	// somekicks[0] = "banchannel";
+	// somekicks[1] = "Guest1"; // id 21
+	// this->kick(_users.find(19), somekicks);			// error ERR_NOSUCHCHANNEL
+	// somekicks[0] = "Vive18";
+	// somekicks.push_back("jl'aime pas lui");
+	// this->kick(_users.find(19), somekicks);
+	// somekicks.pop_back();
+	// somekicks[1] = "Toby";
+	// this->kick(_users.find(19), somekicks);			// auto kick
+	
+	// // old way
+	// // this->kick("Vive18", 20, 19);
+	// // this->kick("Vive18", 19, 21); 					// error ERR_CHANOPRIVSNEEDED
+	// // this->kick("Vive18", 55, 19);					// error ERR_NOTONCHANNEL
+	// // this->kick("pouet", 21, 19);					// error ERR_NOSUCHCHANNEL
+	// // this->kick("Vive18", 21, 19, "jl'aime pas");
+	// // this->kick("Vive18", 19, 19); 					// auto kick possible => oui
+	// this->printChannels();
+
+
 	std::cout << "====================================================\n\n";
+
+	// this->printChannels();
+
 	// END SIMULATION test
 */
 }

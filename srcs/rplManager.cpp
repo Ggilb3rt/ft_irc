@@ -12,15 +12,28 @@ rplManager	*rplManager::getInstance()
 
 rplManager::rplManager()
 {
-	list.insert(new_pair(RPL_OKCONN, RPL_OKCONN_MSG));
+	list.insert(new_pair(RPL_OKCONNECT, RPL_OKCONNECT_MSG));
 	list.insert(new_pair(14, " :petit mais puissant"));
+	list.insert(new_pair(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG));
+	list.insert(new_pair(ERR_USERONCHANNEL, ERR_USERONCHANNEL_MSG));
 	list.insert(new_pair(ERR_NOTONCHANNEL, ERR_NOTONCHANNEL_MSG));
 	list.insert(new_pair(ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG));
 	list.insert(new_pair(ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG));
 	list.insert(new_pair(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG));
+	list.insert(new_pair(ERR_CHANNELISFULL, ERR_CHANNELISFULL_MSG));
+	list.insert(new_pair(ERR_INVITEONLYCHAN, ERR_INVITEONLYCHAN_MSG));
+	list.insert(new_pair(ERR_BADCHANNELKEY, ERR_BADCHANNELKEY_MSG));
+	list.insert(new_pair(RPL_UMODEIS, RPL_UMODEIS_MSG));
+	list.insert(new_pair(RPL_CHANNELMODEIS, RPL_CHANNELMODEIS_MSG));
 	list.insert(new_pair(RPL_NOTOPIC, RPL_NOTOPIC_MSG));
 	list.insert(new_pair(RPL_TOPIC, RPL_TOPIC_MSG));
-	list.insert(new_pair(RPL_UMODEIS, RPL_UMODEIS_MSG));
+	list.insert(new_pair(RPL_LIST, RPL_LIST_MSG));
+	list.insert(new_pair(RPL_LISTEND, RPL_LISTEND_MSG));
+	list.insert(new_pair(RPL_NAMREPLY, RPL_NAMREPLY_MSG));
+	list.insert(new_pair(RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG));
+	list.insert(new_pair(RPL_INVITING, RPL_INVITING_MSG));
+	list.insert(new_pair(ERR_USERSDONTMATCH, ERR_USERSDONTMATCH_MSG));
+
 }
 
 rplManager::~rplManager()

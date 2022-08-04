@@ -69,11 +69,10 @@ private:
 	unsigned int				_nick_suffixe;
 	
 	channel_map					_channel;
-
+	
 	std::string					_pass;
 
 	// init
-	// void			set_signal_status(int signum);
 	void			init();
 	void			initAddrInfo();
 	void			createMasterSocket();
@@ -109,20 +108,29 @@ private:
 	void			sendToClient(int fd, int code, std::string param_1 = "", std::string param_2 = "");
 	user_id			getUserByNick(std::string nick);
 	users_map::iterator getUserById(user_id id);
+	void			namesRplConditions(users_map::iterator &user,
+								channel_map::iterator &all_chans_it,
+								rplManager *rpl_manager);
+	void			listRplConditions(users_map::iterator &user,
+								channel_map::iterator &all_chans_it,
+								rplManager *rpl_manager);
 	void			printUsers();
 	void			printChannels();
 
 
 
-	// cmds //? must return char* with response inside
-	std::string	topic(user_id id, std::string current_chan, const char *msg = NULL);
-	std::string	join(user_id id, std::string chan, std::string key = ""); // key == password ?
-	std::string	part(user_id, const std::vector<std::string> chans);
-	std::string kick(std::string chan, user_id victim, user_id kicker, std::string comment = "");
-	std::string	quit(user_id client, std::string message = "");
-	
-	std::string	names(std::vector<std::string> chans());
-	std::string	list(std::vector<std::string> chans());
+	// cmds //! il faudrait que tout les params soient const
+	bool	topic(users_map::iterator user, std::vector<std::string> params);
+	bool	join(users_map::iterator user, std::vector<std::string> params);
+	bool	part(users_map::iterator user, const std::vector<std::string> params);
+	bool	kick(users_map::iterator user, const std::vector<std::string> params);
+	bool	quit(users_map::iterator user, std::vector<std::string> params);
+
+	bool	mode(users_map::iterator user, std::vector<std::string> params);
+	bool	names(users_map::iterator user, std::vector<std::string> params);
+	bool	list(users_map::iterator user, std::vector<std::string> params);
+	bool	invite(users_map::iterator user, std::vector<std::string> params);
+
 
 public:
 	ircServer(char *_port, std::string pass);

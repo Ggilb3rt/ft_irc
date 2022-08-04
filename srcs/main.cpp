@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 	}
 
 	std::signal(SIGINT, signal_handler);
-	ircServer	base(argv[1]);
+	ircServer	base(argv[1], "superIrc");
 	rplManager	*rpl_manager = rplManager::getInstance();
 
 
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
 
 	base.printAddrInfo();
-	// base.startListen();
+	base.startListen();
 
 	delete rpl_manager;
 

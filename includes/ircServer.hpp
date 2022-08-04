@@ -41,7 +41,9 @@ class ircServer
 #define FDLIMIT 1021
 #define MASK (POLLIN) // + POLLRDHUP + POLLHUP) //+ POLLERR + POLLNVAL + POLLRDHUP)
 
-#define USER_STATUS_DEL	1
+#define USER_STATUS_DEL	2
+#define USER_STATUS_PENDING 0
+#define USER_STATUS_CONNECTED 1
 
 
 typedef		std::map<int, user>						users_map;
@@ -68,7 +70,7 @@ private:
 	
 	channel_map					_channel;
 
-
+	std::string					_pass;
 
 	// init
 	// void			set_signal_status(int signum);
@@ -81,17 +83,19 @@ private:
 
 	// read and parse
 	int				readData(clients_vector::iterator);
-	void			parse(std::string msg);
+	bool			parse(users_map::iterator &it, std::string query);
+	bool    		handleCommands(users_map::iterator &it, std::vector<std::string> &argvec);
 
 	// execute
-	void			parse(clients_vector::iterator it, std::string query, int channel);
-	void			handleCommands(clients_vector::iterator it, std::string query);
-	void			handleNick(users_map::iterator it, std::string newNick);
+	bool			handleUser(users_map::iterator pair, std::vector<std::string> &argvec);
+	bool			handleNick(users_map::iterator pair, std::vector<std::string> &argvec);
+	bool			checkPass(std::string pass);
 
 
 	// client managements
 	void			addClient(int fd);
 	void			addClient(int fd, std::string nick, std::string name);
+	void			registerUser(users_map::iterator &it);
 	void			removeAllUsersFromChans(int id_user);
 	void			removeClient(clients_vector::iterator &it);
 	void			removeClient(users_map::iterator &it);
@@ -102,7 +106,7 @@ private:
 	void			removeChannel(channel_map::iterator &it);
 
 	// helpers
-	void			sendToClient(int fd, const char *msg);
+	void			sendToClient(int fd, int code, std::string param_1 = "", std::string param_2 = "");
 	user_id			getUserByNick(std::string nick);
 	users_map::iterator getUserById(user_id id);
 	void			printUsers();
@@ -121,7 +125,7 @@ private:
 	std::string	list(std::vector<std::string> chans());
 
 public:
-	ircServer(char *_port);
+	ircServer(char *_port, std::string pass);
 	~ircServer();
 
 	void	startListen();

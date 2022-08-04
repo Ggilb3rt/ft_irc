@@ -64,7 +64,7 @@
 
 */
 
-ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
+ircServer::ircServer(char *port, std::string pass) : _port(port), _nick_suffixe(0), _pass(pass)
 {
 	this->init();
 
@@ -86,7 +86,7 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 			- try to change desciption with operator and basic user
 			- remove x/2 users
 				- try to kick some of them with operator and basic user
-	*/
+	
 	std::cout << "\n\n===========STARTING SIMULATION TEST============\n\n";
 
 	// create users
@@ -197,7 +197,7 @@ ircServer::ircServer(char *port) : _port(port), _nick_suffixe(0)
 	std::cout << "\t==> " << modeIt->second.convertModeMaskToFlags() << std::endl;
 	std::cout << "====================================================\n\n";
 	// END SIMULATION test
-
+*/
 }
 
 ircServer::~ircServer()

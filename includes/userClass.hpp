@@ -4,12 +4,16 @@
 #include <string>
 #include <map>
 
+
 class user
 {
+	#define USER_STATUS_PENDING 0
+
 	private:
 		int						_id;
 		std::string				_nick;
 		std::string				_name;
+		std::string				_username;
 		int						_status;
 
 
@@ -18,7 +22,7 @@ class user
 
 		user(int fd) :
 			_id(fd),
-			_status(0)
+			_status(USER_STATUS_PENDING)
 		{}
 		user(int fd, std::string nick, std::string name) :
 			_id(fd),

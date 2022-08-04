@@ -1,25 +1,94 @@
 #include "ircServer.hpp"
 
-void    ircServer::parse(clients_vector::iterator it, std::string query, int channel)
-{
-    if (query.length() > MSG_MAX_SIZE) {
-        sendToClient(it->fd, "Message must be less than 510 characters");
+//  TOKENIZE : prefix, cmd, args
+//  ->check channel concerned
+//  ->check prefix
+
+//  if      ->check command
+//              if !->check validity
+//                      ->send_msg to channel or nth
+//              ->check args
+//              ->send cmd(vector(args))
+//  else    
+//          ->send_msg to channel or nth
+bool    ircServer::parse(users_map::iterator &it, std::string query)
+{   
+    size_t                      pos = 0;
+    size_t                      old = 0;
+    std::string                 longarg;
+    std::vector<std::string>    argvec;
+
+    std::cout << "\n\n--------PARSE--------\n\n" << std::endl;
+
+    if ((pos = query.find(":")) != std::string::npos) {
+        pos += 1;
+        longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
+        query = query.substr(0, pos - 1);
     }
-    else if (*(query.begin()) == '/') {
-        handleCommands(it, query);
+
+    
+    std::cout << "QUERY == " << query << std::endl;
+    pos = 0;
+
+    while (pos != std::string::npos) {
+        pos = query.find(' ', old);
+        if (query.c_str()[pos - 1] == ',') {
+            // TODO: send syntax error
+            return (false);
+        }
+        std::cout << "OLD == " << old << " | POS == " << pos << " | SUB == |" << query.substr(old, pos - old) << "|\n";
+        argvec.push_back(query.substr(old, pos - old));
+        old = pos + 1;
     }
+
+    if (longarg.c_str())
+        argvec.push_back(longarg);
     else {
-       // sendToChannel(query, channel);
+        if (argvec[0] == "USER") {
+            // send err: no double dot before real name
+            return (false);
+        }
     }
-    // check if it starts with /
-    //  -> no? send msg, return;
-    // check if command exists
-    //  handleCmd
-	(void)channel;
+
+    return(handleCommands(it, argvec));
 }
 
-void    ircServer::handleCommands(clients_vector::iterator it, std::string query)
+bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
 {
-    (void)it;
-	(void)query;
+    if (argvec[0] == "NICK") {
+        std::cout << "JE SUIS LAAA\n";
+        argvec.erase(argvec.begin());
+        return (handleNick(it, argvec));
+    }
+    // else if (argvec[0] == "LIST") {
+        
+    // }
+    else if (argvec[0] == "PASS") {
+        std::cout << "JE SUIS ICIIIIII\n";
+        return (checkPass(argvec[1]));
+    }
+    // else if (argvec[0] == "QUIT") {
+    //     return (quit(argvec));
+    // }
+    // else if (argvec[0] == "USER") {
+    //   argvec.erase(argvec.begin());   
+    // }
+    // else if (argvec[0] == "MODE") {
+    //    argvec.erase(argvec.begin());
+    // }
+    // else if (argvec[0] == "PING") {
+    //    argvec.erase(argvec.begin());    
+    // }
+    // else if (argvec[0] == "TOPIC") {
+    //    argvec.erase(argvec.begin());    
+    // }
+    // else if (argvec[0] == "JOIN") {
+    //    argvec.erase(argvec.begin());
+    //    
+    // }
+    // else if (argvec[0] == "PART") {
+    //    argvec.erase(argvec.begin());
+    //    
+    // }
+    return (false);
 }

@@ -36,7 +36,8 @@ int		ircServer::readData(clients_vector::iterator client)
 			if (user_x->second.getStatus() == USER_STATUS_CONNECTED) {
 				while (pos != std::string::npos) {
 					pos = buffer.find("\r\n", old);
-					parse(user_x, buffer.substr(old, pos - old));
+					if (pos != std::string::npos)
+						parse(user_x, buffer.substr(old, pos - old));
         			old = pos + 1;
 				}
 			}

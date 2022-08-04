@@ -90,21 +90,20 @@ void	ircServer::registerUser(users_map::iterator &it) {
 			it->second.setStatus(USER_STATUS_DEL);
 			return ;
 		}
-		// if (!handleUser(it, getChunk(it->second._msg, "USER"))) {
-		// 	newUser.setStatus(USER_STATUS_DEL);
-		// 	return ;
-		// }
-		it->second.setStatus(USER_STATUS_CONNECTED);
-		it->second._msg.clear();
-		std::string res;
-		sendToClient(it->first, RPL_OKCONN, it->second.getNick());
-		std::cout << "Send reponse " << res << std::endl;
-		}
-		if (getChunk(it->second._msg, "USER").size() > 0  ) {
-			// send password required;
-			std::cout << "pas de pass\n";
+		if (!parse(it, getChunk(it->second._msg, "USER"))) {
+			std::cout << "sil te plait ne t'affiche pas\n";
+			it->second.setStatus(USER_STATUS_DEL);
 			return ;
 		}
+		it->second.setStatus(USER_STATUS_CONNECTED);
+		it->second._msg.clear();
+		sendToClient(it->first, RPL_OKCONN, it->second.getNick());
+	}
+	if (getChunk(it->second._msg, "USER").size() > 0  ) {
+		// send password required;
+		std::cout << "pas de pass\n";
+		return ;
+	}
 }
 
 int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {

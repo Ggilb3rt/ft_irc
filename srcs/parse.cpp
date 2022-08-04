@@ -20,6 +20,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 
     std::cout << "\n\n--------PARSE--------\n\n" << std::endl;
 
+    std::cout << "QUERY == " << query << std::endl;
     if ((pos = query.find(":")) != std::string::npos) {
         pos += 1;
         longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
@@ -27,7 +28,6 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     }
 
     
-    std::cout << "QUERY == " << query << std::endl;
     pos = 0;
 
     while (pos != std::string::npos) {
@@ -43,12 +43,12 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 
     if (longarg.c_str())
         argvec.push_back(longarg);
-    else {
-        if (argvec[0] == "USER") {
-            // send err: no double dot before real name
-            return (false);
-        }
-    }
+    // else {
+    //     if (argvec[0] == "USER") {
+    //         // send err: no double dot before real name
+    //         return (false);
+    //     }
+    // }
 
     return(handleCommands(it, argvec));
 }
@@ -70,9 +70,10 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
     // else if (argvec[0] == "QUIT") {
     //     return (quit(argvec));
     // }
-    // else if (argvec[0] == "USER") {
-    //   argvec.erase(argvec.begin());   
-    // }
+    else if (argvec[0] == "USER") {
+      argvec.erase(argvec.begin());
+      return (handleUser(it, argvec)); 
+    }
     // else if (argvec[0] == "MODE") {
     //    argvec.erase(argvec.begin());
     // }
@@ -82,10 +83,10 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
     // else if (argvec[0] == "TOPIC") {
     //    argvec.erase(argvec.begin());    
     // }
-    // else if (argvec[0] == "JOIN") {
-    //    argvec.erase(argvec.begin());
-    //    
-    // }
+    else if (argvec[0] == "JOIN") {
+       argvec.erase(argvec.begin());
+       join(it, argvec);
+    }
     // else if (argvec[0] == "PART") {
     //    argvec.erase(argvec.begin());
     //    

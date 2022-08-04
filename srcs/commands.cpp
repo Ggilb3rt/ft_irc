@@ -4,14 +4,20 @@
 
 // considering the input is an iterator->[client_fd][user], and an already parsed string nick
 
-void	toLower(std::string &nickname) {
+std::string	toLower(std::string nickname) {
+
+	std::string	lower;
+
 	int	i = 0;
 
 	while (nickname.c_str()[i]) {
 		if (nickname.c_str()[i] >= 'A' && nickname.c_str()[i] <= 'Z')
-			nickname[i] = nickname.c_str()[i] + 32;
+			lower += nickname.c_str()[i] + 32;
+		else
+			lower += nickname.c_str()[i];
 		i++;
 	}
+	return (lower);
 }
 
 bool	isAlnum(char c) {
@@ -60,31 +66,39 @@ bool    ircServer::handleNick(users_map::iterator pair, std::vector<std::string>
         sendToClient(pair->first, 432);
 		return (false);
     }
-	std::cout << "\n---HANDLENICK  2---\n" << "---> NICKNAME == |" << newNick << "|\n";
-
-	// MAKE IT CASE INSENSITIVE
-	toLower(newNick);
 
 	std::cout << "\n---HANDLENICK  3---\n" << "---> NICKNAME == |" << newNick << "|\n";
 
 	// CHECK FOR DOUBLON
     while (beg != end) {
-        if (beg->second.getNick() == newNick) {
-            sendToClient(pair->first, 433);
-			std::cout << "ERR_NICKNAMEINUSE\n";
+        if (toLower(beg->second.getNick()) == toLower(newNick)) {
+            sendToClient(pair->first, ERR_NICKNAMEINUSE);
+			std::cout << ERR_NICKNAMEINUSE << " " << toLower(newNick) << " == " << toLower(beg->second.getNick()) << std::endl;
 			return (false);
         }
         beg++;
     }
-    pair->second.setNick(newNick);
 	if (pair->second.getStatus() == USER_STATUS_CONNECTED)
-     	sendToClient(pair->first, 001);
+     	sendToClient(pair->first, RPL_OKNICK, std::string(), newNick);
+    pair->second.setNick(newNick);
 	return (true);
 }
 
-// bool		ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &argvec) {
-	
-// }
+bool		ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &argvec) {
+	std::string			newName = argvec[0];
+	if (pair->second.getStatus() == USER_STATUS_CONNECTED) {
+		sendToClient(pair->first, ERR_ALREADYREGISTRED);
+		return (false);
+	}
+	if (argvec.size() < 4 || argvec[4].size() <= 0) {
+		std::cout << "Ayy Caramba! -- " << argvec.size() << "|\n" << argvec[4] << std::endl;
+		sendToClient(pair->first, ERR_NEEDMOREPARAMS);
+		return (false);
+	}
+	pair->second.setName(newName);
+	std::cout << "JE DOIS MAFFICHER SVP\n";
+	return (true);
+}
 
 bool		ircServer::checkPass(std::string pass) {
 	std::cout << "In pass cmd, pass == |" << pass << "|\n";
@@ -92,8 +106,7 @@ bool		ircServer::checkPass(std::string pass) {
 		return (false);
 	}
 	else if (pass.size() < 1) {
-		std::cout << "ERR_ERRNUMBARGS\n";
-		// sendToClient(pair->first, 461);
+		// sendToClient(pair->first, ERR_NEEDMOREPARAMS);
 		return (false);
 	}
 	return (true);
@@ -172,21 +185,23 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 			-> RPL_TOPIC
 	*/
 
-	rplManager					*rpl_manager = rplManager::getInstance();
+	// rplManager					*rpl_manager = rplManager::getInstance();
 	std::vector<std::string>	chans;
 	std::vector<std::string>	keys;
 	channel_map::iterator		chan_exist;
 	bool						user_not_in = true;
 
 	if (params.size() == 0) {
-		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
+		sendToClient(user->first, ERR_NEEDMOREPARAMS, "JOIN");
+		// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
 		return (false);
 	}
 	chans = split_in_vect(params[0], MSG_MULTI_PARAM_DELIM);
 	if (params.size() >= 2) {
 		keys = split_in_vect(params[1], MSG_MULTI_PARAM_DELIM);
 		if (chans.size() != keys.size()) {
-			std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
+			sendToClient(user->first, ERR_NEEDMOREPARAMS, "JOIN");
+			// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
 			return (false);
 		}
 	}
@@ -199,13 +214,15 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 		else {
 			// check mode invite
 			if (chan_exist->second.isFlagSets(CHAN_MASK_I)) {
-				std::cout << rpl_manager->createResponse(ERR_INVITEONLYCHAN, chan_exist->first);
+				sendToClient(user->first, ERR_INVITEONLYCHAN, chan_exist->first);
+				// std::cout << rpl_manager->createResponse(ERR_INVITEONLYCHAN, chan_exist->first);
 				return (false);
 			}
 			// check mode limit then check limit not reach
 			if (chan_exist->second.isFlagSets(CHAN_MASK_L)) {
 				if (chan_exist->second.getUserLimit() <= chan_exist->second.getSize()) {
-					std::cout << rpl_manager->createResponse(ERR_CHANNELISFULL, chan_exist->first);
+					sendToClient(user->first, ERR_CHANNELISFULL, chan_exist->first);
+					// std::cout << rpl_manager->createResponse(ERR_CHANNELISFULL, chan_exist->first);
 					return (false);
 				}
 			}
@@ -214,18 +231,23 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 			// check mode pass then check corresponding pass
 			if (chan_exist->second.isFlagSets(CHAN_MASK_K)) {
 				if (chans.size() != keys.size()) {
-					std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
+					sendToClient(user->first, ERR_NEEDMOREPARAMS, "JOIN");
+					// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "JOIN");
 					return (false);
 				}
 				if (chan_exist->second.getPassword() != keys[i]) {
-					std::cout << rpl_manager->createResponse(ERR_BADCHANNELKEY, chan_exist->first);
+					sendToClient(user->first, ERR_BADCHANNELKEY, chan_exist->first);
+					// std::cout << rpl_manager->createResponse(ERR_BADCHANNELKEY, chan_exist->first);
 					return (false);
 				}
 			}
 			user_not_in = chan_exist->second.addUser(user->first);
 		}
-		if (user_not_in)
-			std::cout << rpl_manager->createResponse(RPL_TOPIC, chan_exist->first, chan_exist->second.getDescription());
+		if (user_not_in) {
+			sendToClient(user->first, RPL_OKJOIN, std::string(), chan_exist->first);
+			sendToClient(user->first, RPL_TOPIC, chan_exist->first, chan_exist->second.getDescription());
+		}
+			// std::cout << rpl_manager->createResponse(RPL_TOPIC, chan_exist->first, chan_exist->second.getDescription());
 		// send NAMES
 		i++;
 	}

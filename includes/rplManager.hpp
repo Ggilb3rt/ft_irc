@@ -6,10 +6,15 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include "userClass.hpp"
 
 // ERRORS
 #define ERR_NOSUCHNICK				401
 #define ERR_NOSUCHNICK_MSG			" :No such nick/channel" // 401 <nickname>
+#define ERR_ONEUSNICKNAME			432
+#define ERR_ONEUSNICKNAME_MSG		" :Erroneous nickname" // 401 <nickname>
+#define ERR_NICKNAMEINUSE			433
+#define ERR_NICKNAMEINUSE_MSG		" :Nickname is already in use" // 401 <nickname>
 #define ERR_NOSUCHCHANNEL			403
 #define ERR_NOSUCHCHANNEL_MSG		" :No such channel" // 403 <channel_name>
 #define ERR_NOTONCHANNEL			442
@@ -28,10 +33,16 @@
 #define ERR_BADCHANNELKEY_MSG		" :Cannot join channel (+k)" // 475 <channel>
 #define ERR_USERSDONTMATCH			502
 #define ERR_USERSDONTMATCH_MSG		" :Cannot change mode for other users"
+#define ERR_ALREADYREGISTRED		462
+#define ERR_ALREADYREGISTRED_MSG	" :Unauthorized command (already registered)"
 
 // REPLIES
-#define RPL_OKCONN				001
-#define RPL_OKCONN_MSG			" :Welcome to the internet"
+#define RPL_OKCONN					001
+#define RPL_OKCONN_MSG				" :Welcome to the internet"
+#define RPL_OKNICK					-1
+#define RPL_OKNICK_MSG				"NICK "
+#define RPL_OKJOIN					-2
+#define RPL_OKJOIN_MSG				"JOIN "
 #define	RPL_UMODEIS					221
 #define	RPL_UMODEIS_MSG				"i" // 221 "<user mode string>"
 #define	RPL_LIST					322
@@ -71,6 +82,7 @@ class	rplManager
 		static rplManager	*getInstance();
 
 		std::string	createResponse(int ret, std::string opt_before = "", std::string opt_after = "");
+		std::string	createResponse(user &usr, int ret, std::string opt_before = "", std::string opt_after = "");
 		void		printAll();
 };
 

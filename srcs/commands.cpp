@@ -304,7 +304,7 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 	modes_to_remove = it_chan->second.convertNegativeFlagsToMask(params[1]);
 
 
-	//! CHECK FOR REMOVE
+	//! CHECK FOR REMOVE user operator
 	// check if -o user == user_edit
 	//		else return ERR_USERSDONTMATCH
 	if (get_bit(modes_to_remove, CHAN_MASK_O)) {
@@ -316,6 +316,8 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 			std::cout << rpl_manager->createResponse(ERR_USERSDONTMATCH);
 			return (false);
 		}
+		it_chan->second.setUserRole(this->getUserByNick(user->second.getNick()), false);
+		modes_to_remove = clear_bit(modes_to_remove, CHAN_MASK_O);
 	}
 
 
@@ -358,7 +360,6 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 	else if (K_set)
 		pass = params[2];
 
-	(void)limit;(void)user_edit;
 
 	// need to check if user is operator
 	if (O_set) {
@@ -371,6 +372,7 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 			return (false);
 		}
 		it_chan->second.setUserRole(this->getUserByNick(user_edit), true);
+		modes_to_add = clear_bit(modes_to_add, CHAN_MASK_O);
 	}
 	// need to check if limit can atoi()
 	if (L_set) {

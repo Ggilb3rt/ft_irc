@@ -87,9 +87,7 @@ int main(int argc, char **argv)
 
 	/* Replie manager TESTS */
 	std::cout << "rpl_manager addr " << rpl_manager << std::endl;
-	rpl_manager->printAll();
-	std::cout << std::endl << rpl_manager->createResponse(1, "roger");
-	std::cout << std::endl << rpl_manager->createResponse(14);
+	// rpl_manager->printAll();
 	std::cout << std::endl << rpl_manager->createResponse(RPL_TOPIC, "channelX", "Super topic de ouf");
 	// end replie manager tests
 

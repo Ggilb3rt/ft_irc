@@ -9,26 +9,6 @@
 
 int		channel::convertPositiveFlagsToMask(std::string param)
 {
-	//? don't know if should set _modes or return the mask
-	//! I do it before return
-
-	// {[+|-]|o|p|s|i|t|n|b|v}
-
-	// +psi
-	// +-psi ==> -psi ==> 0
-	// +p+s+i ==> +psi
-	// +p-si+m ==> +pm-si ==> +pm (if s,i not set)
-	// +p-si+mz  ==> +pm-si ==> +pm (if s,i not set)
-
-	// +opsitnmlbvk						==> +psitnm (because o and b limits other modes (don't understand))
-	// +psitnmlvk						==> +psitnm (because l, v and k needs options)
-	// +psitnmlvk 5						==> +psitnml (because l == 5)
-	// +psitnmlvk 5 userInChan			==> +psitnmlv (because v == userInChan)
-	// +psitnmlvk 5 userNotInChan		==> +psitnml (because userNotInChan)
-	// +psitnmlvk 5 userInChan pass		==> +psitnmlvk (because k == pass)
-	// +psitnmlvkb 5 userInChan pass	==> +psitnmlvk (send error ban)
-
-
 	std::string	valid_flags = CHAN_FLAGS_VALID;
 	int			mask = 0;
 	bool		mask_add = true;

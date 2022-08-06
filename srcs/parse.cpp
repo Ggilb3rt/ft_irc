@@ -53,43 +53,83 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     return(handleCommands(it, argvec));
 }
 
+//? Don't forget to change this value if you modify the number of commands below
+# define NB_CMD 10
+
+enum e_commands
+{
+	NICK,
+	LIST,
+	PASS,
+	QUIT,
+	USER,
+	MODE,
+	PING,
+	TOPIC,
+	JOIN,
+	PART
+};
+
 bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
 {
-    if (argvec[0] == "NICK") {
-        std::cout << "JE SUIS LAAA\n";
-        argvec.erase(argvec.begin());
-        return (handleNick(it, argvec));
-    }
-    // else if (argvec[0] == "LIST") {
-        
-    // }
-    else if (argvec[0] == "PASS") {
-        std::cout << "JE SUIS ICIIIIII\n";
-        return (checkPass(argvec[1]));
-    }
-    // else if (argvec[0] == "QUIT") {
-    //     return (quit(argvec));
-    // }
-    else if (argvec[0] == "USER") {
-      argvec.erase(argvec.begin());
-      return (handleUser(it, argvec)); 
-    }
-    // else if (argvec[0] == "MODE") {
-    //    argvec.erase(argvec.begin());
-    // }
-    // else if (argvec[0] == "PING") {
-    //    argvec.erase(argvec.begin());    
-    // }
-    // else if (argvec[0] == "TOPIC") {
-    //    argvec.erase(argvec.begin());    
-    // }
-    else if (argvec[0] == "JOIN") {
-       argvec.erase(argvec.begin());
-       join(it, argvec);
-    }
-    // else if (argvec[0] == "PART") {
-    //    argvec.erase(argvec.begin());
-    //    
-    // }
+	std::string s_commands[NB_CMD] {
+		"NICK",
+		"LIST",
+		"PASS",
+		"QUIT",
+		"USER",
+		"MODE",
+		"PING",
+		"TOPIC",
+		"JOIN",
+		"PART"
+	};
+
+	for (int i = 0; i < NB_CMD; i++)
+		if ((av[1]) == s_commands[i])
+			break ;
+    
+	switch (i)
+	{
+		case NICK:
+			std::cout << "JE SUIS LAAA\n";
+			argvec.erase(argvec.begin());
+			return (handleNick(it, argvec));
+		
+		case LIST:
+			break;
+		
+		case PASS:
+			std::cout << "JE SUIS ICIIIIII\n";
+			return (checkPass(argvec[1]));
+		
+		case USER:
+			argvec.erase(argvec.begin());
+			return (handleUser(it, argvec)); 
+		
+		case MODE:
+			// argvec.erase(argvec.begin());
+			break;
+
+		case PING:
+			// argvec.erase(argvec.begin());
+			break;
+
+		case TOPIC:
+			// argvec.erase(argvec.begin());  
+			break;
+		
+		case JOIN:
+			argvec.erase(argvec.begin());
+			join(it, argvec);
+			break;
+
+		case PART:
+			argvec.erase(argvec.begin());
+			break;
+		
+		default:
+			break;
+	}
     return (false);
 }

@@ -18,6 +18,8 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_OKTOPIC, RPL_OKTOPIC_MSG));
 	list.insert(new_pair(RPL_OKPONG, RPL_OKPONG_MSG));
 	list.insert(new_pair(RPL_OKPART, RPL_OKPART_MSG));
+	list.insert(new_pair(RPL_OKNAMES, RPL_OKNAMES_MSG));
+	list.insert(new_pair(RPL_OKNLIST, RPL_OKNLIST_MSG));
 	list.insert(new_pair(14, " :petit mais puissant"));
 	list.insert(new_pair(ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG));
 	list.insert(new_pair(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG));

@@ -71,27 +71,35 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		return (quit(it, argvec));
 	}
 	else if (argvec[0] == "USER") {
-	argvec.erase(argvec.begin());
-	return (handleUser(it, argvec)); 
+		argvec.erase(argvec.begin());
+		return (handleUser(it, argvec)); 
 	}
 	// else if (argvec[0] == "MODE") {
 	//    argvec.erase(argvec.begin());
 	// }
 	else if (argvec[0] == "TOPIC") {
-	argvec.erase(argvec.begin());
-	topic(it, argvec);   
+		argvec.erase(argvec.begin());
+		topic(it, argvec);   
 	}
 	else if (argvec[0] == "JOIN") {
-	argvec.erase(argvec.begin());
-	join(it, argvec);
+		argvec.erase(argvec.begin());
+		join(it, argvec);
 	}
 	else if (argvec[0] == "PING") {
-	argvec.erase(argvec.begin());
-	pong(it, argvec);
+		argvec.erase(argvec.begin());
+		pong(it, argvec);
 	}
 	else if (argvec[0] == "PART") {
-	argvec.erase(argvec.begin());
-	part(it, argvec);
+		argvec.erase(argvec.begin());
+		part(it, argvec);
+	}
+	else if (argvec[0] == "NAMES") {
+		argvec.erase(argvec.begin());
+		names(it, argvec);
+	}
+	else if (argvec[0] == "LIST") {
+		argvec.erase(argvec.begin());
+		list(it, argvec);
 	}
 	return (false);
 }

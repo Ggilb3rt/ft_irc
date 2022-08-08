@@ -244,7 +244,7 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 		if (user_not_in) {
 			sendToClient(user->first, RPL_OKJOIN, std::string(), chan_exist->first);
 			topic(user, std::vector<std::string>(1, chan_exist->first));
-			// names(user, std::vector<std::string>(1, chan_exist->first));
+			names(user, std::vector<std::string>(1, chan_exist->first));
 		}
 		i++;
 	}
@@ -292,8 +292,8 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 		if (chan_exist->second.getSize() == 0)
 			_channel.erase(chan_exist);
 		//! must send to client confirm
-		if (send_part_msg && chans.size() > 2) {
-			std::string ret(chan_exist->first + " " + params[2]);
+		if (send_part_msg && params.size() > 2) {
+			std::string ret(chan_exist->first + " :" + params[2]);
 			sendToClient(user->first, RPL_OKPART, std::string(), ret);
 		}
 		else
@@ -528,7 +528,6 @@ bool	ircServer::names(users_map::iterator user, std::vector<std::string> params)
 			-> RPL_ENDOFNAMES
 	*/
 
-	rplManager					*rpl_manager = rplManager::getInstance();
 	std::vector<std::string>	chans;
 	bool						print_all = !(params.size());
 	channel_map::iterator		all_chans_it;
@@ -539,13 +538,13 @@ bool	ircServer::names(users_map::iterator user, std::vector<std::string> params)
 			chan != chans.end(); chan++) {
 			all_chans_it = _channel.find(*chan);
 			if (all_chans_it != _channel.end())
-				this->namesRplConditions(user, all_chans_it, rpl_manager);
+				this->namesRplConditions(user, all_chans_it);
 		}
 	}
 	else {
 		all_chans_it = _channel.begin();
 		while (all_chans_it != _channel.end()) {
-			this->namesRplConditions(user, all_chans_it, rpl_manager);
+			this->namesRplConditions(user, all_chans_it);
 			all_chans_it++;
 		}
 	}
@@ -565,7 +564,12 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 	bool						print_all = !(params.size());
 	channel_map::iterator		all_chans_it;
 
+	for (size_t i = 0; i < params.size(); i++)
+		std::cout << "liiiiiist " << params[i] << std::endl;
+	// print_all = true;
+
 	if (!print_all) {
+		std::cout << "\tnot print all\n";
 		chans = split_in_vect(params[0], MSG_MULTI_PARAM_DELIM);
 		for (std::vector<std::string>::iterator chan = chans.begin();
 			chan != chans.end(); chan++) {
@@ -576,13 +580,15 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 		}
 	}
 	else {
+		std::cout << "\tprint all\n";
 		all_chans_it = _channel.begin();
 		while (all_chans_it != _channel.end()) {
 			this->listRplConditions(user, all_chans_it, rpl_manager);
 			all_chans_it++;
 		}
 	}
-	std::cout << rpl_manager->createResponse(RPL_LISTEND);
+	sendToClient(user->first, RPL_LISTEND);
+	// std::cout << rpl_manager->createResponse(RPL_LISTEND);
 	return (true);
 }
 

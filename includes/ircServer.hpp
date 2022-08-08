@@ -109,8 +109,7 @@ private:
 	user_id			getUserByNick(std::string nick) const;
 	users_map::iterator getUserById(user_id id);
 	void			namesRplConditions(users_map::iterator &user,
-								channel_map::iterator &all_chans_it,
-								rplManager *rpl_manager);
+								channel_map::iterator &all_chans_it);
 	void			listRplConditions(users_map::iterator &user,
 								channel_map::iterator &all_chans_it,
 								rplManager *rpl_manager);

@@ -72,7 +72,7 @@ enum e_commands
 
 bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
 {
-	std::string s_commands[NB_CMD] {
+	std::string s_commands[NB_CMD] = {
 		"NICK",
 		"LIST",
 		"PASS",
@@ -84,9 +84,9 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		"JOIN",
 		"PART"
 	};
-
-	for (int i = 0; i < NB_CMD; i++)
-		if ((av[1]) == s_commands[i])
+	int i = 0;
+	for (i = 0; i < NB_CMD; i++)
+		if ((argvec[1]) == s_commands[i])
 			break ;
     
 	switch (i)

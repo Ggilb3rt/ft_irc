@@ -53,23 +53,6 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     return(handleCommands(it, argvec));
 }
 
-//? Don't forget to change this value if you modify the number of commands below
-# define NB_CMD 10
-
-enum e_commands
-{
-	NICK,
-	LIST,
-	PASS,
-	QUIT,
-	USER,
-	MODE,
-	PING,
-	TOPIC,
-	JOIN,
-	PART
-};
-
 bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
 {
 	std::string s_commands[NB_CMD] = {
@@ -131,5 +114,6 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		default:
 			break;
 	}
+
     return (false);
 }

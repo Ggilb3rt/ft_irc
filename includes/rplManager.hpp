@@ -43,6 +43,12 @@
 #define RPL_OKNICK_MSG				"NICK "
 #define RPL_OKJOIN					-2
 #define RPL_OKJOIN_MSG				"JOIN "
+#define RPL_OKTOPIC					-3
+#define RPL_OKTOPIC_MSG				"TOPIC "
+#define RPL_OKPONG					-4
+#define RPL_OKPONG_MSG				"PONG "
+#define RPL_OKPART					-5
+#define RPL_OKPART_MSG				"PART "
 #define	RPL_UMODEIS					221
 #define	RPL_UMODEIS_MSG				"i" // 221 "<user mode string>"
 #define	RPL_LIST					322
@@ -54,7 +60,7 @@
 #define	RPL_NOTOPIC					331
 #define RPL_NOTOPIC_MSG				" :No topic is set" // 331 <channel>
 #define RPL_TOPIC					332
-#define RPL_TOPIC_MSG				" :" // 332 <channel> <topic>
+#define RPL_TOPIC_MSG				" :" // 332 <channel> :<topic>
 #define RPL_INVITING				341
 #define RPL_INVITING_MSG			" " // 341 <channel> <nick>
 #define RPL_NAMREPLY				353

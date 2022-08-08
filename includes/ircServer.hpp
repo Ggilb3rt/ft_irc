@@ -67,9 +67,9 @@ private:
 	users_map					_users;
 	clients_vector				_pfds;
 	unsigned int				_nick_suffixe;
-	
+
 	channel_map					_channel;
-	
+
 	std::string					_pass;
 
 	// init
@@ -130,6 +130,8 @@ private:
 	bool	names(users_map::iterator user, std::vector<std::string> params);
 	bool	list(users_map::iterator user, std::vector<std::string> params);
 	bool	invite(users_map::iterator user, std::vector<std::string> params);
+	
+	bool	pong(users_map::iterator user, std::vector<std::string> params);
 
 
 public:

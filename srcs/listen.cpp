@@ -97,7 +97,8 @@ void	ircServer::registerUser(users_map::iterator &it) {
 		}
 		it->second.setStatus(USER_STATUS_CONNECTED);
 		it->second._msg.clear();
-		sendToClient(it->first, RPL_OKCONN, it->second.getNick());
+		sendToClient(it->first, RPL_OKCONN);
+		// sendToClient(it->first, RPL_OKCONN, it->second.getNick());
 	}
 	if (getChunk(it->second._msg, "USER").size() > 0  ) {
 		// send password required;

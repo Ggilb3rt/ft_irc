@@ -53,21 +53,17 @@ bool	isValid(std::string &nickname) {
 	return (true);
 }
 
-void	ircServer::sendToChannel(user sender, channel chan, std::string msg) {
+void	ircServer::sendToChannel(user sender, channel chan, std::string &before, std::string &after) {
 	std::map<user_id, role>::iterator pos;
 	std::map<user_id, role>::iterator end = chan.getEnd();
-	std::string		res = "PRIVMSG ";
 	int				sender_id = sender.getId();
-	res += chan.getName();
-	res += " :";
-	res += msg;
 
 	pos = chan.getUsers();
 	std::cout << "---SEND TO CHAN---\n";
 	while (pos != end) {
 		std::cout << "User == |" << getUserById(pos->first)->second.getNick() << "|\n";
 		if (pos->first != sender_id)
-			sendToClient(sender.getId(), pos->first, -9, std::string(), res);
+			sendToClient(sender.getId(), pos->first, -9, before, after);
 		pos++;
 	}
 }
@@ -75,6 +71,10 @@ void	ircServer::sendToChannel(user sender, channel chan, std::string msg) {
 bool	ircServer::privateMsg(users_map::iterator pair, std::vector<std::string> &argvec) {
 
 	channel_map::iterator	pos;
+	std::string		before = "";
+	std::string		res = "PRIVMSG ";
+
+
 	std::cout << "---PRVMSG---\n";
 
 	if (argvec.size() == 0)
@@ -92,7 +92,10 @@ bool	ircServer::privateMsg(users_map::iterator pair, std::vector<std::string> &a
 			else if (!pos->second.isOnChannel(pair->first))
 				sendToClient(pair->first, ERR_CANNOTSENDTOCHAN, "PRIVMSG ");
 			else {
-				sendToChannel(pair->first, pos->second, argvec[2]);
+				res += dest;
+				res += " :";
+				res += argvec[2];
+				sendToChannel(pair->first, pos->second, before, res);
 				return (true);
 			}
 		}
@@ -100,7 +103,13 @@ bool	ircServer::privateMsg(users_map::iterator pair, std::vector<std::string> &a
 			if (getUserByNick(dest) == 0)
 				sendToClient(pair->first, ERR_NOSUCHNICK, "PRIVMSG ");
 			else {
-				sendToClient(pair->first, getUserByNick(dest), -9, std::string(), "res");
+
+				std::string		res = "PRIVMSG ";
+				res += dest;
+				res += " :";
+				res += argvec[2];
+
+				sendToClient(pair->first, getUserByNick(dest), -9, std::string(), res);
 				return (true);
 			}
 		}

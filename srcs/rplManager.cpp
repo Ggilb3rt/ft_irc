@@ -15,6 +15,12 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_OKCONN, RPL_OKCONN_MSG));
 	list.insert(new_pair(RPL_OKNICK, RPL_OKNICK_MSG));
 	list.insert(new_pair(RPL_OKJOIN, RPL_OKJOIN_MSG));
+	list.insert(new_pair(RPL_OKTOPIC, RPL_OKTOPIC_MSG));
+	list.insert(new_pair(RPL_OKPONG, RPL_OKPONG_MSG));
+	list.insert(new_pair(RPL_OKPART, RPL_OKPART_MSG));
+	list.insert(new_pair(RPL_OKNAMES, RPL_OKNAMES_MSG));
+	list.insert(new_pair(RPL_OKNLIST, RPL_OKNLIST_MSG));
+	list.insert(new_pair(RPL_OKNINVITE, RPL_OKNINVITE_MSG));
 	list.insert(new_pair(14, " :petit mais puissant"));
 	list.insert(new_pair(ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG));
 	list.insert(new_pair(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG));
@@ -49,7 +55,7 @@ rplManager::~rplManager()
 std::string	rplManager::createResponse(user &usr, int ret, std::string opt_before, std::string opt_after)
 {
 	std::stringstream	ss;
-	std::string res(":" + usr.getNick() + "!" + usr.getName() + "@" + "127.0.0.1 ");
+	std::string res(":" + usr.getNick() + "!" + usr.getName() + "@" + "localhost ");
 	rpl_map::iterator	it = list.find(ret);
 
 	if (ret > -1) {
@@ -58,9 +64,10 @@ std::string	rplManager::createResponse(user &usr, int ret, std::string opt_befor
 			res += '0';
 		}
 		res += ss.str();
+		res += " " + usr.getNick() + " ";
 	}
 	if (opt_before.size() > 0) {
-		res += " ";
+		// res += " ";
 		res += opt_before;
 	}
 	if (it != list.end())

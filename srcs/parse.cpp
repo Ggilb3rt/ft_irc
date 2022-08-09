@@ -24,7 +24,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     if ((pos = query.find(":")) != std::string::npos) {
         pos += 1;
         longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
-        query = query.substr(0, pos - 1);
+        query = query.substr(0, pos - 2);
     }
 
     
@@ -41,7 +41,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
         old = pos + 1;
     }
 
-    if (longarg.c_str())
+    if (longarg.size())
         argvec.push_back(longarg);
     // else {
     //     if (argvec[0] == "USER") {
@@ -53,35 +53,37 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     return(handleCommands(it, argvec));
 }
 
-#define NB_CMD 10
+#define NB_CMD 11
 
 enum e_commands
 {
     NICK,
-    LIST,
     PASS,
-    QUIT,
     USER,
+    LIST,
+    QUIT,
     MODE,
     PING,
     TOPIC,
     JOIN,
-    PART
+    PART,
+	INVITE,
 };
 
 bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
 {
 	std::string s_commands[NB_CMD] = {
 		"NICK",
-		"LIST",
 		"PASS",
-		"QUIT",
 		"USER",
+		"LIST",
+		"QUIT",
 		"MODE",
 		"PING",
 		"TOPIC",
 		"JOIN",
-		"PART"
+		"PART",
+		"INVITE"
 	};
 	int i = 0;
 	for (i = 0; i < NB_CMD; i++)
@@ -94,10 +96,7 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 			std::cout << "JE SUIS LAAA\n";
 			argvec.erase(argvec.begin());
 			return (handleNick(it, argvec));
-		
-		case LIST:
-			break;
-		
+
 		case PASS:
 			std::cout << "JE SUIS ICIIIIII\n";
 			return (checkPass(argvec[1]));
@@ -106,26 +105,44 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 			argvec.erase(argvec.begin());
 			return (handleUser(it, argvec)); 
 		
+		case LIST:
+			argvec.erase(argvec.begin());
+			return (list(it, argvec));
+			break;
+		
+		case QUIT:
+			argvec.erase(argvec.begin());
+			return (quit(it, argvec));
+			// break;
+
 		case MODE:
 			// argvec.erase(argvec.begin());
 			break;
 
 		case PING:
-			// argvec.erase(argvec.begin());
-			break;
+			argvec.erase(argvec.begin());
+			return (pong(it, argvec));
+			// break;
 
 		case TOPIC:
-			// argvec.erase(argvec.begin());  
-			break;
+			argvec.erase(argvec.begin()); 
+			return (topic(it, argvec)); 
+			// break;
 		
 		case JOIN:
 			argvec.erase(argvec.begin());
-			join(it, argvec);
-			break;
+			return (join(it, argvec));
+			// break;
 
 		case PART:
 			argvec.erase(argvec.begin());
-			break;
+			return (part(it, argvec));
+			// break;
+		
+		case INVITE:
+			argvec.erase(argvec.begin());
+			return (invite(it, argvec));
+			// break;
 		
 		default:
 			break;

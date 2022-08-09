@@ -142,13 +142,13 @@ __We have to debate about what is needed and what is not following the subject._
   - SQUIT (not needed, only server-server or alias of QUIT)
 - Channel (4.2)
   - [x] JOIN
-  - [x] PART
+  - [x] PART (need to sendMessageToAll)
   - [ ] MODE
   - [x] TOPIC
   - [x] NAMES
   - [x] LIST
   - [x] INVITE
-  - [x] KICK (question with ERR_BADCHANMASK)
+  - [x] KICK
 - Server (4.3) (only with 'this' because no server-server communication)
   - VERSION
   - STATS
@@ -168,7 +168,7 @@ __We have to debate about what is needed and what is not following the subject._
 - Miscellaneous messages (4.6)
   - KILL
   - PING
-  - [?] PONG (return with arguments of recieved PING)
+  - [x] PONG (return with arguments of recieved PING)
   - ERROR
 - OPTIONALS
   - lol nope

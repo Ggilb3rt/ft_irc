@@ -45,32 +45,42 @@
 #define ERR_ALREADYREGISTRED_MSG	" :Unauthorized command (already registered)"
 
 // REPLIES
-#define RPL_OKCONN					001
-#define RPL_OKCONN_MSG				" :Welcome to the internet"
 #define RPL_OKNICK					-1
 #define RPL_OKNICK_MSG				"NICK "
 #define RPL_OKJOIN					-2
 #define RPL_OKJOIN_MSG				"JOIN "
-// #define RPL_OKNICK					-1
-// #define RPL_OKNICK_MSG				"NICK "
+#define RPL_OKTOPIC					-3
+#define RPL_OKTOPIC_MSG				"TOPIC "
+#define RPL_OKPONG					-4
+#define RPL_OKPONG_MSG				"PONG "
+#define RPL_OKPART					-5
+#define RPL_OKPART_MSG				"PART "
+#define RPL_OKNAMES					-6
+#define RPL_OKNAMES_MSG				"NAMES "
+#define RPL_OKNLIST					-7
+#define RPL_OKNLIST_MSG				"LIST "
+#define RPL_OKNINVITE				-8
+#define RPL_OKNINVITE_MSG			"INVITE "
+#define RPL_OKCONN					001
+#define RPL_OKCONN_MSG				" :Welcome to the internet"
 #define	RPL_UMODEIS					221
 #define	RPL_UMODEIS_MSG				"i" // 221 "<user mode string>"
 #define	RPL_LIST					322
 #define RPL_LIST_MSG				" :" // 322 <channel> <# visible> :<topic>
 #define RPL_LISTEND					323
-#define RPL_LISTEND_MSG				" :End of LIST" // 323
+#define RPL_LISTEND_MSG				":End of LIST" // 323
 #define RPL_CHANNELMODEIS			324
 #define RPL_CHANNELMODEIS_MSG		" " // 324 "<channel> <mode> <mode params>"
 #define	RPL_NOTOPIC					331
 #define RPL_NOTOPIC_MSG				" :No topic is set" // 331 <channel>
 #define RPL_TOPIC					332
-#define RPL_TOPIC_MSG				" :" // 332 <channel> <topic>
+#define RPL_TOPIC_MSG				" :" // 332 <channel> :<topic>
 #define RPL_INVITING				341
 #define RPL_INVITING_MSG			" " // 341 <channel> <nick>
 #define RPL_NAMREPLY				353
-#define RPL_NAMREPLY_MSG			" :" // 353 "( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
+#define RPL_NAMREPLY_MSG			"" // 353 "( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
 #define RPL_ENDOFNAMES				366
-#define RPL_ENDOFNAMES_MSG			" :End of NAMES" // 366 <channel> :End of NAMES list
+#define RPL_ENDOFNAMES_MSG			" :End of NAMES list" // 366 <channel> :End of NAMES list
 
 
 class	rplManager

@@ -67,9 +67,9 @@ private:
 	users_map					_users;
 	clients_vector				_pfds;
 	unsigned int				_nick_suffixe;
-	
+
 	channel_map					_channel;
-	
+
 	std::string					_pass;
 	std::string					_host;
 
@@ -107,8 +107,7 @@ private:
 	user_id			getUserByNick(std::string nick) const;
 	users_map::iterator getUserById(user_id id);
 	void			namesRplConditions(users_map::iterator &user,
-								channel_map::iterator &all_chans_it,
-								rplManager *rpl_manager);
+								channel_map::iterator &all_chans_it);
 	void			listRplConditions(users_map::iterator &user,
 								channel_map::iterator &all_chans_it,
 								rplManager *rpl_manager);
@@ -131,6 +130,8 @@ private:
 	bool	names(users_map::iterator user, std::vector<std::string> params);
 	bool	list(users_map::iterator user, std::vector<std::string> params);
 	bool	invite(users_map::iterator user, std::vector<std::string> params);
+	
+	bool	pong(users_map::iterator user, std::vector<std::string> params);
 
 
 public:

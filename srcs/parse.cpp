@@ -24,10 +24,8 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     if ((pos = query.find(":")) != std::string::npos) {
         pos += 1; 
         longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
-        std::cout << "LONGARG == " << longarg << std::endl;
         query = query.substr(0, pos - 2);
-        std::cout << "QUERY == |" << query << "|\n";
-    } 
+    }
 
     pos = 0;
 
@@ -55,67 +53,106 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     return(handleCommands(it, argvec));
 }
 
+#define NB_CMD 12
+
+enum e_commands
+{
+    NICK,
+    PASS,
+    USER,
+    LIST,
+    QUIT,
+    MODE,
+    PING,
+    PRIVMSG,
+    TOPIC,
+    JOIN,
+    PART,
+	INVITE
+};
+
 bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
 {
-    if (argvec[0] == "NICK") {
-        size_t i = 0;
-        while (i < argvec.size()) {
-            std::cout << "ARGVEC[" << i << "] == |" << argvec[i] << "|\n";
-            i++;
-        }
-        argvec.erase(argvec.begin());
-        return (nick(it, argvec));
-    }
-    if (argvec[0] == "PRIVMSG") {
-        size_t i = 0;
-        while (i < argvec.size()) {
-            std::cout << "PRIVMSG[" << i << "] == |" << argvec[i] << "|\n";
-            i++;
-        }
-        argvec.erase(argvec.begin());
-        return (privateMsg(it, argvec));
-    }
-    // else if (argvec[0] == "LIST") {
-        
-    // }
-    else if (argvec[0] == "PASS") {
-        std::cout << "JE SUIS ICIIIIII\n";
-        argvec.erase(argvec.begin());
-        return (pass(it, argvec));
-    }
-    // else if (argvec[0] == "QUIT") {
-    //     return (quit(argvec));
-    // }
-    else if (argvec[0] == "USER") {
-          size_t i = 0;
-      argvec.erase(argvec.begin());
-        while (i < argvec.size()) {
-            std::cout << "ARGVEC[" << i << "] == " << argvec[i] << std::endl;
-            i++;
-        }
-      return (handleUser(it, argvec)); 
-    }
-    // else if (argvec[0] == "MODE") {
-    //    argvec.erase(argvec.begin());
-    // }
-    // else if (argvec[0] == "PING") {  
-    //    argvec.erase(argvec.begin());    
-    // }
-    // else if (argvec[0] == "TOPIC") {
-    //    argvec.erase(argvec.begin());    
-    // }
-    else if (argvec[0] == "JOIN") {
-           size_t i = 0;
-        while (i < argvec.size()) {
-            std::cout << "ARGVEC[" << i << "] == " << argvec[i] << std::endl;
-            i++;
-        }
-       argvec.erase(argvec.begin());
-       join(it, argvec);
-    }
-    // else if (argvec[0] == "PART") {
-    //    argvec.erase(argvec.begin());
-    //    
-    // }
+	std::string s_commands[NB_CMD] = {
+		"NICK",
+		"PASS",
+		"USER",
+		"LIST",
+		"QUIT",
+		"MODE",
+		"PING",
+        "PRIVMSG",
+		"TOPIC",
+		"JOIN",
+		"PART",
+		"INVITE"
+	};
+	int i = 0;
+	for (i = 0; i < NB_CMD; i++)
+		if ((argvec[0]) == s_commands[i])
+			break ;
+    
+	switch (i)
+	{
+		case NICK:
+			argvec.erase(argvec.begin());
+			return (nick(it, argvec));
+
+		case PASS:
+			argvec.erase(argvec.begin());
+			return (pass(it, argvec));
+		
+		case USER:
+			argvec.erase(argvec.begin());
+			return (handleUser(it, argvec)); 
+		
+		case LIST:
+			argvec.erase(argvec.begin());
+			return (list(it, argvec));
+			break;
+
+        case PRIVMSG:
+			argvec.erase(argvec.begin());
+			return (privateMsg(it, argvec));
+			break;
+		
+		case QUIT:
+			argvec.erase(argvec.begin());
+			return (quit(it, argvec));
+			// break;
+
+		case MODE:
+			// argvec.erase(argvec.begin());
+			break;
+
+		case PING:
+			argvec.erase(argvec.begin());
+			return (pong(it, argvec));
+			// break;
+
+		case TOPIC:
+			argvec.erase(argvec.begin()); 
+			return (topic(it, argvec)); 
+			// break;
+		
+		case JOIN:
+			argvec.erase(argvec.begin());
+			return (join(it, argvec));
+			// break;
+
+		case PART:
+			argvec.erase(argvec.begin());
+			return (part(it, argvec));
+			// break;
+		
+		case INVITE:
+			argvec.erase(argvec.begin());
+			return (invite(it, argvec));
+			// break;
+		
+		default:
+			break;
+	}
+
     return (false);
 }

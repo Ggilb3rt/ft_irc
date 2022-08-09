@@ -351,11 +351,11 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 		if (send_part_msg && params.size() > 2) {
 			std::string ret(chan_exist->first + " :" + params[2]);
 			sendToClient(user->first, RPL_OKPART, std::string(), ret);
-			// sendToAll();
+			sendToChannel(user->first, chan_exist->second, RPL_OKPART, std::string(), ret);
 		}
 		else {
 			sendToClient(user->first, RPL_OKPART, std::string(), chan_exist->first);
-			// sendToAll();
+			sendToChannel(user->first, chan_exist->second, RPL_OKPART, std::string(), chan_exist->first);
 		}
 
 		i++;

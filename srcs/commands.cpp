@@ -53,27 +53,79 @@ bool	isValid(std::string &nickname) {
 	return (true);
 }
 
-bool    ircServer::handleNick(users_map::iterator pair, std::vector<std::string> &argvec) {
+void	ircServer::sendToChannel(user sender, channel chan, std::string msg) {
+	std::map<user_id, role>::iterator pos;
+	std::map<user_id, role>::iterator end = chan.getEnd();
+	std::string		res = "PRIVMSG ";
+	int				sender_id = sender.getId();
+	res += chan.getName();
+	res += " :";
+	res += msg;
+
+	pos = chan.getUsers();
+	std::cout << "---SEND TO CHAN---\n";
+	while (pos != end) {
+		std::cout << "User == |" << getUserById(pos->first)->second.getNick() << "|\n";
+		if (pos->first != sender_id)
+			sendToClient(sender.getId(), pos->first, -9, std::string(), res);
+		pos++;
+	}
+}
+
+bool	ircServer::privateMsg(users_map::iterator pair, std::vector<std::string> &argvec) {
+
+	channel_map::iterator	pos;
+	std::cout << "---PRVMSG---\n";
+
+	if (argvec.size() == 0)
+		sendToClient(pair->first, ERR_NORECIPIENT, "PRIVMSG ");
+	else if (argvec.size() == 1)
+		sendToClient(pair->first, ERR_NOTEXTTOSEND, "PRIVMSG ");
+	else if (argvec.size() > 3)
+		sendToClient(pair->first, ERR_TOOMANYTARGETS, "PRIVMSG ");
+	else {
+		std::string	dest = argvec[0];
+		if (dest[0] == '#') {
+			pos = _channel.find(dest);
+			if (pos == _channel.end())
+				sendToClient(pair->first, ERR_NOSUCHCHANNEL, "PRIVMSG ");
+			else if (!pos->second.isOnChannel(pair->first))
+				sendToClient(pair->first, ERR_CANNOTSENDTOCHAN, "PRIVMSG ");
+			else {
+				sendToChannel(pair->first, pos->second, argvec[2]);
+				return (true);
+			}
+		}
+		else {
+			if (getUserByNick(dest) == 0)
+				sendToClient(pair->first, ERR_NOSUCHNICK, "PRIVMSG ");
+			else {
+				sendToClient(pair->first, getUserByNick(dest), -9, std::string(), "res");
+				return (true);
+			}
+		}
+	}
+	return (false);
+}
+
+bool    ircServer::nick(users_map::iterator pair, std::vector<std::string> &argvec) {
 	std::string			newNick = argvec[0];
     users_map::iterator beg = _users.begin();
     users_map::iterator end = _users.end();
     std::string        	 res;
 
 	// SIZE OF NICK ISNT VALID OR NOT IN SET OF CHARS
-	std::cout << "\n---HANDLENICK---\n" << "---> NICKNAME == |" << newNick << "|\n";
+	// std::cout << "\n---nick---\n" << "---> NICKNAME == |" << newNick << "|\n";
 	if (newNick.length() > 9 || !newNick.length() || !isValid(newNick)) {
-		std::cout << "ERR_ERRONEUSNICKNAME\n";
-        sendToClient(pair->first, 432);
+		// std::cout << "ERR_ERRONEUSNICKNAME\n";
+        sendToClient(pair->first, ERR_ONEUSNICKNAME, newNick);
 		return (false);
     }
-
-	std::cout << "\n---HANDLENICK  3---\n" << "---> NICKNAME == |" << newNick << "|\n";
 
 	// CHECK FOR DOUBLON
     while (beg != end) {
         if (toLower(beg->second.getNick()) == toLower(newNick)) {
-            sendToClient(pair->first, ERR_NICKNAMEINUSE);
-			std::cout << ERR_NICKNAMEINUSE << " " << toLower(newNick) << " == " << toLower(beg->second.getNick()) << std::endl;
+            sendToClient(pair->first, ERR_NICKNAMEINUSE, newNick);
 			return (false);
         }
         beg++;
@@ -84,29 +136,36 @@ bool    ircServer::handleNick(users_map::iterator pair, std::vector<std::string>
 	return (true);
 }
 
-bool		ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &argvec) {
-	std::string			newName = argvec[0];
+bool	ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &argvec) {
+	std::string			newName = argvec[3];
+	std::string			newUserName = argvec[1];
+	
 	if (pair->second.getStatus() == USER_STATUS_CONNECTED) {
 		sendToClient(pair->first, ERR_ALREADYREGISTRED);
 		return (false);
 	}
-	if (argvec.size() < 4 || argvec[4].size() <= 0) {
-		std::cout << "Ayy Caramba! -- " << argvec.size() << "|\n" << argvec[4] << std::endl;
+	int i = 0;
+	while (i <= 4) {
+		std::cout << argvec[i] << std::endl;
+		i++;
+	}
+	if (argvec.size() < 4) {
 		sendToClient(pair->first, ERR_NEEDMOREPARAMS);
 		return (false);
 	}
 	pair->second.setName(newName);
-	std::cout << "JE DOIS MAFFICHER SVP\n";
+	pair->second.setUserName(newUserName);
 	return (true);
 }
 
-bool		ircServer::checkPass(std::string pass) {
+bool		ircServer::pass(users_map::iterator pair, std::vector<std::string> &argvec) {
+	std::string	pass = argvec[0];
 	std::cout << "In pass cmd, pass == |" << pass << "|\n";
 	if (pass != this->_pass) {
 		return (false);
 	}
 	else if (pass.size() < 1) {
-		// sendToClient(pair->first, ERR_NEEDMOREPARAMS);
+		sendToClient(pair->first, ERR_NEEDMOREPARAMS);
 		return (false);
 	}
 	return (true);

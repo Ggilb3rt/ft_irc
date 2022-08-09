@@ -4,6 +4,7 @@ void	ircServer::init()
 {
 	this->initAddrInfo();
 	this->createMasterSocket();
+	this->_host = "127.0.0.1";
 }
 
 void	ircServer::initAddrInfo()

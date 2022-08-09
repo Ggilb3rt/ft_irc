@@ -22,12 +22,11 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 
     std::cout << "QUERY == " << query << std::endl;
     if ((pos = query.find(":")) != std::string::npos) {
-        pos += 1;
+        pos += 1; 
         longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
         query = query.substr(0, pos - 2);
     }
 
-    
     pos = 0;
 
     while (pos != std::string::npos) {
@@ -37,7 +36,8 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
             return (false);
         }
         std::cout << "OLD == " << old << " | POS == " << pos << " | SUB == |" << query.substr(old, pos - old) << "|\n";
-        argvec.push_back(query.substr(old, pos - old));
+        std::string sub = query.substr(old, pos - old);
+        argvec.push_back(sub);
         old = pos + 1;
     }
 
@@ -53,7 +53,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     return(handleCommands(it, argvec));
 }
 
-#define NB_CMD 11
+#define NB_CMD 12
 
 enum e_commands
 {
@@ -64,10 +64,11 @@ enum e_commands
     QUIT,
     MODE,
     PING,
+    PRIVMSG,
     TOPIC,
     JOIN,
     PART,
-	INVITE,
+	INVITE
 };
 
 bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
@@ -80,6 +81,7 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		"QUIT",
 		"MODE",
 		"PING",
+        "PRIVMSG",
 		"TOPIC",
 		"JOIN",
 		"PART",
@@ -93,13 +95,12 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 	switch (i)
 	{
 		case NICK:
-			std::cout << "JE SUIS LAAA\n";
 			argvec.erase(argvec.begin());
-			return (handleNick(it, argvec));
+			return (nick(it, argvec));
 
 		case PASS:
-			std::cout << "JE SUIS ICIIIIII\n";
-			return (checkPass(argvec[1]));
+			argvec.erase(argvec.begin());
+			return (pass(it, argvec));
 		
 		case USER:
 			argvec.erase(argvec.begin());
@@ -108,6 +109,11 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		case LIST:
 			argvec.erase(argvec.begin());
 			return (list(it, argvec));
+			break;
+
+        case PRIVMSG:
+			argvec.erase(argvec.begin());
+			return (privateMsg(it, argvec));
 			break;
 		
 		case QUIT:

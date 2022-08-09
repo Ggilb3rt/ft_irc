@@ -11,6 +11,14 @@
 // ERRORS
 #define ERR_NOSUCHNICK				401
 #define ERR_NOSUCHNICK_MSG			" :No such nick/channel" // 401 <nickname>
+#define ERR_TOOMANYTARGETS			407
+#define ERR_TOOMANYTARGETS_MSG		" :Duplicate recipients. No message delivered"
+#define ERR_NOTEXTTOSEND			412
+#define ERR_NOTEXTTOSEND_MSG		" :No text to send" // 401 <nickname>
+#define ERR_CANNOTSENDTOCHAN		404
+#define ERR_CANNOTSENDTOCHAN_MSG	" :Cannot send to channel"
+#define ERR_NORECIPIENT				411
+#define ERR_NORECIPIENT_MSG			" :No recipient given"
 #define ERR_ONEUSNICKNAME			432
 #define ERR_ONEUSNICKNAME_MSG		" :Erroneous nickname" // 401 <nickname>
 #define ERR_NICKNAMEINUSE			433

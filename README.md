@@ -37,7 +37,9 @@ Quick connection
 
 ```bash
 /network add ft_irc
-/server add -network ft_irc 127.0.0.1 6697
+/server add -network ft_irc 127.0.0.1 6697 pass
+/network add -nick newNick ft_irc #change default nick
+/network add -autosendcmd '^JOIN lol' ft_irc # https://irssi.org/documentation/help/network/
 #start the server in shell with ./ft_irc 6697 password
 /connect ft_irc
 ```

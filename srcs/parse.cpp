@@ -53,7 +53,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     return(handleCommands(it, argvec));
 }
 
-#define NB_CMD 12
+#define NB_CMD 13
 
 enum e_commands
 {
@@ -65,6 +65,7 @@ enum e_commands
     MODE,
     PING,
     PRIVMSG,
+    NOTICE,
     TOPIC,
     JOIN,
     PART,
@@ -82,6 +83,7 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		"MODE",
 		"PING",
         "PRIVMSG",
+        "NOTICE",
 		"TOPIC",
 		"JOIN",
 		"PART",
@@ -113,7 +115,12 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 
         case PRIVMSG:
 			argvec.erase(argvec.begin());
-			return (privateMsg(it, argvec));
+			return (privmsg(it, argvec));
+			break;
+        
+        case NOTICE:
+            argvec.erase(argvec.begin());
+			return (privmsg(it, argvec));
 			break;
 		
 		case QUIT:

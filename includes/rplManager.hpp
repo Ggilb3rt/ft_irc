@@ -61,6 +61,10 @@
 #define RPL_OKNLIST_MSG				"LIST "
 #define RPL_OKNINVITE				-8
 #define RPL_OKNINVITE_MSG			"INVITE "
+#define RPL_OKPRIVMSG				-9
+#define RPL_OKPRIVMSG_MSG			"PRIVMSG "
+#define RPL_OKMSG					-10
+#define RPL_OKMSG_MSG				"MSG "
 #define RPL_OKCONN					001
 #define RPL_OKCONN_MSG				" :Welcome to the internet"
 #define	RPL_UMODEIS					221

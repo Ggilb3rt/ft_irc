@@ -47,6 +47,8 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_LISTEND, RPL_LISTEND_MSG));
 	list.insert(new_pair(RPL_NAMREPLY, RPL_NAMREPLY_MSG));
 	list.insert(new_pair(RPL_ENDOFNAMES, RPL_ENDOFNAMES_MSG));
+	list.insert(new_pair(RPL_OKPRIVMSG, RPL_OKPRIVMSG_MSG));
+	list.insert(new_pair(RPL_OKMSG, RPL_OKMSG_MSG));
 	list.insert(new_pair(RPL_INVITING, RPL_INVITING_MSG));
 	list.insert(new_pair(ERR_USERSDONTMATCH, ERR_USERSDONTMATCH_MSG));
 

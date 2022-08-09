@@ -53,7 +53,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     return(handleCommands(it, argvec));
 }
 
-#define NB_CMD 12
+#define NB_CMD 13
 
 enum e_commands
 {
@@ -68,7 +68,8 @@ enum e_commands
     TOPIC,
     JOIN,
     PART,
-	INVITE
+	INVITE,
+	KICK
 };
 
 bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
@@ -85,7 +86,8 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		"TOPIC",
 		"JOIN",
 		"PART",
-		"INVITE"
+		"INVITE",
+		"KICK"
 	};
 	int i = 0;
 	for (i = 0; i < NB_CMD; i++)
@@ -149,6 +151,9 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 			argvec.erase(argvec.begin());
 			return (invite(it, argvec));
 			// break;
+		case KICK:
+			argvec.erase(argvec.begin());
+			return (kick(it, argvec));
 		
 		default:
 			break;

@@ -21,6 +21,8 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_OKNAMES, RPL_OKNAMES_MSG));
 	list.insert(new_pair(RPL_OKNLIST, RPL_OKNLIST_MSG));
 	list.insert(new_pair(RPL_OKNINVITE, RPL_OKNINVITE_MSG));
+	list.insert(new_pair(RPL_OKQUIT, RPL_OKQUIT_MSG));
+	list.insert(new_pair(RPL_OKKICK, RPL_OKKICK_MSG));
 	list.insert(new_pair(14, " :petit mais puissant"));
 	list.insert(new_pair(ERR_CANNOTSENDTOCHAN, ERR_CANNOTSENDTOCHAN_MSG));
 	list.insert(new_pair(ERR_NORECIPIENT, ERR_NORECIPIENT_MSG));

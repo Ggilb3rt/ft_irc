@@ -61,6 +61,10 @@
 #define RPL_OKNLIST_MSG				"LIST "
 #define RPL_OKNINVITE				-8
 #define RPL_OKNINVITE_MSG			"INVITE "
+#define RPL_OKQUIT					-10
+#define RPL_OKQUIT_MSG				"QUIT "
+#define RPL_OKKICK					-11
+#define RPL_OKKICK_MSG				"KICK "
 #define RPL_OKCONN					001
 #define RPL_OKCONN_MSG				" :Welcome to the internet"
 #define	RPL_UMODEIS					221

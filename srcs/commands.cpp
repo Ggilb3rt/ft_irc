@@ -53,7 +53,7 @@ bool	isValid(std::string &nickname) {
 	return (true);
 }
 
-void	ircServer::sendToChannel(user sender, channel chan, std::string &before, std::string &after) {
+void	ircServer::sendToChannel(user sender, channel chan, int code, std::string before, std::string after) {
 	std::map<user_id, role>::iterator pos;
 	std::map<user_id, role>::iterator end = chan.getEnd();
 	int				sender_id = sender.getId();
@@ -63,7 +63,7 @@ void	ircServer::sendToChannel(user sender, channel chan, std::string &before, st
 	while (pos != end) {
 		std::cout << "User == |" << getUserById(pos->first)->second.getNick() << "|\n";
 		if (pos->first != sender_id)
-			sendToClient(sender.getId(), pos->first, -9, before, after);
+			sendToClient(sender.getId(), pos->first, code, before, after);
 		pos++;
 	}
 }
@@ -95,7 +95,7 @@ bool	ircServer::privateMsg(users_map::iterator pair, std::vector<std::string> &a
 				res += dest;
 				res += " :";
 				res += argvec[2];
-				sendToChannel(pair->first, pos->second, before, res);
+				sendToChannel(pair->first, pos->second, -9, before, res);
 				return (true);
 			}
 		}
@@ -190,18 +190,13 @@ bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 			-> RPL_TOPIC
 			-> ERR_CHANOPRIVSNEEDED (in setDescription())
 	*/
-	// rplManager				*rpl_manager = rplManager::getInstance();
 	int						ret;
 	channel_map::iterator	chan_it;
 	std::string				chan;
 	bool					read_topic = params.size() < 2 ? true : false;
 
-	for (size_t i = 0; i < params.size(); i++)
-		std::cout << "topiiiiiic " << params[i] << std::endl;
-
 	if (params.size() == 0) {
 		sendToClient(user->first, ERR_NEEDMOREPARAMS, "TOPIC");
-		// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "TOPIC");
 		return (false);
 	}
 	chan = params[0];
@@ -212,20 +207,14 @@ bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 	}
 	if (read_topic) {
 		sendToClient(user->first, RPL_TOPIC, chan, chan_it->second.getDescription().c_str());
-		// std::cout << (rpl_manager->createResponse(RPL_TOPIC, chan, chan_it->second.getDescription().c_str()));
 		return (true);
 	}
 	ret = chan_it->second.setDescription(user->first, params[1]);
 	if (ret == RPL_TOPIC) {
-		// std::cout << "topic passe ici\n";
-		// std::string	user_chan(chan + " :" + chan_it->second.getDescription().c_str());
-		// sendToClient(user->first, RPL_OKTOPIC, std::string(), user_chan);
 		sendToClient(user->first, RPL_TOPIC, chan, chan_it->second.getDescription().c_str());
-		// std::cout << (rpl_manager->createResponse(RPL_TOPIC, chan, chan_it->second.getDescription().c_str()));
 		return (true);
 	}
 	sendToClient(user->first, ret, chan);
-	// std::cout << (rpl_manager->createResponse(ret, chan));
 	return (false);
 }
 
@@ -259,9 +248,6 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 	std::vector<std::string>	keys;
 	channel_map::iterator		chan_exist;
 	bool						user_not_in = true;
-
-	for (size_t i = 0; i < params.size(); i++)
-		std::cout << "joiiiin " << params[i] << std::endl;
 
 	if (params.size() == 0) {
 		sendToClient(user->first, ERR_NEEDMOREPARAMS, "JOIN");
@@ -326,16 +312,10 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 		-> ERR_NEEDMOREPARAMS             -> ERR_NOSUCHCHANNEL
         -> ERR_NOTONCHANNEL
 	*/
-	// rplManager									*rpl_manager = rplManager::getInstance();
-	// std::vector<std::string>::const_iterator	chan = params.begin();
-	// std::vector<std::string>::const_iterator	end = params.end();
 	std::vector<std::string>					chans;
 	channel_map::iterator						chan_exist;
 	bool										send_part_msg = true;
 	size_t										i = 0;
-
-	for (size_t i = 0; i < params.size(); i++)
-		std::cout << "paaaaaaart " << params[i] << std::endl;
 
 	if (params.size() == 0) {
 		sendToClient(user->first, ERR_NEEDMOREPARAMS, "PART");
@@ -356,9 +336,8 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 		}
 		if (chan_exist->second.getSize() == 0)
 			_channel.erase(chan_exist);
-		//! must send to client confirm
-		if (send_part_msg && params.size() > 2) {
-			std::string ret(chan_exist->first + " :" + params[2]);
+		if (send_part_msg && params.size() > 1) {
+			std::string ret(chan_exist->first + " :" + params[1]);
 			sendToClient(user->first, RPL_OKPART, std::string(), ret);
 			sendToChannel(user->first, chan_exist->second, RPL_OKPART, std::string(), ret);
 		}
@@ -381,15 +360,18 @@ bool	ircServer::kick(users_map::iterator user, const std::vector<std::string> pa
 		   -> ERR_CHANOPRIVSNEEDED
            -> ERR_NOTONCHANNEL
 	*/
-	rplManager				*rpl_manager = rplManager::getInstance();
+	// rplManager				*rpl_manager = rplManager::getInstance();
 	channel_map::iterator	it_chan;
 	user_id					kicker = user->first;
 	user_id					victim;
+	std::string				victim_nick;
 	std::string				cur_chan;
 	std::string				comment;
+	std::string				res;
 	
 	if (params.size() < 2) {
-		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "KICK");
+		sendToClient(user->first, ERR_NEEDMOREPARAMS, "KICK");
+		// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "KICK");
 		return (false);
 	}
 	cur_chan = params[0];
@@ -397,29 +379,41 @@ bool	ircServer::kick(users_map::iterator user, const std::vector<std::string> pa
 	comment = params.size() > 2 ? params[2] : "";
 	it_chan = _channel.find(cur_chan);
 	if (it_chan == _channel.end()) {
-		std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, cur_chan);
+		sendToClient(user->first, ERR_NOSUCHCHANNEL, cur_chan);
+		// std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, cur_chan);
 		return (false);
 	}
 	// check if kicker is operator
 	if (it_chan->second.isOperator(kicker)) {
-		if (it_chan->second.removeUser(victim) == 0) {
+		if (!it_chan->second.isOnChannel(victim)) {
 			// check if victim exist
-			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, cur_chan);
+			sendToClient(user->first, ERR_NOTONCHANNEL, cur_chan);
+			// std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, cur_chan);
 			return (false);
+		}
+		else {
+			victim_nick = getUserById(victim)->second.getNick();
+			res = cur_chan;
+			res += " ";
+			res += victim_nick;
+			if (comment.size() > 0) {
+				res += " :";
+				res += comment; 
+			}
+			sendToClient(kicker, RPL_OKKICK, std::string(), res);
+			sendToChannel(kicker, it_chan->second, RPL_OKKICK, std::string(), res);
+			it_chan->second.removeUser(victim);
 		}
 	}
 	else {
-		std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, cur_chan);
+		sendToClient(user->first, ERR_CHANOPRIVSNEEDED, cur_chan);
+		// std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, cur_chan);
 		return (false);
 	}
 	if (it_chan->second.getSize() == 0)
 		_channel.erase(it_chan);
 
-	// must be send as reponse to the channel ? (ie all other users in the channel)
-	std::cout << victim << " kicked by " << kicker;
-	if (comment.size() > 0)
-		std::cout << " using \"" << comment << "\" has a reason";
-	std::cout << std::endl;
+	// must be send as reponse to the channel ? (ie all other users in the channel)	
 	return (true);
 }
 
@@ -429,11 +423,24 @@ bool	ircServer::quit(users_map::iterator user, std::vector<std::string> params)
 		QUIT REPLIES
 			none.
 	*/
+	//! probleme etrange, /quit then connect then /quit msg; first time send to channels, second to menu
+	std::string		res(":");
+
+	// std::cout << "size " << params.size() << std::endl;
 	if (user != _users.end()) {
 		if (params.size() > 0)
-			std::cout << "QUIT :" << params[0] << std::endl;
-		else
-			std::cout << "QUIT :" << user->second.getNick() << std::endl;
+			res += params[0];
+			// std::cout << "QUIT :" << params[0] << std::endl;
+		else {
+			// std::cout << "never see it\n\n";
+			res += user->second.getNick();
+		}
+			// std::cout << "QUIT :" << user->second.getNick() << std::endl;
+		for (channel_map::iterator chan = _channel.begin(); chan != _channel.end(); chan++) {
+			if (chan->second.isOnChannel(user->first))
+				sendToChannel(user->second, chan->second, RPL_OKQUIT, std::string(), res);
+		}
+		// std::cout << "res " << res << std::endl;
 		this->removeClient(user);
 	}
 	return (true);

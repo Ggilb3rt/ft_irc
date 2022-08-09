@@ -140,7 +140,7 @@ __We have to debate about what is needed and what is not following the subject._
   - [ ] USER
   - SERVER (not needed, only server-server)
   - OPER
-  - [x] QUIT
+  - [x] QUIT (bug etrange)
   - SQUIT (not needed, only server-server or alias of QUIT)
 - Channel (4.2)
   - [x] JOIN

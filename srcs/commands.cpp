@@ -147,7 +147,7 @@ bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 		// std::cout << (rpl_manager->createResponse(RPL_TOPIC, chan, chan_it->second.getDescription().c_str()));
 		return (true);
 	}
-	ret = chan_it->second.setDescription(user->first, params[2]);
+	ret = chan_it->second.setDescription(user->first, params[1]);
 	if (ret == RPL_TOPIC) {
 		// std::cout << "topic passe ici\n";
 		// std::string	user_chan(chan + " :" + chan_it->second.getDescription().c_str());
@@ -271,7 +271,6 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 
 	if (params.size() == 0) {
 		sendToClient(user->first, ERR_NEEDMOREPARAMS, "PART");
-		// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "PART");
 		return (false);
 	}
 	chans = split_in_vect(params[0], MSG_MULTI_PARAM_DELIM);
@@ -281,13 +280,11 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 		chan_exist = _channel.find(chans[i]);
 		if (chan_exist == _channel.end()) {
 			sendToClient(user->first, ERR_NOSUCHCHANNEL, chans[i]);
-			// std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, chans[i]);
 			i++;
 			continue;
 		}
 		if (chan_exist->second.removeUser(user->first) == 0) {
 			sendToClient(user->first, ERR_NOTONCHANNEL, chans[i]);
-			// std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, chans[i]);
 		}
 		if (chan_exist->second.getSize() == 0)
 			_channel.erase(chan_exist);
@@ -295,9 +292,12 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 		if (send_part_msg && params.size() > 2) {
 			std::string ret(chan_exist->first + " :" + params[2]);
 			sendToClient(user->first, RPL_OKPART, std::string(), ret);
+			// sendToAll();
 		}
-		else
+		else {
 			sendToClient(user->first, RPL_OKPART, std::string(), chan_exist->first);
+			// sendToAll();
+		}
 
 		i++;
 	}
@@ -561,15 +561,10 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 	
 	rplManager					*rpl_manager = rplManager::getInstance();
 	std::vector<std::string>	chans;
-	bool						print_all = !(params.size());
+	bool						print_all = !(params[0].size());
 	channel_map::iterator		all_chans_it;
 
-	for (size_t i = 0; i < params.size(); i++)
-		std::cout << "liiiiiist " << params[i] << std::endl;
-	// print_all = true;
-
 	if (!print_all) {
-		std::cout << "\tnot print all\n";
 		chans = split_in_vect(params[0], MSG_MULTI_PARAM_DELIM);
 		for (std::vector<std::string>::iterator chan = chans.begin();
 			chan != chans.end(); chan++) {
@@ -580,7 +575,6 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 		}
 	}
 	else {
-		std::cout << "\tprint all\n";
 		all_chans_it = _channel.begin();
 		while (all_chans_it != _channel.end()) {
 			this->listRplConditions(user, all_chans_it, rpl_manager);
@@ -588,7 +582,6 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 		}
 	}
 	sendToClient(user->first, RPL_LISTEND);
-	// std::cout << rpl_manager->createResponse(RPL_LISTEND);
 	return (true);
 }
 
@@ -608,36 +601,43 @@ bool	ircServer::invite(users_map::iterator user, std::vector<std::string> params
 	std::string					rep;
 
 	if (params.size() < 2) {
-		std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "INVITE");
+		sendToClient(user->first, ERR_NEEDMOREPARAMS, "INVITE");
+		// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "INVITE");
 		return (false);
 	}
 	invited_user = this->getUserByNick(params[0]);
 	if (invited_user == 0) {
+		sendToClient(user->first, ERR_NOSUCHNICK, params[0]);
 		std::cout << rpl_manager->createResponse(ERR_NOSUCHNICK, params[0]);
 		return (false);
 	}
 	chan_exist = _channel.find(params[1]);
 	if (chan_exist != _channel.end()) {
 		if (!chan_exist->second.isOnChannel(user->first)) {
-			std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, chan_exist->first);
+			sendToClient(user->first, ERR_NOTONCHANNEL, chan_exist->first);
+			// std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, chan_exist->first);
 			return (false);
 		}
 		if (chan_exist->second.isOnChannel(invited_user)) {
 			rep = params[0];
 			rep += " ";
 			rep += chan_exist->first;
-			std::cout << rpl_manager->createResponse(ERR_USERONCHANNEL, rep);
+			sendToClient(user->first, ERR_USERONCHANNEL, rep);
+			// std::cout << rpl_manager->createResponse(ERR_USERONCHANNEL, rep);
 			return (false);
 		}
 		if (chan_exist->second.isFlagSets(CHAN_MASK_I)
 			&& !chan_exist->second.isOperator(user->first)) {
-			std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, chan_exist->first);
+			sendToClient(user->first, ERR_CHANOPRIVSNEEDED, chan_exist->first);
+			// std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, chan_exist->first);
 			return (false);
 		}
-		rep = chan_exist->first;
+		rep = user->second.getNick();
 		rep += " ";
-		rep += params[0];
-		std::cout << rpl_manager->createResponse(RPL_INVITING, rep);
+		rep += chan_exist->first;
+		sendToClient(user->first, RPL_INVITING, chan_exist->first, params[0]);
+		sendToClient(user->first, this->getUserByNick(params[0]), RPL_OKNINVITE, std::string(), rep);
+		//! must put something to channel to say he is invited
 		return (true);
 	}
 	return (false);

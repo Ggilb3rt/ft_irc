@@ -24,7 +24,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     if ((pos = query.find(":")) != std::string::npos) {
         pos += 1;
         longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
-        query = query.substr(0, pos);
+        query = query.substr(0, pos - 2);
     }
 
     
@@ -100,6 +100,10 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 	else if (argvec[0] == "LIST") {
 		argvec.erase(argvec.begin());
 		list(it, argvec);
+	}
+	else if (argvec[0] == "INVITE") {
+		argvec.erase(argvec.begin());
+		invite(it, argvec);
 	}
 	return (false);
 }

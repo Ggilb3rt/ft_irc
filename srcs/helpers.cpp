@@ -11,6 +11,16 @@ void	ircServer::sendToClient(int fd, int code, std::string param_1, std::string 
     }
 }
 
+void	ircServer::sendToClient(int fd_sender, int fd_reciver, int code, std::string param_1, std::string param_2)
+{
+	rplManager	*instance = rplManager::getInstance();
+	std::string	res	= instance->createResponse(getUserById(fd_sender)->second, code, param_1, param_2);
+	std::cout << "response2 == " << res << std::endl;
+    if (send(fd_reciver, res.c_str(), res.length(), 0) == -1) {
+        std::cerr << strerror(errno) << std::endl;
+    }
+}
+
 user_id	ircServer::getUserByNick(const std::string nick) const
 {
 	// users_map::iterator		it = _users.begin();
@@ -79,21 +89,16 @@ void	ircServer::listRplConditions(users_map::iterator &user, channel_map::iterat
 	if (all_chans_it->second.isFlagSets(CHAN_MASK_P)) {
 		if (all_chans_it->second.isOnChannel(user->first))
 			sendToClient(user->first, RPL_LIST, rep, all_chans_it->second.getDescription());
-			// std::cout << rpl_manager->createResponse(RPL_LIST, all_chans_it->first, all_chans_it->second.getDescription());
 		else
 			sendToClient(user->first, RPL_LIST, rep, "Prv");
-			// std::cout << rpl_manager->createResponse(RPL_LIST, all_chans_it->first, "Prv");
 	}
 	else if (all_chans_it->second.isFlagSets(CHAN_MASK_S)) {
 		if (all_chans_it->second.isOnChannel(user->first))
 			sendToClient(user->first, RPL_LIST, rep, all_chans_it->second.getDescription());
-			// std::cout << rpl_manager->createResponse(RPL_LIST, all_chans_it->first, all_chans_it->second.getDescription());
 	}
 	else {
 		sendToClient(user->first, RPL_LIST, rep, all_chans_it->second.getDescription());
-		std::cout << "list replie de ouf " << all_chans_it->first << std::endl;
 	}
-		// std::cout << rpl_manager->createResponse(RPL_LIST, all_chans_it->first, all_chans_it->second.getDescription());
 }
 
 

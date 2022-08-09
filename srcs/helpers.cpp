@@ -1,5 +1,15 @@
 #include "ircServer.hpp"
 
+void    ircServer::sendToClient(int fd_sender, int fd_reciver, int code, std::string param_1, std::string param_2)
+{
+    rplManager    *instance = rplManager::getInstance();
+    std::string    res    = instance->createResponse(getUserById(fd_sender)->second, code, param_1, param_2);
+    std::cout << "response2 == " << res << std::endl;
+    if (send(fd_reciver, res.c_str(), res.length(), 0) == -1) {
+        std::cerr << strerror(errno) << std::endl;
+    }
+}
+
 void	ircServer::sendToClient(int fd, int code, std::string param_1, std::string param_2)
 {
 	rplManager	*instance = rplManager::getInstance();

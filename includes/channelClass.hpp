@@ -62,7 +62,9 @@ public:
 	size_t		removeUser(user_id user_fd);
 	void		setUserRole(user_id id, role new_role);
 	size_t		getSize() const;
-	// users_list::iterator		getUser(user_id id);
+	
+	users_list::iterator		getUsers() { return _users.begin();}
+	users_list::iterator		getEnd() { return _users.end();}
 	
 	bool		isFlagSets(int flag) const;
 	void		addFlags(int flag);

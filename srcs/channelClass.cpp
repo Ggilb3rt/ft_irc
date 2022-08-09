@@ -7,6 +7,7 @@
 
 */
 
+
 int		channel::convertPositiveFlagsToMask(std::string param)
 {
 	std::string	valid_flags = CHAN_FLAGS_VALID;

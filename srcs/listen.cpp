@@ -76,8 +76,6 @@ std::string	getChunk(std::string msg, std::string param) {
 }
 
 void	ircServer::registerUser(users_map::iterator &it) {
-
-
 	if (getChunk(it->second._msg, "CAP").size() > 0 && 
 		getChunk(it->second._msg, "PASS").size() > 0  &&
 		getChunk(it->second._msg, "NICK").size() > 0  &&

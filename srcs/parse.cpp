@@ -22,12 +22,13 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 
     std::cout << "QUERY == " << query << std::endl;
     if ((pos = query.find(":")) != std::string::npos) {
-        pos += 1;
+        pos += 1; 
         longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
-        query = query.substr(0, pos - 1);
-    }
+        std::cout << "LONGARG == " << longarg << std::endl;
+        query = query.substr(0, pos - 2);
+        std::cout << "QUERY == |" << query << "|\n";
+    } 
 
-    
     pos = 0;
 
     while (pos != std::string::npos) {
@@ -37,11 +38,12 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
             return (false);
         }
         std::cout << "OLD == " << old << " | POS == " << pos << " | SUB == |" << query.substr(old, pos - old) << "|\n";
-        argvec.push_back(query.substr(old, pos - old));
+        std::string sub = query.substr(old, pos - old);
+        argvec.push_back(sub);
         old = pos + 1;
     }
 
-    if (longarg.c_str())
+    if (longarg.size())
         argvec.push_back(longarg);
     // else {
     //     if (argvec[0] == "USER") {
@@ -56,34 +58,58 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::string> &argvec)
 {
     if (argvec[0] == "NICK") {
-        std::cout << "JE SUIS LAAA\n";
+        size_t i = 0;
+        while (i < argvec.size()) {
+            std::cout << "ARGVEC[" << i << "] == |" << argvec[i] << "|\n";
+            i++;
+        }
         argvec.erase(argvec.begin());
-        return (handleNick(it, argvec));
+        return (nick(it, argvec));
+    }
+    if (argvec[0] == "PRIVMSG") {
+        size_t i = 0;
+        while (i < argvec.size()) {
+            std::cout << "PRIVMSG[" << i << "] == |" << argvec[i] << "|\n";
+            i++;
+        }
+        argvec.erase(argvec.begin());
+        return (privateMsg(it, argvec));
     }
     // else if (argvec[0] == "LIST") {
         
     // }
     else if (argvec[0] == "PASS") {
         std::cout << "JE SUIS ICIIIIII\n";
-        return (checkPass(argvec[1]));
+        argvec.erase(argvec.begin());
+        return (pass(it, argvec));
     }
     // else if (argvec[0] == "QUIT") {
     //     return (quit(argvec));
     // }
     else if (argvec[0] == "USER") {
+          size_t i = 0;
       argvec.erase(argvec.begin());
+        while (i < argvec.size()) {
+            std::cout << "ARGVEC[" << i << "] == " << argvec[i] << std::endl;
+            i++;
+        }
       return (handleUser(it, argvec)); 
     }
     // else if (argvec[0] == "MODE") {
     //    argvec.erase(argvec.begin());
     // }
-    // else if (argvec[0] == "PING") {
+    // else if (argvec[0] == "PING") {  
     //    argvec.erase(argvec.begin());    
     // }
     // else if (argvec[0] == "TOPIC") {
     //    argvec.erase(argvec.begin());    
     // }
     else if (argvec[0] == "JOIN") {
+           size_t i = 0;
+        while (i < argvec.size()) {
+            std::cout << "ARGVEC[" << i << "] == " << argvec[i] << std::endl;
+            i++;
+        }
        argvec.erase(argvec.begin());
        join(it, argvec);
     }

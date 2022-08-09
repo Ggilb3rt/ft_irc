@@ -71,6 +71,7 @@ private:
 	channel_map					_channel;
 	
 	std::string					_pass;
+	std::string					_host;
 
 	// init
 	void			init();
@@ -84,11 +85,6 @@ private:
 	int				readData(clients_vector::iterator);
 	bool			parse(users_map::iterator &it, std::string query);
 	bool    		handleCommands(users_map::iterator &it, std::vector<std::string> &argvec);
-
-	// execute
-	bool			handleUser(users_map::iterator pair, std::vector<std::string> &argvec);
-	bool			handleNick(users_map::iterator pair, std::vector<std::string> &argvec);
-	bool			checkPass(std::string pass);
 
 
 	// client managements
@@ -106,6 +102,8 @@ private:
 
 	// helpers
 	void			sendToClient(int fd, int code, std::string param_1 = "", std::string param_2 = "");
+	void    		sendToClient(int fd_sender, int fd_reciver, int code, std::string param_1 = "", std::string param_2 = "");
+	void			sendToChannel(user sender, channel chan, std::string msg);
 	user_id			getUserByNick(std::string nick) const;
 	users_map::iterator getUserById(user_id id);
 	void			namesRplConditions(users_map::iterator &user,
@@ -120,12 +118,15 @@ private:
 
 
 	// cmds //! il faudrait que tout les params soient const
+	bool	handleUser(users_map::iterator user, std::vector<std::string> &argvec);
+	bool	privateMsg(users_map::iterator pair, std::vector<std::string> &argvec);
+	bool	nick(users_map::iterator user, std::vector<std::string> &argvec);
+	bool	pass(users_map::iterator user, std::vector<std::string> &argvec);
 	bool	topic(users_map::iterator user, std::vector<std::string> params);
 	bool	join(users_map::iterator user, std::vector<std::string> params);
 	bool	part(users_map::iterator user, const std::vector<std::string> params);
 	bool	kick(users_map::iterator user, const std::vector<std::string> params);
 	bool	quit(users_map::iterator user, std::vector<std::string> params);
-
 	bool	mode(users_map::iterator user, std::vector<std::string> params);
 	bool	names(users_map::iterator user, std::vector<std::string> params);
 	bool	list(users_map::iterator user, std::vector<std::string> params);

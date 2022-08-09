@@ -16,6 +16,11 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_OKNICK, RPL_OKNICK_MSG));
 	list.insert(new_pair(RPL_OKJOIN, RPL_OKJOIN_MSG));
 	list.insert(new_pair(14, " :petit mais puissant"));
+	list.insert(new_pair(ERR_CANNOTSENDTOCHAN, ERR_CANNOTSENDTOCHAN_MSG));
+	list.insert(new_pair(ERR_NORECIPIENT, ERR_NORECIPIENT_MSG));
+	list.insert(new_pair(ERR_TOOMANYTARGETS, ERR_TOOMANYTARGETS_MSG));
+	list.insert(new_pair(ERR_NOTEXTTOSEND, ERR_NOTEXTTOSEND_MSG));
+	list.insert(new_pair(ERR_NOSUCHCHANNEL, ERR_NOSUCHCHANNEL_MSG));
 	list.insert(new_pair(ERR_ALREADYREGISTRED, ERR_ALREADYREGISTRED_MSG));
 	list.insert(new_pair(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG));
 	list.insert(new_pair(ERR_ONEUSNICKNAME, ERR_ONEUSNICKNAME_MSG));
@@ -49,7 +54,7 @@ rplManager::~rplManager()
 std::string	rplManager::createResponse(user &usr, int ret, std::string opt_before, std::string opt_after)
 {
 	std::stringstream	ss;
-	std::string res(":" + usr.getNick() + "!" + usr.getName() + "@" + "127.0.0.1 ");
+	std::string res(":" + usr.getNick() + "!" + usr.getUserName() + "@" + "127.0.0.1 ");
 	rpl_map::iterator	it = list.find(ret);
 
 	if (ret > -1) {

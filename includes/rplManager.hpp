@@ -61,6 +61,8 @@
 #define RPL_OKNLIST_MSG				"LIST "
 #define RPL_OKNINVITE				-8
 #define RPL_OKNINVITE_MSG			"INVITE "
+#define RPL_OKPRIVMSG				-9
+#define RPL_OKPRIVMSG_MSG			"PRIVMSG "
 #define RPL_OKQUIT					-10
 #define RPL_OKQUIT_MSG				"QUIT "
 #define RPL_OKKICK					-11

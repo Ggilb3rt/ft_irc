@@ -49,14 +49,6 @@ void	ircServer::removeAllUsersFromChans(int id_user)
 	}
 }
 
-void	ircServer::removeClient(clients_vector::iterator &it)
-{
-	removeAllUsersFromChans(it->fd);
-	_users.erase(it->fd);
-	close(it->fd);
-	_pfds.erase(it);
-}
-
 void	ircServer::removeClient(users_map::iterator &it)
 {
 	removeAllUsersFromChans(it->first);

@@ -3,23 +3,11 @@
 /*
 	TODO:
 	- VALGRIND errors :
-		- NC
-			- can't read cmds avec connection
-		- Parsing
-			- invalid read on USER cmd
-		- read.cpp
-			- invalid read of 2 bytes
 	- Finish error management :
 		-segfault :
-			- start fd_killer and ctrl+c before it ends
-					--> no more segfault but don't remove users, but probleme probably come from tester :
-						I try to connect all clients before sending something -> no readData() -> no user_x.setStatus(USER_STATUS_DEL)
-						? add POLLRDHUP will help? -> nope
-						I change the fd_killer, now he revc after send, it's help to remove all users but still one (if ctr+C between connect() and send())
 	- Parsing : 
 	- Commands :
 	- Miscellaneous :
-		?- can i use USER cmd to show my user infos ?
 		?- Remove ip v6 ?
 		- Code cleanup
 			-------------------
@@ -55,9 +43,18 @@
 			--> getUserByNick already exist
 		- implement commands in README [ ]
 	- VALGRIND errors :
+		- NC
+			- can't read cmds avec connection
+		- Parsing
+			- invalid read on USER cmd
 		- many errors when use part cmd ==> channel was deleted before sending if last user leaved
 	- Segfault : 
 			- scenario :
+				- start fd_killer and ctrl+c before it ends
+						--> no more segfault but don't remove users, but probleme probably come from tester :
+							I try to connect all clients before sending something -> no readData() -> no user_x.setStatus(USER_STATUS_DEL)
+							? add POLLRDHUP will help? -> nope
+							I change the fd_killer, now he revc after send, it's help to remove all users but still one (if ctr+C between connect() and send())
 				- clientX connects, then clientY connects
 					clientY disconnects before clientX then clientX disconnects
 					(true in branch main)

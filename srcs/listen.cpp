@@ -30,14 +30,14 @@ void	ircServer::startListen()
 				}
 			}
 			else {
-				for (clients_vector::iterator it = _pfds.begin(); it != _pfds.end(); it++) {
+				for (clients_vector::iterator it_c = _pfds.begin(); it_c != _pfds.end(); it_c++) {
 					// if ((*it).revents == POLLRDHUP || (*it).revents == POLLHUP) {
 					// 	users_map::iterator	user_x = _users.find(it->fd);
 					// 	if (user_x != _users.end())
 					// 		user_x->second.setStatus(USER_STATUS_DEL);
 					// }
-					if ((*it).revents == POLLIN) {
-						this->readData(it);
+					if ((*it_c).revents == POLLIN) {
+						this->readData(it_c);
 						ret_poll--;
 					}
 					if (ret_poll == 0)
@@ -99,8 +99,7 @@ void	ircServer::registerUser(users_map::iterator &it) {
 		// sendToClient(it->first, RPL_OKCONN, it->second.getNick());
 	}
 	if (getChunk(it->second._msg, "USER").size() > 0  ) {
-		// send password required;
-		std::cout << "pas de pass\n";
+		std::cout << "User tried to connect without password\n";
 		return ;
 	}
 }

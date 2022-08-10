@@ -92,7 +92,6 @@ private:
 	void			addClient(int fd, std::string nick, std::string name);
 	void			registerUser(users_map::iterator &it);
 	void			removeAllUsersFromChans(int id_user);
-	void			removeClient(clients_vector::iterator &it);
 	void			removeClient(users_map::iterator &it);
 
 	// channel managements
@@ -118,7 +117,8 @@ private:
 
 	// cmds //! il faudrait que tout les params soient const
 	bool	handleUser(users_map::iterator user, std::vector<std::string> &argvec);
-	bool	privateMsg(users_map::iterator pair, std::vector<std::string> &argvec);
+	bool	privmsg(users_map::iterator pair, std::vector<std::string> &argvec);
+	bool	notice(users_map::iterator pair, std::vector<std::string> &argvec);
 	bool	nick(users_map::iterator user, std::vector<std::string> &argvec);
 	bool	pass(users_map::iterator user, std::vector<std::string> &argvec);
 	bool	topic(users_map::iterator user, std::vector<std::string> params);

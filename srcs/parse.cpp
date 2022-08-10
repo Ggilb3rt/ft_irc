@@ -20,7 +20,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 
     std::cout << "\n\n--------PARSE--------\n\n" << std::endl;
 
-    std::cout << "QUERY == " << query << std::endl;
+    std::cout << "QUERY == |" << query << "|\n";
     if ((pos = query.find(":")) != std::string::npos) {
         pos += 1; 
         longarg = query.substr(pos, query.find(END_MSG, pos) - pos);
@@ -31,7 +31,7 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 
     while (pos != std::string::npos) {
         pos = query.find(' ', old);
-        if (query.c_str()[pos - 1] == ',') {
+        if (pos != std::string::npos && query.c_str()[pos - 1] == ',') {
             // TODO: send syntax error
             return (false);
         }
@@ -43,17 +43,17 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
 
     if (longarg.size())
         argvec.push_back(longarg);
-    // else {
-    //     if (argvec[0] == "USER") {
-    //         // send err: no double dot before real name
-    //         return (false);
-    //     }
-    // }
+    else {
+        if (argvec[0] == "USER") {
+            sendToClient(it->first, ERR_NEEDMOREPARAMS, "USER");
+            return (false);
+        }
+    }
 
     return(handleCommands(it, argvec));
 }
 
-#define NB_CMD 13
+#define NB_CMD 14
 
 enum e_commands
 {
@@ -65,6 +65,7 @@ enum e_commands
     MODE,
     PING,
     PRIVMSG,
+    NOTICE,
     TOPIC,
     JOIN,
     PART,
@@ -83,6 +84,7 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		"MODE",
 		"PING",
         "PRIVMSG",
+        "NOTICE",
 		"TOPIC",
 		"JOIN",
 		"PART",
@@ -115,7 +117,12 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 
         case PRIVMSG:
 			argvec.erase(argvec.begin());
-			return (privateMsg(it, argvec));
+			return (privmsg(it, argvec));
+			break;
+        
+        case NOTICE:
+            argvec.erase(argvec.begin());
+			return (notice(it, argvec));
 			break;
 		
 		case QUIT:

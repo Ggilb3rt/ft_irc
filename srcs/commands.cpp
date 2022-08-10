@@ -59,24 +59,70 @@ void	ircServer::sendToChannel(user sender, channel chan, int code, std::string b
 	int				sender_id = sender.getId();
 
 	pos = chan.getUsers();
-	std::cout << "---SEND TO CHAN---\n";
 	while (pos != end) {
-		std::cout << "User == |" << getUserById(pos->first)->second.getNick() << "|\n";
 		if (pos->first != sender_id)
 			sendToClient(sender.getId(), pos->first, code, before, after);
 		pos++;
 	}
 }
 
-bool	ircServer::privateMsg(users_map::iterator pair, std::vector<std::string> &argvec) {
-
+bool	ircServer::notice(users_map::iterator pair, std::vector<std::string> &argvec) {
 	channel_map::iterator	pos;
+	int						fd;
 	std::string		before = "";
-	std::string		res = "PRIVMSG";
+	std::string	dest = argvec[0];
 
 
 	std::cout << "---PRVMSG---\n";
 
+	if (argvec.size() == 0)
+		std::cout << "NOTICE doesn't crash\n";
+	else if (argvec.size() == 1)
+		std::cout << "NOTICE doesn't crash\n";
+	else if (argvec.size() > 3)
+		std::cout << "NOTICE doesn't crash\n";
+	else {
+		if (dest[0] == '#') {
+			pos = _channel.find(dest);
+			if (pos == _channel.end())
+				std::cout << "NOTICE doesn't crash\n";
+			else if (!pos->second.isOnChannel(pair->first))
+				std::cout << "NOTICE doesn't crash\n";
+			else {
+				dest += " :";
+				dest += argvec[2];
+				sendToChannel(pair->first, pos->second, RPL_OKPRIVMSG, before, dest);
+				return (true);
+			}
+		}
+		else {
+			if ((fd = getUserByNick(dest)) == 0)
+				std::cout << "NOTICE doesn't crash\n";
+			else {
+				dest += " :";
+				dest += argvec[2];
+				sendToClient(pair->first, fd, RPL_OKPRIVMSG, std::string(), dest);
+				return (true);
+			}
+		}
+	}
+	return (false);
+}
+
+bool	ircServer::privmsg(users_map::iterator pair, std::vector<std::string> &argvec) {
+
+	channel_map::iterator	pos;
+	int						fd;
+	std::string		before = "";
+	std::string	dest = argvec[0];
+
+
+	std::cout << "---PRVMSG---\n";
+	size_t i = 0;
+	while (i < argvec.size()) {
+		std::cout << "ARGVEC[" << i << "] == |" << argvec[i] << "|\n";
+		i++;
+	}
 	if (argvec.size() == 0)
 		sendToClient(pair->first, ERR_NORECIPIENT, "PRIVMSG ");
 	else if (argvec.size() == 1)
@@ -84,7 +130,6 @@ bool	ircServer::privateMsg(users_map::iterator pair, std::vector<std::string> &a
 	else if (argvec.size() > 3)
 		sendToClient(pair->first, ERR_TOOMANYTARGETS, "PRIVMSG ");
 	else {
-		std::string	dest = argvec[0];
 		if (dest[0] == '#') {
 			pos = _channel.find(dest);
 			if (pos == _channel.end())
@@ -92,26 +137,19 @@ bool	ircServer::privateMsg(users_map::iterator pair, std::vector<std::string> &a
 			else if (!pos->second.isOnChannel(pair->first))
 				sendToClient(pair->first, ERR_CANNOTSENDTOCHAN, "PRIVMSG ");
 			else {
-				res += dest;
-				res += " :";
-				res += argvec[2];
-				sendToChannel(pair->first, pos->second, -9, before, res);
+				dest += " :";
+				dest += argvec[1];
+				sendToChannel(pair->first, pos->second, RPL_OKPRIVMSG, before, dest);
 				return (true);
 			}
 		}
 		else {
-			if (getUserByNick(dest) == 0)
+			if ((fd = getUserByNick(dest)) == 0)
 				sendToClient(pair->first, ERR_NOSUCHNICK, "PRIVMSG ");
 			else {
-
-				// std::string		res = "PRIVMSG ";
-				// res += dest;
-				// res += " :";
-				// res += argvec[2];
-
-				std::string			res("PRIVMSG " + dest + " :" + argvec[2]);
-
-				sendToClient(pair->first, getUserByNick(dest), -9, std::string(), res);
+				dest += " :";
+				dest += argvec[1];
+				sendToClient(pair->first, fd, RPL_OKPRIVMSG, std::string(), dest);
 				return (true);
 			}
 		}
@@ -156,7 +194,7 @@ bool	ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &a
 		return (false);
 	}
 	int i = 0;
-	while (i <= 4) {
+	while (i <= 3) {
 		std::cout << argvec[i] << std::endl;
 		i++;
 	}
@@ -426,7 +464,7 @@ bool	ircServer::quit(users_map::iterator user, std::vector<std::string> params)
 			if (chan->second.isOnChannel(user->first))
 				sendToChannel(user->second, chan->second, RPL_OKQUIT, std::string(), res);
 		}
-		this->removeClient(user);
+		user->second.setStatus(USER_STATUS_DEL);
 	}
 	return (true);
 }

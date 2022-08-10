@@ -56,30 +56,24 @@ int main(int argc, char **argv)
 	int	chan_mode = 0;
 
 	bin(chan_mode);
-	chan_mode = set_bit(chan_mode, CHAN_MASK_M);
-	bin(chan_mode);
 	chan_mode = set_bit(chan_mode, CHAN_MASK_I);
 	bin(chan_mode);
 	chan_mode = set_bit(chan_mode, CHAN_MASK_O);
 	bin(chan_mode);
 	chan_mode = toggle_bit(chan_mode, CHAN_MASK_O);
 	bin(chan_mode);
-	chan_mode = clear_bit(chan_mode, CHAN_MASK_V);
+	chan_mode = set_bit(chan_mode, CHAN_MASK_P);
 	bin(chan_mode);
-	chan_mode = set_bit(chan_mode, CHAN_MASK_V);
-	bin(chan_mode);
-	chan_mode = clear_bit(chan_mode, CHAN_MASK_V);
+	chan_mode = clear_bit(chan_mode, CHAN_MASK_P);
 	bin(chan_mode);
 
 	if (get_bit(chan_mode, CHAN_MASK_K))
 		std::cout << "Mask K is set\n"; // no
 	if (get_bit(chan_mode, CHAN_MASK_I))
 		std::cout << "Mask I is set\n"; // yes
-	if (get_bit(chan_mode, CHAN_MASK_M))
-		std::cout << "Mask M is set\n"; // yes
 	if (get_bit(chan_mode, CHAN_MASK_O))
 		std::cout << "Mask O is set\n"; // no
-	if (get_bit(chan_mode, CHAN_MASK_V))
+	if (get_bit(chan_mode, CHAN_MASK_P))
 		std::cout << "Mask V is set\n"; // no
 
 	bin(chan_mode);

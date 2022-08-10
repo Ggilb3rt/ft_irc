@@ -121,36 +121,31 @@ bool   ircServer::handleCommands(users_map::iterator &it, std::vector<std::strin
 		case QUIT:
 			argvec.erase(argvec.begin());
 			return (quit(it, argvec));
-			// break;
 
 		case MODE:
-			// argvec.erase(argvec.begin());
-			break;
+			argvec.erase(argvec.begin());
+			return (mode(it, argvec));
 
 		case PING:
 			argvec.erase(argvec.begin());
 			return (pong(it, argvec));
-			// break;
 
 		case TOPIC:
 			argvec.erase(argvec.begin()); 
 			return (topic(it, argvec)); 
-			// break;
 		
 		case JOIN:
 			argvec.erase(argvec.begin());
 			return (join(it, argvec));
-			// break;
 
 		case PART:
 			argvec.erase(argvec.begin());
 			return (part(it, argvec));
-			// break;
 		
 		case INVITE:
 			argvec.erase(argvec.begin());
 			return (invite(it, argvec));
-			// break;
+
 		case KICK:
 			argvec.erase(argvec.begin());
 			return (kick(it, argvec));

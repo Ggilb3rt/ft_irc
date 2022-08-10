@@ -2,9 +2,13 @@
 
 /*
 	TODO:
-	- signals : need it to quit infinite loop (tests no leaks)
+	- VALGRIND errors :
+		- Parsing
+			- invalid read on USER cmd
+		- read.cpp
+			- invalid read of 2 bytes
+		- many errors when use part cmd
 	- Finish error management :
-		-send : must create send()function
 		-segfault :
 			- start fd_killer and ctrl+c before it ends
 					--> no more segfault but don't remove users, but probleme probably come from tester :
@@ -12,15 +16,9 @@
 						? add POLLRDHUP will help? -> nope
 						I change the fd_killer, now he revc after send, it's help to remove all users but still one (if ctr+C between connect() and send())
 	- Parsing : 
-		- check README to get syntax requirements
-		- implement lexer
-		- ! multi command in single fd
 	- Commands :
-		- user_id getUserByName(std::string name);
-			--> needed for kick (and other cmds), convertir le nom en id dans le parser
-			--> getUserByNick already exist
-		- implement commands in README [ ]
 	- Miscellaneous :
+		?- can i use USER cmd to show my user infos ?
 		?- Remove ip v6 ?
 		- Code cleanup
 			-------------------
@@ -28,7 +26,9 @@
 
 
 	TODO: DONE
+	- signals : need it to quit infinite loop (tests no leaks)
 	- Finish error management :
+		-send : must create send()function
 		-accept (-1 handled, 0 seems inoperant) but don't want to exit() when -1,
 				just print err and go againt, use an arbitrary limit
 		-listen: (ok)
@@ -38,6 +38,10 @@
 			==> solution : one buffer by client
 		- when client make ctrl+D more than one time he is stucked
 			--> probleme from nc ? the rest of the server is ok, sooooo fuck it ?
+	- Parsing : 
+		- check README to get syntax requirements
+		- implement lexer
+		- ! multi command in single fd
 	- Channels :
 		- when client disconnect : 
 			- remove channel if it was the last in
@@ -45,6 +49,10 @@
 				==> it works, the first user in the map is set has operator
 	- Commands :
 		- PART and KICK don't remove channel if last user (is it a problem ?)
+		- user_id getUserByName(std::string name);
+			--> needed for kick (and other cmds), convertir le nom en id dans le parser
+			--> getUserByNick already exist
+		- implement commands in README [ ]
 	- Segfault : 
 			- scenario :
 				- clientX connects, then clientY connects

@@ -65,6 +65,8 @@
 #define RPL_OKQUIT_MSG				"QUIT "
 #define RPL_OKKICK					-11
 #define RPL_OKKICK_MSG				"KICK "
+#define RPL_OKMODE					-12
+#define RPL_OKMODE_MSG				"MODE "
 #define RPL_OKCONN					001
 #define RPL_OKCONN_MSG				" :Welcome to the internet"
 #define	RPL_UMODEIS					221

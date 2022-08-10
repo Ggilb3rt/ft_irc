@@ -77,7 +77,6 @@ bool			channel::isInBanList(std::string nick)
 		it != this->_banlist.end() ; it++) {
 			if (it->compare(nick) == 0)
 				return (true);
-				//! send ERR_BANNEDFROMCHAN 467 (maybe not here, in cmd MODE)
 	}
 	return (false);
 }
@@ -94,9 +93,9 @@ int		channel::setDescription(user_id id, std::string description)
 	if (isFlagSets(CHAN_MASK_T))
 		if (!isOperator(id))
 			return (ERR_CHANOPRIVSNEEDED);
-	this->_description = description;
 	if (this->_description == "")
 		return (RPL_NOTOPIC);
+	this->_description = description;
 	return (RPL_TOPIC);
 }
 

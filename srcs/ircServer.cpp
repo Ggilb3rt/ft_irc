@@ -7,7 +7,6 @@
 			- invalid read on USER cmd
 		- read.cpp
 			- invalid read of 2 bytes
-		- many errors when use part cmd
 	- Finish error management :
 		-segfault :
 			- start fd_killer and ctrl+c before it ends
@@ -53,6 +52,8 @@
 			--> needed for kick (and other cmds), convertir le nom en id dans le parser
 			--> getUserByNick already exist
 		- implement commands in README [ ]
+	- VALGRIND errors :
+		- many errors when use part cmd ==> channel was deleted before sending if last user leaved
 	- Segfault : 
 			- scenario :
 				- clientX connects, then clientY connects

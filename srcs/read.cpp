@@ -21,30 +21,21 @@ int		ircServer::readData(clients_vector::iterator client)
 				std::cerr << "ERROR recv : " << errno << std::endl;
 			else if (recv_ret == 0) {
 				user_x->second.setStatus(USER_STATUS_DEL);
-				std::cout << "remote host " << client->fd << " closed the connection" << std::endl;
 				return 0;
 			}
 			else {
 				for (int i = recv_ret; i < maxlen ; i++)
 					buff[i] = '\0';
 				user_x->second._msg += buff;
-				std::cout << "My buffer[" << recv_ret << "] in fd["
-						<< user_x->second.getId() << "] |"
-						<< buff << "|" << std::endl;
 			}
 			
 			if (user_x->second.getStatus() == USER_STATUS_CONNECTED) {
 				while (pos != std::string::npos) {
 					pos = user_x->second._msg.find("\r\n", old);
-					std::cout << "POS == " << pos << std::endl;
 					if (pos != std::string::npos) {
 						buffer = user_x->second._msg.substr(old, pos - old);
-						std::cout << "BUFFERSTRING == |" << buffer << "|\n";
 						parse(user_x, buffer);
 						user_x->second._msg = user_x->second._msg.substr(pos + 2);
-					}
-					else {
-						std::cout << "PROUT\n";
 					}
         			old = pos + 1;
 				}

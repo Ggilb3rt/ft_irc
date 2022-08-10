@@ -1,71 +1,5 @@
 #include "ircServer.hpp"
 
-//! Commands should send(), some then must send multiple replies (like join)
-
-// considering the input is an iterator->[client_fd][user], and an already parsed string nick
-
-std::string	toLower(std::string nickname) {
-
-	std::string	lower;
-
-	int	i = 0;
-
-	while (nickname.c_str()[i]) {
-		if (nickname.c_str()[i] >= 'A' && nickname.c_str()[i] <= 'Z')
-			lower += nickname.c_str()[i] + 32;
-		else
-			lower += nickname.c_str()[i];
-		i++;
-	}
-	return (lower);
-}
-
-bool	isAlnum(char c) {
-	if (c >= '0' && c <= '9')
-		return (true);
-	if (c >= 'a' && c <= 'z')
-		return (true);
-	if (c >= 'A' && c <= 'Z')
-		return (true);
-	return (false);
-}
-
-bool	isSpecialOk(char c) {
-	if ((c >= '[' && c <= '}') || c == '-')
-		return (true);
-	return (false);
-}
-
-bool	isValid(std::string &nickname) {
-	int	i = 0;
-
-	if (nickname.c_str()[i] >= '0' && nickname.c_str()[i] <= '9')
-		return (false);
-	while (nickname.c_str()[i]) {
-		if (!isAlnum(nickname.c_str()[i]))
-			return (false);
-		if (!isSpecialOk(nickname.c_str()[i]))
-			return (false);
-		if (nickname.c_str()[i] == ' ')
-			nickname[i] = '_';
-		i++;
-	}
-	return (true);
-}
-
-void	ircServer::sendToChannel(user sender, channel chan, int code, std::string before, std::string after) {
-	channel::users_list::iterator pos;
-	channel::users_list::iterator end = chan.getEnd();
-	int				sender_id = sender.getId();
-
-	pos = chan.getUsers();
-	while (pos != end) {
-		if (pos->first != sender_id)
-			sendToClient(sender.getId(), pos->first, code, before, after);
-		pos++;
-	}
-}
-
 bool	ircServer::notice(users_map::iterator pair, std::vector<std::string> &argvec) {
 	channel_map::iterator	pos;
 	int						fd;
@@ -116,26 +50,19 @@ bool	ircServer::privmsg(users_map::iterator pair, std::vector<std::string> &argv
 	std::string		before = "";
 	std::string	dest = argvec[0];
 
-
-	std::cout << "---PRVMSG---\n";
-	size_t i = 0;
-	while (i < argvec.size()) {
-		std::cout << "ARGVEC[" << i << "] == |" << argvec[i] << "|\n";
-		i++;
-	}
 	if (argvec.size() == 0)
-		sendToClient(pair->first, ERR_NORECIPIENT, "PRIVMSG ");
+		sendToClient(pair->first, ERR_NORECIPIENT, "PRIVMSG");
 	else if (argvec.size() == 1)
-		sendToClient(pair->first, ERR_NOTEXTTOSEND, "PRIVMSG ");
+		sendToClient(pair->first, ERR_NOTEXTTOSEND, "PRIVMSG");
 	else if (argvec.size() > 3)
-		sendToClient(pair->first, ERR_TOOMANYTARGETS, "PRIVMSG ");
+		sendToClient(pair->first, ERR_TOOMANYTARGETS, "PRIVMSG");
 	else {
 		if (dest[0] == '#') {
 			pos = _channel.find(dest);
 			if (pos == _channel.end())
-				sendToClient(pair->first, ERR_NOSUCHCHANNEL, "PRIVMSG ");
+				sendToClient(pair->first, ERR_NOSUCHCHANNEL, "PRIVMSG");
 			else if (!pos->second.isOnChannel(pair->first))
-				sendToClient(pair->first, ERR_CANNOTSENDTOCHAN, "PRIVMSG ");
+				sendToClient(pair->first, ERR_CANNOTSENDTOCHAN, "PRIVMSG");
 			else {
 				dest += " :";
 				dest += argvec[1];
@@ -145,7 +72,7 @@ bool	ircServer::privmsg(users_map::iterator pair, std::vector<std::string> &argv
 		}
 		else {
 			if ((fd = getUserByNick(dest)) == 0)
-				sendToClient(pair->first, ERR_NOSUCHNICK, "PRIVMSG ");
+				sendToClient(pair->first, ERR_NOSUCHNICK, "PRIVMSG");
 			else {
 				dest += " :";
 				dest += argvec[1];
@@ -163,15 +90,11 @@ bool    ircServer::nick(users_map::iterator pair, std::vector<std::string> &argv
     users_map::iterator end = _users.end();
     std::string        	 res;
 
-	// SIZE OF NICK ISNT VALID OR NOT IN SET OF CHARS
-	// std::cout << "\n---nick---\n" << "---> NICKNAME == |" << nzewNick << "|\n";
 	if (newNick.length() > 9 || !newNick.length() || !isValid(newNick)) {
-		// std::cout << "ERR_ERRONEUSNICKNAME\n";
         sendToClient(pair->first, ERR_ONEUSNICKNAME, newNick);
 		return (false);
     }
 
-	// CHECK FOR DOUBLON
     while (beg != end) {
         if (toLower(beg->second.getNick()) == toLower(newNick)) {
             sendToClient(pair->first, ERR_NICKNAMEINUSE, newNick);
@@ -209,7 +132,6 @@ bool	ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &a
 
 bool		ircServer::pass(users_map::iterator pair, std::vector<std::string> &argvec) {
 	std::string	pass = argvec[0];
-	std::cout << "In pass cmd, pass == |" << pass << "|\n";
 	if (pass != this->_pass) {
 		return (false);
 	}

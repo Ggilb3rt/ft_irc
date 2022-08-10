@@ -1,24 +1,11 @@
 #include "ircServer.hpp"
 
-//  TOKENIZE : prefix, cmd, args
-//  ->check channel concerned
-//  ->check prefix
-
-//  if      ->check command
-//              if !->check validity
-//                      ->send_msg to channel or nth
-//              ->check args
-//              ->send cmd(vector(args))
-//  else    
-//          ->send_msg to channel or nth
 bool    ircServer::parse(users_map::iterator &it, std::string query)
 {   
     size_t                      pos = 0;
     size_t                      old = 0;
     std::string                 longarg;
     std::vector<std::string>    argvec;
-
-    std::cout << "\n\n--------PARSE--------\n\n" << std::endl;
 
     std::cout << "QUERY == |" << query << "|\n";
     if ((pos = query.find(":")) != std::string::npos) {
@@ -32,10 +19,8 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
     while (pos != std::string::npos) {
         pos = query.find(' ', old);
         if (pos != std::string::npos && query.c_str()[pos - 1] == ',') {
-            // TODO: send syntax error
             return (false);
         }
-        std::cout << "OLD == " << old << " | POS == " << pos << " | SUB == |" << query.substr(old, pos - old) << "|\n";
         std::string sub = query.substr(old, pos - old);
         argvec.push_back(sub);
         old = pos + 1;

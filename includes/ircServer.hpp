@@ -100,6 +100,10 @@ private:
 	void			removeChannel(channel_map::iterator &it);
 
 	// helpers
+	std::string		toLower(std::string nickname);
+	bool			isAlnum(char c);
+	bool			isSpecialOk(char c);
+	bool			isValid(std::string &nickname);
 	void			sendToClient(int fd, int code, std::string param_1 = "", std::string param_2 = "");
 	void    		sendToClient(int fd_sender, int fd_reciver, int code, std::string param_1 = "", std::string param_2 = "");
 	void			sendToChannel(user sender, channel chan, int code, std::string before = "", std::string after = "");

@@ -4,7 +4,7 @@ void    ircServer::sendToClient(int fd_sender, int fd_reciver, int code, std::st
 {
     rplManager    *instance = rplManager::getInstance();
     std::string    res    = instance->createResponse(getUserById(fd_sender)->second, code, param_1, param_2);
-    std::cout << "response2 == " << res << std::endl;
+    std::cout << "response == " << res << std::endl;
     if (send(fd_reciver, res.c_str(), res.length(), 0) == -1) {
         std::cerr << strerror(errno) << std::endl;
     }
@@ -13,7 +13,6 @@ void    ircServer::sendToClient(int fd_sender, int fd_reciver, int code, std::st
 void	ircServer::sendToClient(int fd, int code, std::string param_1, std::string param_2)
 {
 	rplManager	*instance = rplManager::getInstance();
-	std::cout << "BONJOUR JE SUIS LA" << std::endl;
 	std::string	res	= instance->createResponse(getUserById(fd)->second, code, param_1, param_2);
 	std::cout << "response == " << res << std::endl;
     if (send(fd, res.c_str(), res.length(), 0) == -1) {
@@ -23,14 +22,6 @@ void	ircServer::sendToClient(int fd, int code, std::string param_1, std::string 
 
 user_id	ircServer::getUserByNick(const std::string nick) const
 {
-	// users_map::iterator		it = _users.begin();
-	// users_map::iterator		end = _users.end();
-
-	// while (it != end) {
-	// 	if (it->second.getNick() == nick)
-	// 		return (it->first);
-	// 	it++;
-	// }
 	for (users_map::const_iterator it_user = _users.begin();
 		it_user != _users.end();
 		it_user++) {
@@ -164,5 +155,67 @@ void	ircServer::printAddrInfo()
 		// convert the IP to a string and print it:
 		inet_ntop(_p->ai_family, addr, _ipstr, sizeof _ipstr);
 		std::cout << "\t" << ipver << " : " << _ipstr << std::endl;
+	}
+}
+
+std::string	ircServer::toLower(std::string nickname) {
+
+	std::string	lower;
+
+	int	i = 0;
+
+	while (nickname.c_str()[i]) {
+		if (nickname.c_str()[i] >= 'A' && nickname.c_str()[i] <= 'Z')
+			lower += nickname.c_str()[i] + 32;
+		else
+			lower += nickname.c_str()[i];
+		i++;
+	}
+	return (lower);
+}
+
+bool	ircServer::isAlnum(char c) {
+	if (c >= '0' && c <= '9')
+		return (true);
+	if (c >= 'a' && c <= 'z')
+		return (true);
+	if (c >= 'A' && c <= 'Z')
+		return (true);
+	return (false);
+}
+
+bool	ircServer::isSpecialOk(char c) {
+	if ((c >= '[' && c <= '}') || c == '-')
+		return (true);
+	return (false);
+}
+
+bool	ircServer::isValid(std::string &nickname) {
+	int	i = 0;
+
+	if (nickname.c_str()[i] >= '0' && nickname.c_str()[i] <= '9')
+		return (false);
+	while (nickname.c_str()[i]) {
+		if (!isAlnum(nickname.c_str()[i]))
+			return (false);
+		if (!isSpecialOk(nickname.c_str()[i]))
+			return (false);
+		if (nickname.c_str()[i] == ' ')
+			nickname[i] = '_';
+		i++;
+	}
+	return (true);
+}
+
+void	ircServer::sendToChannel(user sender, channel chan, int code, std::string before, std::string after) {
+	channel::users_list::iterator pos;
+	channel::users_list::iterator end = chan.getEnd();
+	int				sender_id = sender.getId();
+
+	pos = chan.getUsers();
+	while (pos != end) {
+		if (pos->first != sender_id)
+			sendToClient(sender.getId(), pos->first, code, before, after);
+		pos++;
 	}
 }

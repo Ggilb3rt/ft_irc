@@ -3,6 +3,8 @@
 /*
 	TODO:
 	- VALGRIND errors :
+		- NC
+			- can't read cmds avec connection
 		- Parsing
 			- invalid read on USER cmd
 		- read.cpp

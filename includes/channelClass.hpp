@@ -27,7 +27,7 @@ private:
 	int							_modes;
 	size_t						_user_limit;
 	std::string					_password;
-	std::vector<std::string>	_banlist;
+	std::map<user_id, std::string>	_invit_list;
 
 	channel() {}
 
@@ -42,15 +42,14 @@ public:
 	void			setUserLimit(size_t new_limit) { _user_limit = new_limit; }
 	std::string		getPassword() {return _password; }
 	void			setPassword(std::string s) { _password = s; }
-	bool			isInBanList(std::string nick);
 	//! should be private (after tests)
 
 	channel(std::string name, user_id creator) :
 			_name(name), _description("Super channel " + name), _modes(0),
-			_user_limit(0), _password(""), _banlist()
+			_user_limit(0), _password(""), _invit_list()
 	{
 		_users.insert(std::pair<user_id, role>(creator, true));
-		(void)_user_limit; (void)_password; (void)_banlist;
+		(void)_user_limit; (void)_password; (void)_invit_list;
 	}
 	~channel() {}
 
@@ -62,7 +61,15 @@ public:
 	size_t		removeUser(user_id user_fd);
 	void		setUserRole(user_id id, role new_role);
 	size_t		getSize() const;
-	
+	void		addToInvitList(user_id id, std::string nick) { _invit_list.insert(std::pair<user_id, std::string>(id, nick));}
+	void		removeFromInvitList(user_id id) { _invit_list.erase(id);}
+	bool		isOnInvitList(user_id id) const
+	{ 
+					if (_invit_list.find(id) != _invit_list.end())
+						return true;
+					return false;
+	}
+
 	users_list::iterator		getUsers() { return _users.begin();}
 	users_list::iterator		getEnd() { return _users.end();}
 	

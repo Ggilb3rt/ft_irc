@@ -71,17 +71,6 @@ std::string		channel::convertModeMaskToFlags()
 	return (flags);
 }
 
-bool			channel::isInBanList(std::string nick)
-{
-	for (std::vector<std::string>::iterator it = this->_banlist.begin() ;
-		it != this->_banlist.end() ; it++) {
-			if (it->compare(nick) == 0)
-				return (true);
-	}
-	return (false);
-}
-
-
 
 ///////////////
 // MODIFIERS //
@@ -116,7 +105,6 @@ size_t		channel::removeUser(user_id user_fd) { return (this->_users.erase(user_f
 
 void		channel::setUserRole(user_id id, role new_role)
 {
-	// cf OPER command to set correct response (will we do OPER cmd ?)
 	users_list::iterator it = _users.find(id);
 	if (it != _users.end())
 		it->second = new_role;
@@ -154,6 +142,7 @@ void		channel::removeFlags(int flag)
 				this->setUserLimit(0);
 			if (i == CHAN_MASK_K)
 				this->setPassword("");
+			//! remove invited list ?
 		}
 		i++;
 	}

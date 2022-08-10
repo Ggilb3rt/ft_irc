@@ -41,8 +41,12 @@ bool    ircServer::parse(users_map::iterator &it, std::string query)
         old = pos + 1;
     }
 
-    if (longarg.size())
-        argvec.push_back(longarg);
+    if (longarg.size()) {
+		if (argvec[0] == "USER" && argvec.size() > 5)
+			argvec[3] = longarg;
+		else
+        	argvec.push_back(longarg);
+	}
     else {
         if (argvec[0] == "USER") {
             sendToClient(it->first, ERR_NEEDMOREPARAMS, "USER");

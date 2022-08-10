@@ -44,7 +44,7 @@ void	ircServer::startListen()
 						break ;
 				}
 				for (users_map::iterator it = _users.begin(); it != _users.end(); it++) {
-					std::cout << "STATUS[" << it->second.getNick() << "] == " << it->second.getStatus() << std::endl;
+					std::cout << "STATUS[" << it->second.getNick() << "][" << it->first << "] ==" << it->second.getStatus() << std::endl;
 					if (it->second.getStatus() == USER_STATUS_DEL) {
 						removeClient(it);
 						this->printUsers();
@@ -85,6 +85,7 @@ void	ircServer::registerUser(users_map::iterator &it) {
 			return ;
 		}
 		if (!parse(it, getChunk(it->second._msg, "NICK"))) {
+			std::cout << "JEDOIS M'AFFICHER\n";
 			it->second.setStatus(USER_STATUS_DEL);
 			return ;
 		}
@@ -99,7 +100,8 @@ void	ircServer::registerUser(users_map::iterator &it) {
 		// sendToClient(it->first, RPL_OKCONN, it->second.getNick());
 	}
 	if (getChunk(it->second._msg, "USER").size() > 0  ) {
-		std::cout << "User tried to connect without password\n";
+
+		it->second.setStatus(USER_STATUS_DEL);
 		return ;
 	}
 }

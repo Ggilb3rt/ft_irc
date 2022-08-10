@@ -69,6 +69,8 @@
 #define RPL_OKKICK_MSG				"KICK "
 #define RPL_OKMODE					-12
 #define RPL_OKMODE_MSG				"MODE "
+#define RPL_OKNOTICE				-13
+#define RPL_OKNOTICE_MSG			"NOTICE "
 #define RPL_OKCONN					001
 #define RPL_OKCONN_MSG				" :Welcome to the internet"
 #define	RPL_UMODEIS					221

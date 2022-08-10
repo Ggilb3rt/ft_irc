@@ -90,8 +90,8 @@ bool	ircServer::notice(users_map::iterator pair, std::vector<std::string> &argve
 				std::cout << "NOTICE doesn't crash\n";
 			else {
 				dest += " :";
-				dest += argvec[2];
-				sendToChannel(pair->first, pos->second, RPL_OKPRIVMSG, before, dest);
+				dest += argvec[1];
+				sendToChannel(pair->first, pos->second, RPL_OKNOTICE, before, dest);
 				return (true);
 			}
 		}
@@ -100,8 +100,8 @@ bool	ircServer::notice(users_map::iterator pair, std::vector<std::string> &argve
 				std::cout << "NOTICE doesn't crash\n";
 			else {
 				dest += " :";
-				dest += argvec[2];
-				sendToClient(pair->first, fd, RPL_OKPRIVMSG, std::string(), dest);
+				dest += argvec[1];
+				sendToClient(pair->first, fd, RPL_OKNOTICE, std::string(), dest);
 				return (true);
 			}
 		}
@@ -164,7 +164,7 @@ bool    ircServer::nick(users_map::iterator pair, std::vector<std::string> &argv
     std::string        	 res;
 
 	// SIZE OF NICK ISNT VALID OR NOT IN SET OF CHARS
-	// std::cout << "\n---nick---\n" << "---> NICKNAME == |" << newNick << "|\n";
+	// std::cout << "\n---nick---\n" << "---> NICKNAME == |" << nzewNick << "|\n";
 	if (newNick.length() > 9 || !newNick.length() || !isValid(newNick)) {
 		// std::cout << "ERR_ERRONEUSNICKNAME\n";
         sendToClient(pair->first, ERR_ONEUSNICKNAME, newNick);
@@ -198,7 +198,7 @@ bool	ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &a
 		std::cout << argvec[i] << std::endl;
 		i++;
 	}
-	if (argvec.size() < 4) {
+	if (argvec.size() < 4) {	
 		sendToClient(pair->first, ERR_NEEDMOREPARAMS);
 		return (false);
 	}

@@ -17,7 +17,7 @@ NAME = ircserv
 PORT = 6697
 
 # Password for the server
-PSWD = 
+PSWD = superIrc
 
 # sources needed to compile
 SRC =	channelClass.cpp \

@@ -13,9 +13,9 @@ void	ircServer::initAddrInfo()
 	// INIT STRUCT
 	memset(&_hints, 0, sizeof(_hints));
 	memset(&_servinfo, 0, sizeof(_servinfo));
-	_hints.ai_family = AF_INET; // AF_INET or AF_INET6 to force version
+	_hints.ai_family = AF_INET;
 	_hints.ai_socktype = SOCK_STREAM;
-	_hints.ai_flags = AI_PASSIVE; // maybe useles
+	_hints.ai_flags = AI_PASSIVE;
 
 	_addrinfo_status = getaddrinfo(ADDRESS_NAME, _port, &_hints, &_servinfo);
 	if (_addrinfo_status != 0) {
@@ -35,11 +35,6 @@ void	ircServer::createMasterSocket()
 		freeaddrinfo(_servinfo);
 		exit(errno);
 	}
-	// if (setsockopt(_master_sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)1, sizeof(int)) < -1) {
-	// 	std::cerr << "ERROR : setsockopt" << std::endl;
-	// 	freeaddrinfo(_servinfo);
-	// 	exit(errno);
-	// }
 	bind_ret = bind(_master_sockfd, _servinfo->ai_addr, _servinfo->ai_addrlen);
 	if (bind_ret == -1) {
 		std::cerr << "ERROR : Bind" << std::endl;

@@ -10,7 +10,6 @@ void	ircServer::addClient(int fd)
 		std::cerr << "ERROR : fd " << fd << " is already in use." << std::endl;
 		return ;
 	}
-	std::cout << "addclient : " << ret.first->second.getId() << " " << fd << std::endl;
 }
 
 void	ircServer::removeAllUsersFromChans(int id_user)

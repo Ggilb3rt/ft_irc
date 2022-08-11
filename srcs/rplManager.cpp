@@ -24,7 +24,6 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_OKQUIT, RPL_OKQUIT_MSG));
 	list.insert(new_pair(RPL_OKKICK, RPL_OKKICK_MSG));
 	list.insert(new_pair(RPL_OKMODE, RPL_OKMODE_MSG));
-	list.insert(new_pair(14, " :petit mais puissant"));
 	list.insert(new_pair(ERR_CANNOTSENDTOCHAN, ERR_CANNOTSENDTOCHAN_MSG));
 	list.insert(new_pair(ERR_NORECIPIENT, ERR_NORECIPIENT_MSG));
 	list.insert(new_pair(ERR_TOOMANYTARGETS, ERR_TOOMANYTARGETS_MSG));
@@ -40,6 +39,7 @@ rplManager::rplManager()
 	list.insert(new_pair(ERR_CHANOPRIVSNEEDED, ERR_CHANOPRIVSNEEDED_MSG));
 	list.insert(new_pair(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG));
 	list.insert(new_pair(ERR_CHANNELISFULL, ERR_CHANNELISFULL_MSG));
+	list.insert(new_pair(14, " :petit mais puissant"));
 	list.insert(new_pair(ERR_INVITEONLYCHAN, ERR_INVITEONLYCHAN_MSG));
 	list.insert(new_pair(ERR_BADCHANNELKEY, ERR_BADCHANNELKEY_MSG));
 	list.insert(new_pair(RPL_UMODEIS, RPL_UMODEIS_MSG));
@@ -78,38 +78,11 @@ std::string	rplManager::createResponse(user &usr, int ret, std::string opt_befor
 		res += " " + usr.getNick() + " ";
 	}
 	if (opt_before.size() > 0) {
-		// res += " ";
 		res += opt_before;
 	}
 	if (it != list.end())
 		res += it->second;
 	if (opt_after.size() > 0) {
-		// res += " ";
-		res += opt_after;
-	}
-	res += END_MSG;
-	return (res);
-}
-
-std::string	rplManager::createResponse(int ret, std::string opt_before, std::string opt_after)
-{
-	std::stringstream	ss;
-	std::string res = "";
-	rpl_map::iterator	it = list.find(ret);
-
-	ss << ret;
-	for (int i = ret; i < 100; i *= 10) {
-		res += '0';
-	}
-	res += ss.str();
-	if (opt_before.size() > 0) {
-		res += " ";
-		res += opt_before;
-	}
-	if (it != list.end())
-		res += it->second;
-	if (opt_after.size() > 0) {
-		// res += " ";
 		res += opt_after;
 	}
 	res += END_MSG;

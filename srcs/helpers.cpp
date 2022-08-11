@@ -129,23 +129,16 @@ void ircServer::printChannels()
 
 void	ircServer::printAddrInfo()
 {
-	char			_ipstr[INET6_ADDRSTRLEN];
 	struct addrinfo	*_p;
 
-	std::cout << std::endl << "IP addresses for " << ADDRESS_NAME << " : " << std::endl << std::endl;
+	std::cout << std::endl << "Listening on : " << ADDRESS_NAME << std::endl << std::endl;
 	for(_p = _servinfo;_p != NULL; _p = _p->ai_next) {
-		void		*addr;
-		std::string	ipver;
 
-		if (_p->ai_family == AF_INET) { // IPv4
+		if (_p->ai_family == AF_INET) {
 			struct sockaddr_in *ipv4 = (struct sockaddr_in *)_p->ai_addr;
 			std::cout << "Port is " << ntohs(ipv4->sin_port) << std::endl;
-			addr = &(ipv4->sin_addr);
-			ipver = "IPv4";
 		}
 
-		inet_ntop(_p->ai_family, addr, _ipstr, sizeof _ipstr);
-		std::cout << "\t" << ipver << " : " << _ipstr << std::endl;
 	}
 }
 

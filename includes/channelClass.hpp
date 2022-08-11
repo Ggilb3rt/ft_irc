@@ -33,18 +33,6 @@ private:
 
 
 public:
-	//! should be private (after tests)
-	int				convertFlagsToMask(std::string param, bool flag_positive);
-	int				convertPositiveFlagsToMask(std::string param);
-	int				convertNegativeFlagsToMask(std::string param);
-
-	std::string		convertModeMaskToFlags();
-	size_t			getUserLimit() { return _user_limit; }
-	void			setUserLimit(size_t new_limit) { _user_limit = new_limit; }
-	std::string		getPassword() {return _password; }
-	void			setPassword(std::string s) { _password = s; }
-	
-	//! should be private (after tests)
 
 	channel(std::string name, user_id creator) :
 			_name(name), _description("Super channel " + name), _modes(0),
@@ -65,12 +53,14 @@ public:
 	size_t		getSize() const;
 	void		addToInvitList(user_id id, std::string nick) { _invit_list.insert(std::pair<user_id, std::string>(id, nick));}
 	void		removeFromInvitList(user_id id) { _invit_list.erase(id);}
-	bool		isOnInvitList(user_id id) const
-	{ 
-					if (_invit_list.find(id) != _invit_list.end())
-						return true;
-					return false;
-	}
+	bool		isOnInvitList(user_id id) const;
+	int				convertFlagsToMask(std::string param, bool flag_positive);
+	std::string		convertModeMaskToFlags();
+
+	size_t			getUserLimit() { return _user_limit; }
+	void			setUserLimit(size_t new_limit) { _user_limit = new_limit; }
+	std::string		getPassword() {return _password; }
+	void			setPassword(std::string s) { _password = s; }
 
 	users_list::iterator		getUsers() { return _users.begin();}
 	users_list::iterator		getEnd() { return _users.end();}
@@ -78,7 +68,6 @@ public:
 	bool		isFlagSets(int flag) const;
 	void		addFlags(int flag);
 	void		removeFlags(int flag);
-	//! not sure if needded
 	void		toggleFlag(int flag);
 
 
@@ -87,7 +76,6 @@ public:
 	bool		isOperator(user_id id) const;
 	void		replaceLastOperator();
 	void		sendToAll(ircServer& server, const char *msg) const;
-	//void		sendToOne(const char *msg) const;	
 
 	// DEBUG
 	void		printUsers() const;

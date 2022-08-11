@@ -67,8 +67,7 @@ std::string	getChunk(std::string msg, std::string param) {
 }
 
 void	ircServer::registerUser(users_map::iterator &it) {
-	if (getChunk(it->second._msg, "CAP").size() > 0 && 
-		getChunk(it->second._msg, "PASS").size() > 0  &&
+	if (getChunk(it->second._msg, "PASS").size() > 0  &&
 		getChunk(it->second._msg, "NICK").size() > 0  &&
 		getChunk(it->second._msg, "USER").size() > 0  ) {
 		if (!parse(it, getChunk(it->second._msg, "PASS"))) {
@@ -88,18 +87,8 @@ void	ircServer::registerUser(users_map::iterator &it) {
 		sendToClient(it->first, RPL_OKCONN);
 	}
 	if (getChunk(it->second._msg, "USER").size() > 0  ) {
-
+		std::cerr << "Password Needed, try again" << std::endl;
 		it->second.setStatus(USER_STATUS_DEL);
 		return ;
 	}
-}
-
-int		ircServer::handleChange(int	ret_poll, clients_vector::iterator &it) {
-	if (it->revents & POLLIN) {
-		std::cout << "read data " << it->fd << std::endl;
-		std::cout << "qt of data read : " << this->readData(it) << std::endl;
-		ret_poll--;
-		std::cout << "retpol and of read " << ret_poll << std::endl;
-	}
-	return (ret_poll);
 }

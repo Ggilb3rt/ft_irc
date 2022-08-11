@@ -112,7 +112,6 @@ class	rplManager
 
 		static rplManager	*getInstance();
 
-		std::string	createResponse(int ret, std::string opt_before = "", std::string opt_after = "");
 		std::string	createResponse(user &usr, int ret, std::string opt_before = "", std::string opt_after = "");
 };
 

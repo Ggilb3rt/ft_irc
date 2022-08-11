@@ -1,15 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-#include <iostream>
-
 #include "ircServer.hpp"
 
 volatile std::sig_atomic_t g_signal_status = 0;

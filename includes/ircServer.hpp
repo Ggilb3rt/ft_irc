@@ -7,7 +7,6 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <poll.h>
 
 #include <cerrno>
@@ -39,7 +38,7 @@ class ircServer
 #define ADDRESS_NAME "localhost"
 #define BACKLOG 10 // the number of connection allowed on the incomming queue
 #define FDLIMIT 1021
-#define MASK (POLLIN) // + POLLRDHUP + POLLHUP) //+ POLLERR + POLLNVAL + POLLRDHUP)
+#define MASK (POLLIN)
 
 #define USER_STATUS_DEL	2
 #define USER_STATUS_PENDING 0
@@ -77,9 +76,6 @@ private:
 	void			init();
 	void			initAddrInfo();
 	void			createMasterSocket();
-
-	// listen
-	int				handleChange(int	ret_poll, clients_vector::iterator &it);
 
 	// read and parse
 	int				readData(clients_vector::iterator);

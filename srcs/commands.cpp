@@ -144,6 +144,7 @@ bool	ircServer::handleUser(users_map::iterator pair, std::vector<std::string> &a
 bool		ircServer::pass(users_map::iterator pair, std::vector<std::string> &argvec) {
 	std::string	pass = argvec[0];
 	if (pass != this->_pass) {
+		std::cerr << "Incorrect Password" << std::endl;
 		return (false);
 	}
 	else if (pass.size() < 1) {

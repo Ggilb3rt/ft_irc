@@ -1,12 +1,6 @@
 #include "ircServer.hpp"
 #include "channelClass.hpp"
 
-/*
-	Idée : les fonctions returns le message de retour que send() 
-	devra envoyer au client
-
-*/
-
 int		channel::convertFlagsToMask(std::string param, bool flag_positive)
 {
 	std::string	valid_flags = CHAN_FLAGS_VALID;
@@ -162,6 +156,13 @@ void		channel::replaceLastOperator()
 		it++;
 	}
 	this->setUserRole(_users.begin()->first, true);
+}
+
+bool		channel::isOnInvitList(user_id id) const
+{ 
+	if (_invit_list.find(id) != _invit_list.end())
+		return true;
+	return false;
 }
 
 // DEBUG

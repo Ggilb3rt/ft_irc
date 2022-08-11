@@ -14,7 +14,7 @@
 NAME = ircserv
 
 # Port to host the server
-PORT = 6697
+PORT = 6698
 
 # Password for the server
 PSWD = superIrc

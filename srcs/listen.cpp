@@ -39,14 +39,13 @@ void	ircServer::startListen()
 						break ;
 				}
 				for (users_map::iterator it = _users.begin(); it != _users.end(); it++) {
-					std::cout << "STATUS[" << it->second.getNick() << "][" << it->first << "] ==" << it->second.getStatus() << std::endl;
+					if (it->second.getStatus() == USER_STATUS_PENDING) {
+						registerUser(it);
+					}
 					if (it->second.getStatus() == USER_STATUS_DEL) {
 						removeClient(it);
 						this->printUsers();
 						break ;
-					}
-					else if (it->second.getStatus() == USER_STATUS_PENDING) {
-						registerUser(it);
 					}
 				}
 			}
@@ -58,7 +57,6 @@ std::string	getChunk(std::string msg, std::string param) {
 	std::string chunk;
 	size_t pos_param;
 	size_t pos_end;
-
 	pos_param = msg.find(param);
 	pos_end = msg.find(END_MSG, pos_param);
 	if (pos_param == std::string::npos || pos_end == std::string::npos) {
@@ -77,7 +75,7 @@ void	ircServer::registerUser(users_map::iterator &it) {
 			it->second.setStatus(USER_STATUS_DEL);
 			return ;
 		}
-		if (!parse(it, getChunk(it->second._msg, "NICK"))) {
+		if (!parse(it, getChunk(it->second._msg, "NICK")))	 {
 			it->second.setStatus(USER_STATUS_DEL);
 			return ;
 		}

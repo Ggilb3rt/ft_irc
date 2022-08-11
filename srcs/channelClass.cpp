@@ -121,7 +121,6 @@ void		channel::removeFlags(int flag)
 				this->setUserLimit(0);
 			if (i == CHAN_MASK_K)
 				this->setPassword("");
-			//! remove invited list ?
 		}
 		i++;
 	}

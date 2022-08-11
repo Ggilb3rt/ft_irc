@@ -20,9 +20,6 @@ bool	ircServer::notice(users_map::iterator pair, std::vector<std::string> &argve
 	std::string		before = "";
 	std::string	dest = argvec[0];
 
-
-	std::cout << "---PRVMSG---\n";
-
 	if (argvec.size() == 0)
 		std::cout << "NOTICE doesn't crash\n";
 	else if (argvec.size() == 1)
@@ -158,14 +155,6 @@ bool		ircServer::pass(users_map::iterator pair, std::vector<std::string> &argvec
 
 bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 {
-		/*
-		TOPIC REPLIES
-			-> ERR_NEEDMOREPARAMS
-			-> ERR_NOTONCHANNEL (in setDescription())
-			-> RPL_NOTOPIC (in setDescription())
-			-> RPL_TOPIC
-			-> ERR_CHANOPRIVSNEEDED (in setDescription())
-	*/
 	int						ret;
 	channel_map::iterator	chan_it;
 	std::string				chan;
@@ -196,15 +185,6 @@ bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 
 bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 {
-	/*
-		JOIN REPLIES
-			-> ERR_NEEDMOREPARAMS              -x ERR_BANNEDFROMCHAN
-			-> ERR_INVITEONLYCHAN              -> ERR_BADCHANNELKEY
-			-> ERR_CHANNELISFULL               -x ERR_BADCHANMASK
-			-x ERR_NOSUCHCHANNEL               -x ERR_TOOMANYCHANNELS
-			-> RPL_TOPIC
-	*/
-
 	std::vector<std::string>	chans;
 	std::vector<std::string>	keys;
 	channel_map::iterator		chan_exist;
@@ -265,13 +245,8 @@ bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 	return (true);
 }
 
-bool	ircServer::part(users_map::iterator user, const std::vector<std::string> params)
+bool	ircServer::part(users_map::iterator user, std::vector<std::string> params)
 {
-	/*
-		PART REPLIES
-		-> ERR_NEEDMOREPARAMS             -> ERR_NOSUCHCHANNEL
-        -> ERR_NOTONCHANNEL
-	*/
 	std::vector<std::string>					chans;
 	channel_map::iterator						chan_exist;
 	bool										send_part_msg = true;
@@ -310,15 +285,8 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 	return (true);
 }
 
-bool	ircServer::kick(users_map::iterator user, const std::vector<std::string> params)
+bool	ircServer::kick(users_map::iterator user, std::vector<std::string> params)
 {
-	/*
-		KICK REPLIES
-           -> ERR_NEEDMOREPARAMS              -> ERR_NOSUCHCHANNEL
-           -x ERR_BADCHANMASK (no infos on RFC1459 4.2.8)                 
-		   -> ERR_CHANOPRIVSNEEDED
-           -> ERR_NOTONCHANNEL
-	*/
 	channel_map::iterator	it_chan;
 	user_id					kicker = user->first;
 	user_id					victim;
@@ -369,10 +337,6 @@ bool	ircServer::kick(users_map::iterator user, const std::vector<std::string> pa
 
 bool	ircServer::quit(users_map::iterator user, std::vector<std::string> params)
 {
-	/*
-		QUIT REPLIES
-			none.
-	*/
 	std::string		res(":");
 
 	if (user != _users.end()) {
@@ -391,20 +355,6 @@ bool	ircServer::quit(users_map::iterator user, std::vector<std::string> params)
 
 bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 {
-	/*		
-	RFC for modes is fucked, no params needed for +k wtf ?!
-	so we will use Parameters: <channel> {[+|-]|o|p|s|i|t|l|k} [<limit>] [<user>] [<password>]
-
-		MODE REPLIES
-			-> ERR_NEEDMOREPARAMS
-			-> RPL_CHANNELMODEIS
-			-> ERR_CHANOPRIVSNEEDED          	-> ERR_NOSUCHNICK
-			-> ERR_NOTONCHANNEL               	-x ERR_KEYSET
-			-x RPL_BANLIST                   	-x RPL_ENDOFBANLIST
-			-x ERR_UNKNOWNMODE               	-> ERR_NOSUCHCHANNEL
-			-> ERR_USERSDONTMATCH            	-? RPL_UMODEIS
-			-x ERR_UMODEUNKNOWNFLAG
-	*/
 	channel_map::iterator	it_chan;
 	int						modes_to_add = 0;
 	int						modes_to_remove = 0;
@@ -453,12 +403,6 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 
 bool	ircServer::names(users_map::iterator user, std::vector<std::string> params)
 {
-	/*
-		NAMES REPLIES
-        	-> RPL_NAMREPLY
-			-> RPL_ENDOFNAMES
-	*/
-
 	std::vector<std::string>	chans;
 	bool						print_all = !(params.size());
 	channel_map::iterator		all_chans_it;
@@ -484,12 +428,6 @@ bool	ircServer::names(users_map::iterator user, std::vector<std::string> params)
 
 bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 {
-	/*
-		LIST REPLIES
-			-x ERR_NOSUCHSERVER               -x RPL_LISTSTART (obsolete. Not used.)
-           	-> RPL_LIST                       -> RPL_LISTEND
-	*/
-	
 	rplManager					*rpl_manager = rplManager::getInstance();
 	std::vector<std::string>	chans;
 	bool						print_all = true;
@@ -520,13 +458,6 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 
 bool	ircServer::invite(users_map::iterator user, std::vector<std::string> params)
 {
-	/*
-		LIST REPLIES
-          -> ERR_NEEDMOREPARAMS             -> ERR_NOSUCHNICK
-          -> ERR_NOTONCHANNEL               -> ERR_USERONCHANNEL
-          -> ERR_CHANOPRIVSNEEDED
-          -> RPL_INVITING                   -x RPL_AWAY (works with )
-	*/
 	channel_map::iterator		chan_exist;
 	user_id						invited_user;
 	std::string					rep;

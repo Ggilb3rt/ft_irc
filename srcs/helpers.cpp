@@ -93,7 +93,6 @@ void	ircServer::listRplConditions(users_map::iterator &user, channel_map::iterat
 }
 
 
-// just for debug
 void ircServer::printUsers()
 {
 	users_map::iterator	it = _users.begin();
@@ -138,21 +137,13 @@ void	ircServer::printAddrInfo()
 		void		*addr;
 		std::string	ipver;
 
-		// get the pointer to the address itself,
-		// different fields in IPv4 and IPv6:
 		if (_p->ai_family == AF_INET) { // IPv4
 			struct sockaddr_in *ipv4 = (struct sockaddr_in *)_p->ai_addr;
 			std::cout << "Port is " << ntohs(ipv4->sin_port) << std::endl;
 			addr = &(ipv4->sin_addr);
 			ipver = "IPv4";
-		} else { // IPv6
-			struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)_p->ai_addr;
-			std::cout << "Port is " << ntohs(ipv6->sin6_port) << std::endl;
-			addr = &(ipv6->sin6_addr);
-			ipver = "IPv6";
 		}
 
-		// convert the IP to a string and print it:
 		inet_ntop(_p->ai_family, addr, _ipstr, sizeof _ipstr);
 		std::cout << "\t" << ipver << " : " << _ipstr << std::endl;
 	}
@@ -276,7 +267,6 @@ bool			ircServer::modeJoinParamsAndFlags(int &modes_to_add, std::vector<std::str
 	else if (K_set)
 		pass = params[2];
 
-	// need to check if user is operator
 	if (O_set) {
 		if (!it_chan->second.isOperator(user->first)) {
 			sendToClient(user->first, ERR_CHANOPRIVSNEEDED, it_chan->first);
@@ -289,7 +279,6 @@ bool			ircServer::modeJoinParamsAndFlags(int &modes_to_add, std::vector<std::str
 		it_chan->second.setUserRole(this->getUserByNick(user_edit), true);
 		modes_to_add = clear_bit(modes_to_add, CHAN_MASK_O);
 	}
-	// need to check if limit can atoi()
 	if (L_set) {
 		std::stringstream	ss;
 		size_t				num;					
@@ -298,7 +287,6 @@ bool			ircServer::modeJoinParamsAndFlags(int &modes_to_add, std::vector<std::str
 		ss >> num;
 		it_chan->second.setUserLimit(num);
 	}
-	// set password
 	if (K_set)
 		it_chan->second.setPassword(pass);
 	return (true);

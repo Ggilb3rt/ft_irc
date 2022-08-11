@@ -89,7 +89,6 @@ private:
 
 	// client managements
 	void			addClient(int fd);
-	void			addClient(int fd, std::string nick, std::string name);
 	void			registerUser(users_map::iterator &it);
 	void			removeAllUsersFromChans(int id_user);
 	void			removeClient(users_map::iterator &it);
@@ -120,7 +119,6 @@ private:
 	bool			modeJoinParamsAndFlags(int &modes_to_add, std::vector<std::string> &params, users_map::iterator &user, channel_map::iterator it_chan, std::string &limit, std::string &user_edit, std::string &pass);
 
 
-	// cmds //! il faudrait que tout les params soient const
 	bool	notice(users_map::iterator pair, std::vector<std::string> &argvec);
 	bool	privmsg(users_map::iterator pair, std::vector<std::string> &argvec);
 	bool	nick(users_map::iterator user, std::vector<std::string> &argvec);
@@ -128,8 +126,8 @@ private:
 	bool	pass(users_map::iterator user, std::vector<std::string> &argvec);
 	bool	topic(users_map::iterator user, std::vector<std::string> params);
 	bool	join(users_map::iterator user, std::vector<std::string> params);
-	bool	part(users_map::iterator user, const std::vector<std::string> params);
-	bool	kick(users_map::iterator user, const std::vector<std::string> params);
+	bool	part(users_map::iterator user, std::vector<std::string> params);
+	bool	kick(users_map::iterator user, std::vector<std::string> params);
 	bool	quit(users_map::iterator user, std::vector<std::string> params);
 	bool	mode(users_map::iterator user, std::vector<std::string> params);
 	bool	names(users_map::iterator user, std::vector<std::string> params);

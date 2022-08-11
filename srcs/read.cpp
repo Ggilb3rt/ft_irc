@@ -27,11 +27,12 @@ int		ircServer::readData(clients_vector::iterator client)
 				for (int i = recv_ret; i < maxlen ; i++)
 					buff[i] = '\0';
 				user_x->second._msg += buff;
+				std::cout << "buf = |" << buff << "|\n";
 			}
 			
 			if (user_x->second.getStatus() == USER_STATUS_CONNECTED) {
 				while (pos != std::string::npos) {
-					pos = user_x->second._msg.find("\r\n", old);
+					pos = user_x->second._msg.find(END_MSG, old);
 					if (pos != std::string::npos) {
 						buffer = user_x->second._msg.substr(old, pos - old);
 						parse(user_x, buffer);

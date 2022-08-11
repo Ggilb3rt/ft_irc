@@ -435,6 +435,10 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 		sendToClient(user->first, RPL_CHANNELMODEIS, it_chan->first, it_chan->second.convertModeMaskToFlags());
 		return (true);
 	}
+	if (!it_chan->second.isOperator(user->first)) {
+		sendToClient(user->first, ERR_CHANOPRIVSNEEDED, it_chan->first);
+		return (false);
+	}
 	modes_to_add = it_chan->second.convertFlagsToMask(params[1], true);
 	modes_to_remove = it_chan->second.convertFlagsToMask(params[1], false);
 	if (modeRemoveUserOperator(modes_to_remove, params, user, it_chan) == false)

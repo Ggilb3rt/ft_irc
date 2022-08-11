@@ -66,9 +66,6 @@ kill %3 # will kill job 3
 
 
 ## Search
-### Questions
-? Does we need to implement :
-- services
 
 ### Server
 __Name maximum length 63 characters__[^RFC2812_1_1]
@@ -92,9 +89,10 @@ For users :
   -O, -o, -V
 
 For channels : 
-  -a, -i, -m, -n, -q, -p, -s, -r, -t, -k, -l, -b, -e, -I (see details in [RFC2811 4](https://www.rfcreader.com/#rfc2811_line281))
+  -a, -i, -m, -n, -q, -p, -s, -r, -t, -k, -l, -b, -e, -i (see details in [RFC2811 4](https://www.rfcreader.com/#rfc2811_line281))
 
 All these modes can be manipulated by "channel operators" by using MODE command
+In this project we will use flags opstlik.
 
 ### User
 Each user is distinguished from other by a unique nickname, __max length 9 characters__ (always real ?)[^RFC2812_1_2_1]
@@ -108,6 +106,7 @@ He can[^RFC1459_1_3_1] :
 - MODE (RFC1459 4.2.3)
 - INVITE (RFC1459 4.2.7) (mode +i (RFC2811 2.4))
 - TOPIC (RFC1459 4.2.4)
+
 Not needed :
 - SQUIT (RFC2812 3.1.8) because no server-server communication
 
@@ -135,9 +134,9 @@ Not all implementations use CR-LF[^RFC1459_8]
 Needed commands (cf RFC1459 4.x) :
 __We have to debate about what is needed and what is not following the subject.__
 - Connection (4.1)
-  - [ ] PASS
-  - [ ] NICK
-  - [ ] USER
+  - [x] PASS
+  - [x] NICK
+  - [x] USER
   - SERVER (not needed, only server-server)
   - OPER
   - [x] QUIT (bug etrange)
@@ -145,7 +144,7 @@ __We have to debate about what is needed and what is not following the subject._
 - Channel (4.2)
   - [x] JOIN
   - [x] PART (need to sendMessageToAll)
-  - [ ] MODE
+  - [x] MODE
   - [x] TOPIC
   - [x] NAMES
   - [x] LIST
@@ -161,8 +160,8 @@ __We have to debate about what is needed and what is not following the subject._
   - ADMIN
   - INFO
 - Sending messages (4.4)
-  - [ ] PRIVMSG (mode +n, +m, +v (RFC2811 2.4)) (! irssi use command "/MSG user message" syntax)
-  - [ ] NOTICE
+  - [x] PRIVMSG (mode +n, +m, +v (RFC2811 2.4)) (! irssi use command "/MSG user message" syntax)
+  - [x] NOTICE
 - User (4.5)
   - WHO
   - WHOIS
@@ -174,10 +173,10 @@ __We have to debate about what is needed and what is not following the subject._
   - ERROR
 - OPTIONALS
   - lol nope
-- all operators specials habilities are needed
+- all operators specials habilities and all channels commands are needed
 
 ### Error replies
-[RFC1459 section 6](https://www.rfcreader.com/#rfc1459_line1993), we just have to copie paste all in a file
+[RFC1459 section 6](https://www.rfcreader.com/#rfc1459_line1993)
 
 ### Funny things
 > "Because of IRC's scandanavian origin, the characters {}| are

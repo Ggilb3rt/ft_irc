@@ -105,17 +105,15 @@ class	rplManager
 		rpl_map	list;
 
 		rplManager();
+		void		printAll();
 
 	public:
-		// rplManager(rplManager &copy) { delete _rplManager; }
-		// void operator=(const rplManager &other) { delete _rplManager; }
 		~rplManager();
 
 		static rplManager	*getInstance();
 
 		std::string	createResponse(int ret, std::string opt_before = "", std::string opt_after = "");
 		std::string	createResponse(user &usr, int ret, std::string opt_before = "", std::string opt_after = "");
-		void		printAll();
 };
 
 #endif

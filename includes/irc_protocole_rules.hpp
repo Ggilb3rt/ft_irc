@@ -25,13 +25,4 @@ enum chan_mask {
 	CHAN_MASK_K
 };
 
-//            o - give/take channel operator privileges;
-//            p - private channel flag;
-//            s - secret channel flag;
-//            i - invite-only channel flag;
-//            t - topic settable by channel operator only flag;
-//            l - set the user limit to channel;
-//            k - set a channel key (password).
-
-
 #endif

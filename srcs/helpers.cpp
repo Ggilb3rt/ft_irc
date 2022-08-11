@@ -227,12 +227,10 @@ bool			ircServer::modeRemoveUserOperator(int &modes_to_remove, std::vector<std::
 		if (params.size() != 3) {
 			std::string res(it_chan->first + " MODE");
 			sendToClient(user->first, ERR_NEEDMOREPARAMS, res);
-			// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
 			return (false);
 		}
 		if (user->first != this->getUserByNick(params[2])) {
 				sendToClient(user->first, ERR_USERSDONTMATCH);
-				// std::cout << rpl_manager->createResponse(ERR_USERSDONTMATCH);
 				return (false);
 		}
 		it_chan->second.setUserRole(this->getUserByNick(user->second.getNick()), false);

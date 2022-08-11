@@ -19,6 +19,8 @@
 #define ERR_CANNOTSENDTOCHAN_MSG	" :Cannot send to channel"
 #define ERR_NORECIPIENT				411
 #define ERR_NORECIPIENT_MSG			" :No recipient given"
+#define ERR_UNKNOWNCOMMAND			421
+#define ERR_UNKNOWNCOMMAND_MSG		"  :Unknown command" // 421 <command>
 #define ERR_ONEUSNICKNAME			432
 #define ERR_ONEUSNICKNAME_MSG		" :Erroneous nickname" // 401 <nickname>
 #define ERR_NICKNAMEINUSE			433

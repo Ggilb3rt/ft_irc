@@ -34,6 +34,7 @@ private:
 
 public:
 	//! should be private (after tests)
+	int				convertFlagsToMask(std::string param, bool flag_positive);
 	int				convertPositiveFlagsToMask(std::string param);
 	int				convertNegativeFlagsToMask(std::string param);
 
@@ -42,6 +43,7 @@ public:
 	void			setUserLimit(size_t new_limit) { _user_limit = new_limit; }
 	std::string		getPassword() {return _password; }
 	void			setPassword(std::string s) { _password = s; }
+	
 	//! should be private (after tests)
 
 	channel(std::string name, user_id creator) :

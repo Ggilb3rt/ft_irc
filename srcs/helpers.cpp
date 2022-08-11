@@ -77,15 +77,15 @@ void	ircServer::listRplConditions(users_map::iterator &user, channel_map::iterat
 	rep += " ";
 	ss << all_chans_it->second._users.size();
 	rep += ss.str();
-	if (all_chans_it->second.isFlagSets(CHAN_MASK_P)) {
+	if (all_chans_it->second.isFlagSets(CHAN_MASK_S)) {
+		if (all_chans_it->second.isOnChannel(user->first))
+			sendToClient(user->first, RPL_LIST, rep, all_chans_it->second.getDescription());
+	}
+	else if (all_chans_it->second.isFlagSets(CHAN_MASK_P)) {
 		if (all_chans_it->second.isOnChannel(user->first))
 			sendToClient(user->first, RPL_LIST, rep, all_chans_it->second.getDescription());
 		else
 			sendToClient(user->first, RPL_LIST, rep, "Prv");
-	}
-	else if (all_chans_it->second.isFlagSets(CHAN_MASK_S)) {
-		if (all_chans_it->second.isOnChannel(user->first))
-			sendToClient(user->first, RPL_LIST, rep, all_chans_it->second.getDescription());
 	}
 	else {
 		sendToClient(user->first, RPL_LIST, rep, all_chans_it->second.getDescription());
@@ -218,4 +218,90 @@ void	ircServer::sendToChannel(user sender, channel chan, int code, std::string b
 			sendToClient(sender.getId(), pos->first, code, before, after);
 		pos++;
 	}
+}
+
+bool			ircServer::modeRemoveUserOperator(int &modes_to_remove, std::vector<std::string> &params,
+											users_map::iterator &user, channel_map::iterator it_chan)
+{
+	if (get_bit(modes_to_remove, CHAN_MASK_O)) {
+		if (params.size() != 3) {
+			std::string res(it_chan->first + " MODE");
+			sendToClient(user->first, ERR_NEEDMOREPARAMS, res);
+			// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
+			return (false);
+		}
+		if (user->first != this->getUserByNick(params[2])) {
+				sendToClient(user->first, ERR_USERSDONTMATCH);
+				// std::cout << rpl_manager->createResponse(ERR_USERSDONTMATCH);
+				return (false);
+		}
+		it_chan->second.setUserRole(this->getUserByNick(user->second.getNick()), false);
+		modes_to_remove = clear_bit(modes_to_remove, CHAN_MASK_O);
+	}
+	return (true);
+}
+
+bool			ircServer::modeJoinParamsAndFlags(int &modes_to_add, std::vector<std::string> &params,
+											users_map::iterator &user, channel_map::iterator it_chan,
+											std::string &limit, std::string &user_edit, std::string &pass)
+{
+	size_t	count = 0;
+	bool	L_set = get_bit(modes_to_add, CHAN_MASK_L);
+	bool	O_set = get_bit(modes_to_add, CHAN_MASK_O);
+	bool	K_set = get_bit(modes_to_add, CHAN_MASK_K);
+
+	if (L_set)
+		count++;
+	if (O_set)
+		count++;
+	if (K_set)
+		count++;
+	if ((params.size() - 2) < count) {
+		sendToClient(user->first, ERR_NEEDMOREPARAMS, "MODE");
+		return (false);
+	}
+	if (L_set) {
+		limit = params[2];
+		if (O_set) {
+			user_edit = params[3];
+			if (K_set)
+				pass = params[4];
+		}
+		else if (K_set)
+			pass = params[3];
+	}
+	else if (O_set) {
+		user_edit = params[2];
+		if (K_set)
+			pass = params[3];
+	}
+	else if (K_set)
+		pass = params[2];
+
+	// need to check if user is operator
+	if (O_set) {
+		if (!it_chan->second.isOperator(user->first)) {
+			sendToClient(user->first, ERR_CHANOPRIVSNEEDED, it_chan->first);
+			return (false);
+		}
+		if (!it_chan->second.isOnChannel(this->getUserByNick(user_edit))) {
+			sendToClient(user->first, ERR_NOSUCHNICK, user_edit);
+			return (false);
+		}
+		it_chan->second.setUserRole(this->getUserByNick(user_edit), true);
+		modes_to_add = clear_bit(modes_to_add, CHAN_MASK_O);
+	}
+	// need to check if limit can atoi()
+	if (L_set) {
+		std::stringstream	ss;
+		size_t				num;					
+		
+		ss << limit;
+		ss >> num;
+		it_chan->second.setUserLimit(num);
+	}
+	// set password
+	if (K_set)
+		it_chan->second.setPassword(pass);
+	return (true);
 }

@@ -54,6 +54,7 @@ rplManager::rplManager()
 	list.insert(new_pair(RPL_OKNOTICE, RPL_OKNOTICE_MSG));
 	list.insert(new_pair(RPL_INVITING, RPL_INVITING_MSG));
 	list.insert(new_pair(ERR_USERSDONTMATCH, ERR_USERSDONTMATCH_MSG));
+	list.insert(new_pair(ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG));
 
 }
 

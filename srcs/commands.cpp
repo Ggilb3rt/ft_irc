@@ -1,5 +1,19 @@
 #include "ircServer.hpp"
 
+std::vector<std::string>	split_in_vect(std::string base, std::string delimiter)
+{
+	std::vector<std::string>	ret;
+	size_t						found = 0;
+	size_t						start = 0;
+
+	while (found != std::string::npos) {
+		found = base.find(delimiter, start);
+		ret.push_back(base.substr(start, found - start));
+		start = found + delimiter.size();
+	}
+	return (ret);
+}
+
 bool	ircServer::notice(users_map::iterator pair, std::vector<std::string> &argvec) {
 	channel_map::iterator	pos;
 	int						fd;
@@ -180,21 +194,6 @@ bool	ircServer::topic(users_map::iterator user, std::vector<std::string> params)
 	return (false);
 }
 
-//! VOIR AVEC PIERRE SI POSSIBLE D"UTILISER SON SPLIT POUR EVITER LES DOUBLONS
-std::vector<std::string>	split_in_vect(std::string base, std::string delimiter)
-{
-	std::vector<std::string>	ret;
-	size_t						found = 0;
-	size_t						start = 0;
-
-	while (found != std::string::npos) {
-		found = base.find(delimiter, start);
-		ret.push_back(base.substr(start, found - start));
-		start = found + delimiter.size();
-	}
-	return (ret);
-}
-
 bool	ircServer::join(users_map::iterator user, std::vector<std::string> params)
 {
 	/*
@@ -292,6 +291,7 @@ bool	ircServer::part(users_map::iterator user, const std::vector<std::string> pa
 		else {
 			if (chan_exist->second.removeUser(user->first) == 0) {
 				sendToClient(user->first, ERR_NOTONCHANNEL, chans[i]);
+				return (false);
 			}
 			if (send_part_msg && params.size() > 1) {
 				std::string ret(chan_exist->first + " :" + params[1]);
@@ -339,10 +339,8 @@ bool	ircServer::kick(users_map::iterator user, const std::vector<std::string> pa
 		sendToClient(user->first, ERR_NOSUCHCHANNEL, cur_chan);
 		return (false);
 	}
-	// check if kicker is operator
 	if (it_chan->second.isOperator(kicker)) {
 		if (!it_chan->second.isOnChannel(victim)) {
-			// check if victim exist
 			sendToClient(user->first, ERR_NOTONCHANNEL, cur_chan);
 			return (false);
 		}
@@ -407,7 +405,6 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 			-> ERR_USERSDONTMATCH            	-? RPL_UMODEIS
 			-x ERR_UMODEUNKNOWNFLAG
 	*/
-
 	channel_map::iterator	it_chan;
 	int						modes_to_add = 0;
 	int						modes_to_remove = 0;
@@ -417,127 +414,38 @@ bool	ircServer::mode(users_map::iterator user, std::vector<std::string> params)
 
 	if (params.size() == 0) {
 		sendToClient(user->first, ERR_NEEDMOREPARAMS, "MODE");
-		// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
 		return (false);
+	}
+	if (params.size() > 1) {
+		if (params[0][0] != '#' && params[1].find("+i") != std::string::npos) {
+			sendToClient(user->first, ERR_UNKNOWNCOMMAND, "MODE +i");
+			return (false);
+		}
 	}
 	it_chan = _channel.find(params[0]);
 	if (it_chan == _channel.end()) {
 		sendToClient(user->first, ERR_NOSUCHCHANNEL, params[0]);
-		// std::cout << rpl_manager->createResponse(ERR_NOSUCHCHANNEL, params[0]);
 		return (false);
 	}
 	if (!it_chan->second.isOnChannel(user->first)) {
 		sendToClient(user->first, ERR_NOTONCHANNEL, params[0]);
-		// std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, params[0]);
 		return (false);
 	}
 	if (params.size() < 2) {
 		sendToClient(user->first, RPL_CHANNELMODEIS, it_chan->first, it_chan->second.convertModeMaskToFlags());
 		return (true);
 	}
-	modes_to_add = it_chan->second.convertPositiveFlagsToMask(params[1]);
-	modes_to_remove = it_chan->second.convertNegativeFlagsToMask(params[1]);
-
-
-	//! CHECK FOR REMOVE user operator
-	// check if -o user == user_edit
-	//		else return ERR_USERSDONTMATCH
-	if (get_bit(modes_to_remove, CHAN_MASK_O)) {
-		if (params.size() != 3) {
-			std::string res(it_chan->first + " MODE");
-			sendToClient(user->first, ERR_NEEDMOREPARAMS, res);
-			// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
-			return (false);
-		}
-		if (user->first != this->getUserByNick(params[2])) {
-			sendToClient(user->first, ERR_USERSDONTMATCH);
-			// std::cout << rpl_manager->createResponse(ERR_USERSDONTMATCH);
-			return (false);
-		}
-		it_chan->second.setUserRole(this->getUserByNick(user->second.getNick()), false);
-		modes_to_remove = clear_bit(modes_to_remove, CHAN_MASK_O);
-	}
-
-
-
-	//! CHECK FOR ADD
-	// check mode add who need params l|o|k
-	size_t	count = 0;
-	bool	L_set = get_bit(modes_to_add, CHAN_MASK_L);
-	bool	O_set = get_bit(modes_to_add, CHAN_MASK_O);
-	bool	K_set = get_bit(modes_to_add, CHAN_MASK_K);
-
-	if (L_set)
-		count++;
-	if (O_set)
-		count++;
-	if (K_set)
-		count++;
-	if ((params.size() - 2) < count) {
-		sendToClient(user->first, ERR_NEEDMOREPARAMS, "MODE");
-		// std::cout << rpl_manager->createResponse(ERR_NEEDMOREPARAMS, "MODE");
+	modes_to_add = it_chan->second.convertFlagsToMask(params[1], true);
+	modes_to_remove = it_chan->second.convertFlagsToMask(params[1], false);
+	if (modeRemoveUserOperator(modes_to_remove, params, user, it_chan) == false)
 		return (false);
-	}
-	/*
-	L | O | K | LO | LOK | LK | OK 
-	*/
-	if (L_set) {
-		limit = params[2];
-		if (O_set) {
-			user_edit = params[3];
-			if (K_set)
-				pass = params[4];
-		}
-		else if (K_set)
-			pass = params[3];
-	}
-	else if (O_set) {
-		user_edit = params[2];
-		if (K_set)
-			pass = params[3];
-	}
-	else if (K_set)
-		pass = params[2];
-
-
-	// need to check if user is operator
-	if (O_set) {
-		if (!it_chan->second.isOperator(user->first)) {
-			sendToClient(user->first, ERR_CHANOPRIVSNEEDED, it_chan->first);
-			// std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, it_chan->first);
-			return (false);
-		}
-		if (!it_chan->second.isOnChannel(this->getUserByNick(user_edit))) {
-			sendToClient(user->first, ERR_NOSUCHNICK, user_edit);
-			// std::cout << rpl_manager->createResponse(ERR_NOSUCHNICK, user_edit);
-			return (false);
-		}
-		it_chan->second.setUserRole(this->getUserByNick(user_edit), true);
-		modes_to_add = clear_bit(modes_to_add, CHAN_MASK_O);
-	}
-	// need to check if limit can atoi()
-	if (L_set) {
-		std::stringstream	ss;
-		size_t				num;					
-		
-		ss << limit;
-		ss >> num;
-		it_chan->second.setUserLimit(num);
-	}
-	// set password
-	if (K_set)
-		it_chan->second.setPassword(pass);
-
-	//! CHANGE MODES
+	if (modeJoinParamsAndFlags(modes_to_add, params, user, it_chan, limit, user_edit, pass) == false)
+		return (false);
 	it_chan->second.removeFlags(modes_to_remove);
 	it_chan->second.addFlags(modes_to_add);
-	// std::cout << "Channel <" << it_chan->first << "> mode " << it_chan->second.convertModeMaskToFlags() << " | " << it_chan->second._modes << std::endl;
 	sendToClient(user->first, RPL_CHANNELMODEIS, it_chan->first, it_chan->second.convertModeMaskToFlags());
-	// std::cout << rpl_manager->createResponse(RPL_CHANNELMODEIS, it_chan->first, it_chan->second.convertModeMaskToFlags());
 	return (true);
 }
-
-
 
 bool	ircServer::names(users_map::iterator user, std::vector<std::string> params)
 {
@@ -580,9 +488,11 @@ bool	ircServer::list(users_map::iterator user, std::vector<std::string> params)
 	
 	rplManager					*rpl_manager = rplManager::getInstance();
 	std::vector<std::string>	chans;
-	bool						print_all = !(params[0].size());
+	bool						print_all = true;
 	channel_map::iterator		all_chans_it;
 
+	if (params.size() > 0)
+		print_all = !(params[0].size());
 	if (!print_all) {
 		chans = split_in_vect(params[0], MSG_MULTI_PARAM_DELIM);
 		for (std::vector<std::string>::iterator chan = chans.begin();
@@ -613,7 +523,6 @@ bool	ircServer::invite(users_map::iterator user, std::vector<std::string> params
           -> ERR_CHANOPRIVSNEEDED
           -> RPL_INVITING                   -x RPL_AWAY (works with )
 	*/
-
 	channel_map::iterator		chan_exist;
 	user_id						invited_user;
 	std::string					rep;
@@ -631,7 +540,6 @@ bool	ircServer::invite(users_map::iterator user, std::vector<std::string> params
 	if (chan_exist != _channel.end()) {
 		if (!chan_exist->second.isOnChannel(user->first)) {
 			sendToClient(user->first, ERR_NOTONCHANNEL, chan_exist->first);
-			// std::cout << rpl_manager->createResponse(ERR_NOTONCHANNEL, chan_exist->first);
 			return (false);
 		}
 		if (chan_exist->second.isOnChannel(invited_user)) {
@@ -639,13 +547,11 @@ bool	ircServer::invite(users_map::iterator user, std::vector<std::string> params
 			rep += " ";
 			rep += chan_exist->first;
 			sendToClient(user->first, ERR_USERONCHANNEL, rep);
-			// std::cout << rpl_manager->createResponse(ERR_USERONCHANNEL, rep);
 			return (false);
 		}
 		if (chan_exist->second.isFlagSets(CHAN_MASK_I)
 			&& !chan_exist->second.isOperator(user->first)) {
 			sendToClient(user->first, ERR_CHANOPRIVSNEEDED, chan_exist->first);
-			// std::cout << rpl_manager->createResponse(ERR_CHANOPRIVSNEEDED, chan_exist->first);
 			return (false);
 		}
 		rep = user->second.getNick();
@@ -653,7 +559,6 @@ bool	ircServer::invite(users_map::iterator user, std::vector<std::string> params
 		rep += chan_exist->first;
 		sendToClient(user->first, RPL_INVITING, chan_exist->first, params[0]);
 		sendToClient(user->first, this->getUserByNick(params[0]), RPL_OKNINVITE, std::string(), rep);
-		//! must put something to channel to say he is invited
 		chan_exist->second.addToInvitList(invited_user, params[0]);
 		return (true);
 	}

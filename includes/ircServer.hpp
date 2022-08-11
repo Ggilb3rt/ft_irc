@@ -116,14 +116,15 @@ private:
 								rplManager *rpl_manager);
 	void			printUsers();
 	void			printChannels();
-
+	bool			modeRemoveUserOperator(int &modes_to_remove, std::vector<std::string> &params, users_map::iterator &user, channel_map::iterator it_chan);
+	bool			modeJoinParamsAndFlags(int &modes_to_add, std::vector<std::string> &params, users_map::iterator &user, channel_map::iterator it_chan, std::string &limit, std::string &user_edit, std::string &pass);
 
 
 	// cmds //! il faudrait que tout les params soient const
-	bool	handleUser(users_map::iterator user, std::vector<std::string> &argvec);
-	bool	privmsg(users_map::iterator pair, std::vector<std::string> &argvec);
 	bool	notice(users_map::iterator pair, std::vector<std::string> &argvec);
+	bool	privmsg(users_map::iterator pair, std::vector<std::string> &argvec);
 	bool	nick(users_map::iterator user, std::vector<std::string> &argvec);
+	bool	handleUser(users_map::iterator user, std::vector<std::string> &argvec);
 	bool	pass(users_map::iterator user, std::vector<std::string> &argvec);
 	bool	topic(users_map::iterator user, std::vector<std::string> params);
 	bool	join(users_map::iterator user, std::vector<std::string> params);
@@ -134,7 +135,6 @@ private:
 	bool	names(users_map::iterator user, std::vector<std::string> params);
 	bool	list(users_map::iterator user, std::vector<std::string> params);
 	bool	invite(users_map::iterator user, std::vector<std::string> params);
-	
 	bool	pong(users_map::iterator user, std::vector<std::string> params);
 
 

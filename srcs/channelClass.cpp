@@ -7,8 +7,7 @@
 
 */
 
-
-int		channel::convertPositiveFlagsToMask(std::string param)
+int		channel::convertFlagsToMask(std::string param, bool flag_positive)
 {
 	std::string	valid_flags = CHAN_FLAGS_VALID;
 	int			mask = 0;
@@ -20,39 +19,22 @@ int		channel::convertPositiveFlagsToMask(std::string param)
 		else if (*it == '+')
 			mask_add = true;
 		else if (valid_flags.find(*it) != std::string::npos) {
-			if (mask_add)
-				mask = set_bit(mask, valid_flags.find(*it));
-			else
-				mask = clear_bit(mask, valid_flags.find(*it));
+			if (flag_positive) {
+				if (mask_add)
+					mask = set_bit(mask, valid_flags.find(*it));
+				else
+					mask = clear_bit(mask, valid_flags.find(*it));
+			}
+			else {
+				if (mask_add)
+					mask = clear_bit(mask, valid_flags.find(*it));
+				else
+					mask = set_bit(mask, valid_flags.find(*it));
+			}
 		}
 	}
-	// std::cout << mask << std::endl;
 	return (mask);
 }
-
-int		channel::convertNegativeFlagsToMask(std::string param)
-{
-
-	std::string	valid_flags = CHAN_FLAGS_VALID;
-	int			mask = 0;
-	bool		mask_add = true;
-
-	for (std::string::iterator it = param.begin(); it != param.end(); it++) {
-		if (*it == '-')
-			mask_add = false;
-		else if (*it == '+')
-			mask_add = true;
-		else if (valid_flags.find(*it) != std::string::npos) {
-			if (mask_add)
-				mask = clear_bit(mask, valid_flags.find(*it));
-			else
-				mask = set_bit(mask, valid_flags.find(*it));
-		}
-	}
-	// std::cout << mask << std::endl;
-	return (mask);
-}
-
 
 std::string		channel::convertModeMaskToFlags()
 {
@@ -70,7 +52,6 @@ std::string		channel::convertModeMaskToFlags()
 	}
 	return (flags);
 }
-
 
 ///////////////
 // MODIFIERS //
@@ -101,7 +82,10 @@ bool	channel::addUser(user_id user_fd)
 	return (true);
 }
 
-size_t		channel::removeUser(user_id user_fd) { return (this->_users.erase(user_fd)); }
+size_t		channel::removeUser(user_id user_fd)
+{
+	return (this->_users.erase(user_fd));
+}
 
 void		channel::setUserRole(user_id id, role new_role)
 {
@@ -110,15 +94,10 @@ void		channel::setUserRole(user_id id, role new_role)
 		it->second = new_role;
 }
 
-size_t		channel::getSize() const { return (_users.size()); }
-
-// channel::users_list::iterator	channel::getUser(user_id id)
-// {
-// 	users_list::iterator	it;
-
-// 	it = _users.find(id);
-// 	return (it);
-// }
+size_t		channel::getSize() const
+{
+	return (_users.size());
+}
 
 void		channel::addFlags(int flag)
 {
@@ -146,7 +125,6 @@ void		channel::removeFlags(int flag)
 		}
 		i++;
 	}
-	// _modes = clear_bit(_modes, flag);
 }
 void		channel::toggleFlag(int flag) { _modes = toggle_bit(_modes, flag); }
 bool		channel::isFlagSets(int flag) const {return (get_bit(_modes, flag)); }
@@ -174,7 +152,6 @@ bool		channel::isOperator(user_id id) const
 	return (1);
 }
 
-
 void		channel::replaceLastOperator()
 {
 	users_list::iterator	it = _users.begin();
@@ -187,20 +164,6 @@ void		channel::replaceLastOperator()
 	}
 	this->setUserRole(_users.begin()->first, true);
 }
-
-// void		channel::sendToAll(ircServer& server, const char *msg) const
-// {
-// 	std::map<user_id, role>::const_iterator	it = _users.begin();
-
-// 	// maybe need to add an header to the msg
-// 	while (it != _users.end()) {
-// 		server.sendToClient(it->first, msg);
-// 		it++;
-// 	}
-// }
-
-
-
 
 // DEBUG
 void		channel::printUsers() const
